@@ -8,9 +8,9 @@ namespace ECDsa_Multikey
 {
     internal class Serialize
     {
-        internal static ImportKeyPair(MultikeyModel multikey)
+        internal static MultikeyModel ImportKeyPair()
         {
-
+            throw new NotImplementedException();
         }
     }
 }

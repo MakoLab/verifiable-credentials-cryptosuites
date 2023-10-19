@@ -39,7 +39,7 @@ namespace JsonLdSignatures.Purposes
             {
                 return Result.Fail("The controller is not defined.");
             }
-            JTo
+            throw new NotImplementedException();
         }
     }
 

@@ -40,16 +40,7 @@ namespace ECDsa_Multikey
 
         private static KeyPairInterface CreateKeyPairInterface(MultikeyModel multikey)
         {
-            var flags = KeyPairFlags.None;
-            if (multikey.PublicKeyMultibase is not null)
-            {
-                flags |= KeyPairFlags.Public;
-            }
-            if (multikey.SecretKeyMultibase is not null)
-            {
-                flags |= KeyPairFlags.Secret;
-            }
-            return new KeyPairInterface(multikey, flags);
+            throw new NotImplementedException();
         }
 
         private static void AssertMultikey(MultikeyModel key)

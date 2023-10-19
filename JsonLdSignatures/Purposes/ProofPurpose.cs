@@ -26,7 +26,7 @@ namespace JsonLdSignatures.Purposes
             {
                 var expected = Date.TimeOfDay.TotalMilliseconds;
                 var delta = MaxTimestampDelta * 1000;
-                var created = proof.Created.TimeOfDay.TotalMilliseconds;
+                var created = proof.Created?.TimeOfDay.TotalMilliseconds;
                 if (created <= expected - delta || created >= expected + delta)
                 {
                     return Result.Fail("The proof's created timestamp is out of range.");

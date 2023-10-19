@@ -48,10 +48,5 @@ namespace ECDsa_Multikey
             }
             throw new Exception("Unsupported secret multikey header.");
         }
-
-        internal static int GetSecretKeySize(CngKey keyPair)
-        {
-            
-        }
     }
 }

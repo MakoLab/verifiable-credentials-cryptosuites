@@ -11,4 +11,8 @@
     <PackageReference Include="json-ld.net" Version="1.0.7" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Cryptosuite\Cryptosuite.csproj" />
+  </ItemGroup>
+
 </Project>
