@@ -23,7 +23,7 @@ namespace DataIntegrity
         private readonly string? _verificationMethod;
         private Proof? _proof;
 
-        public DataIntegrityProof(Signer signer, DateTime? date, ICryptosuite cryptoSuite) : base(ProofType)
+        public DataIntegrityProof(Signer signer, DateTime date, ICryptosuite cryptoSuite) : base(ProofType)
         {
             _cryptoSuite = cryptoSuite;
             _date = date;
@@ -37,13 +37,22 @@ namespace DataIntegrity
 
         public override object CreateProof(Document document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
         {
-            var proof = _proof ??= new Proof();
+            var proof = _proof is null ? new Proof() : new Proof(_proof);
             proof.Type = Type;
             var date = _date;
-            if (proof.Created == null && _date == null)
+            if (proof.Created is null && date is null)
             {
                 date = DateTime.UtcNow;
             }
+            if (date is not null)
+            {
+                proof.Created = date;
+            }
+            proof.VerificationMethod = _verificationMethod;
+            proof.CryptoSuiteName = _cryptoSuite.Name;
+            proof = UpdateProof(document, proof, purpose, proofSet, documentLoader);
+            proof = purpose.Update(proof);
+
             throw new NotImplementedException();
         }
 
@@ -93,6 +102,9 @@ namespace DataIntegrity
             return verifier.Verify(verifyData, signature);
         }
 
-
+        public Proof UpdateProof(Document document, Proof proof, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        {
+            return proof;
+        }
     }
 }

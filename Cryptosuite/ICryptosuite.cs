@@ -8,6 +8,6 @@ namespace Cryptosuite
         string RequiredAlgorithm { get; }
         string Name { get; }
         Verifier CreateVerifier(string publicKey);
-        object Canonize(JToken input, JsonLdOptions options);
+        string Canonize(JToken input, JsonLdOptions options);
     }
 }

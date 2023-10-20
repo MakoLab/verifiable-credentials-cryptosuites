@@ -11,19 +11,19 @@ namespace ECDsa_2019_Cryptosuite
 {
     public class ECDsa2019Cryptosuite : ICryptosuite
     {
-        public string RequiredAlgorithm => throw new NotImplementedException();
+        public string RequiredAlgorithm { get { return "P-256"; } }
 
-        public string Name => throw new NotImplementedException();
+        public string Name { get { return "ecdsa-2019"; } }
 
         public Verifier CreateVerifier(string publicKey)
         {
             throw new NotImplementedException();
         }
 
-        public object Canonize(JToken input, JsonLdOptions options)
+        public string Canonize(JToken input, JsonLdOptions options)
         {
             options.format = "application/n-quads";
-            return JsonLdProcessor.Normalize(input, options);
+            return (string)JsonLdProcessor.Normalize(input, options);
         }
     }
 }
