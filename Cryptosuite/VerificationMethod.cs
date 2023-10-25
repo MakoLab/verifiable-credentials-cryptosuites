@@ -1,4 +1,4 @@
-﻿namespace JsonLdSignatures
+﻿namespace Cryptosuite
 {
     public class VerificationMethod
     {

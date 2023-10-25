@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ECDsa_2019_Cryptosuite
 {
-    public class ECDsa2019Cryptosuite : ICryptosuite
+    public class ECDsa2019Cryptosuite : ICryptosuite, ICanonize
     {
         public string RequiredAlgorithm { get { return "P-256"; } }
 
@@ -20,10 +20,23 @@ namespace ECDsa_2019_Cryptosuite
             throw new NotImplementedException();
         }
 
-        public string Canonize(JToken input, JsonLdOptions options)
+        public string Canonize(string input, object options)
         {
-            options.format = "application/n-quads";
-            return (string)JsonLdProcessor.Normalize(input, options);
+            if (options is JsonLdOptions opts)
+            {
+            }
+            else
+            {
+                opts = new JsonLdOptions();
+                foreach (var prop in options.GetType().GetProperties())
+                {
+                    //if prop.Name is in opts, set it
+                    var propInfo = opts.GetType().GetProperty(prop.Name);
+                    propInfo?.SetValue(opts, prop.GetValue(options));
+                }
+            }
+            opts.format = "application/n-quads";
+            return (string)JsonLdProcessor.Normalize(input, opts);
         }
     }
 }

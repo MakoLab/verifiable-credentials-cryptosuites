@@ -1,4 +1,6 @@
-﻿using JsonLdSignatures.Purposes;
+﻿using Cryptosuite;
+using JsonLD.Core;
+using JsonLdSignatures.Purposes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,11 +22,11 @@ namespace JsonLdSignatures.Suites
             this.Type = type;
         }
 
-        public abstract object CreateProof(Document document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
+        public abstract object CreateProof(string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
 
-        public abstract object Derive(Document document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
+        public abstract object Derive(string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
 
-        public abstract bool VerifyProof(Proof proof, Document document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
+        public abstract bool VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
 
         public bool MatchProof(Proof proof)
         {

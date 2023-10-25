@@ -1,14 +1,19 @@
-﻿using System;
+﻿using Cryptosuite.Util;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JsonLdSignatures
+namespace Cryptosuite
 {
     public class Proof
     {
         public string? Id { get; set; }
+        [JsonConverter(typeof(SingleArrayConverter<string>))]
+        public IEnumerable<string>? Context { get; set; }
         public string? Type { get; set; }
         public DateTime? Created { get; set; }
         public DateTime? Expires { get; set; }
@@ -32,6 +37,7 @@ namespace JsonLdSignatures
         public Proof(Proof proof)
         {
             Id = proof.Id;
+            Context = proof.Context;
             Type = proof.Type;
             Created = proof.Created;
             Expires = proof.Expires;
