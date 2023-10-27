@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cryptosuite
+namespace Cryptosuite.Core.Interfaces
 {
     public interface ICreateVerifyData
     {

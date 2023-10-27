@@ -1,4 +1,5 @@
-﻿using Cryptosuite;
+﻿using Cryptosuite.Core;
+using Cryptosuite.Core.Interfaces;
 using FluentResults;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace JsonLdSignatures.Purposes
 {
-    public class ProofPurpose
+    public class ProofPurpose : IProofPurpose
     {
         private string Term { get; }
         private DateTime Date { get; }

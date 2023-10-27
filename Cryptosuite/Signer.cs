@@ -1,4 +1,4 @@
-﻿namespace Cryptosuite
+﻿namespace Cryptosuite.Core
 {
     public class Signer
     {
@@ -8,7 +8,7 @@
 
         public byte[] Sign(object data)
         {
-            throw new System.NotImplementedException();
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,4 +1,6 @@
-﻿using Cryptosuite;
+﻿using Cryptosuite.Core;
+using Cryptosuite.Core.Interfaces;
+using ECDsa_Multikey;
 using JsonLD.Core;
 using Newtonsoft.Json.Linq;
 using System;
@@ -15,9 +17,14 @@ namespace ECDsa_2019_Cryptosuite
 
         public string Name { get { return "ecdsa-2019"; } }
 
-        public Verifier CreateVerifier(string publicKey)
+        public Verifier CreateVerifier(VerificationMethod verificationMethod)
         {
-            throw new NotImplementedException();
+            if (verificationMethod is not MultikeyModel)
+            {
+                throw new Exception("VerificationMethod must be a MultikeyModel");
+            }
+            var key = Multikey.From((MultikeyModel)verificationMethod);
+            return key.Verifier;
         }
 
         public string Canonize(string input, object options)

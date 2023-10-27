@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using Cryptosuite.Core;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -20,9 +21,8 @@ namespace ECDsa_Multikey
             return Algorithm.ExportSubjectPublicKeyInfo();
         }
 
-        public static KeyPairInterface From(JToken key)
+        public static KeyPairInterface From(MultikeyModel multikey)
         {
-            var multikey = key.ToObject<MultikeyModel>() ?? throw new Exception("Invalid key");
             if (multikey.Type is not null && multikey.Type != "Multikey")
             {
                 multikey = Translators.ToMultikey(multikey);
@@ -41,6 +41,7 @@ namespace ECDsa_Multikey
         private static KeyPairInterface CreateKeyPairInterface(MultikeyModel multikey)
         {
             throw new NotImplementedException();
+
         }
 
         private static void AssertMultikey(MultikeyModel key)

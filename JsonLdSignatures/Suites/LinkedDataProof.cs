@@ -1,4 +1,5 @@
-﻿using Cryptosuite;
+﻿using Cryptosuite.Core;
+using FluentResults;
 using JsonLD.Core;
 using JsonLdSignatures.Purposes;
 using System;
@@ -26,7 +27,7 @@ namespace JsonLdSignatures.Suites
 
         public abstract object Derive(string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
 
-        public abstract bool VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
+        public abstract Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader);
 
         public bool MatchProof(Proof proof)
         {

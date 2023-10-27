@@ -1,6 +1,8 @@
-﻿using Cryptosuite;
-using Cryptosuite.Util;
+﻿using Cryptosuite.Core;
+using Cryptosuite.Core.Interfaces;
+using Cryptosuite.Core.Util;
 using ECDsa_2019_Cryptosuite;
+using FluentResults;
 using JsonLD.Core;
 using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
@@ -31,7 +33,7 @@ namespace DataIntegrity
         private Proof? _proof;
         private byte[]? _hashCache;
         private string? _hashDocument;
-        private JsonSerializer _serializer;
+        private readonly JsonSerializer _serializer;
         private static readonly SHA256 SHA256 = SHA256.Create();
 
         public string ContextUrl { get; set; } = DataIntegrityContext;
@@ -89,12 +91,37 @@ namespace DataIntegrity
 
         public override object Derive(string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
         {
-            throw new NotImplementedException();
+            if (_cryptoSuite is IDerive cs)
+            {
+                return cs.Derive(document, purpose, proofSet, documentLoader);
+            }
+            else
+            {
+                throw new Exception($"The cryptosuite {_cryptoSuite.Name} does not support derivation.");
+            }
         }
 
-        public override bool VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public override Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
         {
-            throw new NotImplementedException();
+            byte[] verifyData;
+            if (_cryptoSuite is ICreateVerifyData csv)
+            {
+                verifyData = csv.CreateVerifyData(document, proof, proofSet, documentLoader);
+            }
+            else
+            {
+                verifyData = CreateVerifyData(document, proof, documentLoader);
+            }
+            var verificationMethod = GetVerificationMethod(proof, documentLoader);
+            var verified = VerifySignature(verifyData, verificationMethod, proof);
+            if (verified)
+            {
+                return Result.Ok();
+            }
+            else
+            {
+                return Result.Fail("Invalid signature.");
+            }
         }
 
         public Proof Sign(object verifyData, Proof proof)
@@ -108,7 +135,7 @@ namespace DataIntegrity
             return proof;
         }
 
-        public bool VerifySignature(object verifyData, string verificationMethod, Proof proof)
+        public bool VerifySignature(object verifyData, VerificationMethod verificationMethod, Proof proof)
         {
             var verifier = _cryptoSuite.CreateVerifier(verificationMethod);
             if (_cryptoSuite.RequiredAlgorithm != verifier.Algorithm)
@@ -193,6 +220,25 @@ namespace DataIntegrity
             else
             {
                 throw new ArgumentException($"The document to be signed must contain this suite's @context: {ContextUrl}.");
+            }
+        }
+
+        private VerificationMethod GetVerificationMethod(Proof proof, DocumentLoader documentLoader)
+        {
+            var verificationMethod = proof.VerificationMethod;
+            if (verificationMethod is null)
+            {
+                throw new ArgumentException($"No {nameof(verificationMethod)} found in proof.");
+            }
+            try
+            {
+                var result = documentLoader.LoadDocument(verificationMethod);
+                var doc = result.Document.ToObject<VerificationMethod>() ?? throw new ArgumentException($"Could not load verification method {verificationMethod}.");
+                return doc;
+            }
+            catch (Exception ex)
+            {
+                throw new ArgumentException($"Could not load verification method {verificationMethod}.", ex);
             }
         }
 

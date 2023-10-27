@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Cryptosuite.Core;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -16,7 +17,7 @@ namespace ECDsa_Multikey
                 throw new Exception($"Unsupported key type {keyPair.Type}");
             }
             keyPair.Contexts ??= new List<string> { Constants.ECDsa2019SuiteContextV1Url };
-            if (!IncludesContext(keyPair, Constants.MultikeyContextV1Url))
+            if (!IncludesContext(keyPair, Constants.ECDsa2019SuiteContextV1Url))
             {
                 throw new Exception($"Context not supported {keyPair.Contexts}");
             }

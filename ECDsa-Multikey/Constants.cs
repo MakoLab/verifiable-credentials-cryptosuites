@@ -18,7 +18,7 @@ namespace ECDsa_Multikey
         internal const string ECDsa2019SuiteContextV1Url = "https://w3id.org/security/suites/ecdsa-2019/v1";
         internal const string MultikeyContextV1Url = "https://w3id.org/security/multikey/v1";
 
-        internal const string MultibaseBase58Header = "z";
+        internal const char MultibaseBase58Header = 'z';
 
         internal static readonly byte[] MulticodecP256PublicKeyHeader = new byte[] { 0x80, 0x24 };
         internal static readonly byte[] MulticodecP384PublicKeyHeader = new byte[] { 0x81, 0x24 };

@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cryptosuite\Cryptosuite.csproj" />
+    <ProjectReference Include="..\Cryptosuite\Cryptosuite.Core.csproj" />
   </ItemGroup>
 
 </Project>

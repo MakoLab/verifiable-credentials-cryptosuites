@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using JsonLD.Core;
-using Cryptosuite;
+using Cryptosuite.Core;
 
 namespace JsonLdSignatures.Purposes
 {

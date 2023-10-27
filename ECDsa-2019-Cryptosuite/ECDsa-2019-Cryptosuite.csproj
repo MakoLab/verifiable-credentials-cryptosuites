@@ -12,7 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Cryptosuite\Cryptosuite.csproj" />
+    <ProjectReference Include="..\Cryptosuite\Cryptosuite.Core.csproj" />
+    <ProjectReference Include="..\ECDsa-Multikey\ECDsa-Multikey.csproj" />
   </ItemGroup>
 
 </Project>

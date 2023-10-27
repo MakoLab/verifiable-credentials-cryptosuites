@@ -1,4 +1,5 @@
-﻿using Cryptosuite;
+﻿using Cryptosuite.Core;
+using FluentResults;
 using JsonLD.Core;
 using JsonLdSignatures.Purposes;
 using System;
@@ -24,7 +25,7 @@ namespace JsonLdSignatures.Suites
             throw new NotImplementedException();
         }
 
-        public override bool VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public override Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
         {
             throw new NotImplementedException();
         }

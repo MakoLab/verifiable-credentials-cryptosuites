@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cryptosuite.Util
+namespace Cryptosuite.Core.Util
 {
     public class SingleArrayConverter<T> : JsonConverter
     {

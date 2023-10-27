@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Cryptosuite
+namespace Cryptosuite.Core
 {
     public class Verifier
     {

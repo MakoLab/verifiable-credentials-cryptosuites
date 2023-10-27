@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
-using Cryptosuite.Util;
+using Cryptosuite.Core.Util;
 
-namespace JsonLdSignaturesTests
+namespace Cryptosuite.Core.Tests
 {
     public class SingleArrayConverterTests
     {

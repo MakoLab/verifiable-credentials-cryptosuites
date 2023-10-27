@@ -48,5 +48,52 @@ namespace ECDsa_Multikey
             }
             throw new Exception("Unsupported secret multikey header.");
         }
+
+        internal static int GetSecretKeySize(ECDsa keys)
+        {
+            return keys.ExportParameters(true).Curve.Oid.FriendlyName switch
+            {
+                "nistP256" => 32,
+                "nistP384" => 48,
+                "nistP521" => 66,
+                _ => throw new Exception("Unsupported curve.")
+            };
+        }
+
+        internal static void SetSecretKeyHeader(ECDsa keys, byte[] buffer)
+        {
+            switch (keys.ExportParameters(true).Curve.Oid.FriendlyName)
+            {
+                case "nistP256":
+                    Constants.MulticodecP256SecretKeyHeader.CopyTo(buffer.AsSpan());
+                    break;
+                case "nistP384":
+                    Constants.MulticodecP384SecretKeyHeader.CopyTo(buffer.AsSpan());
+                    break;
+                case "nistP521":
+                    Constants.MulticodecP521SecretKeyHeader.CopyTo(buffer.AsSpan());
+                    break;
+                default:
+                    throw new Exception("Unsupported curve.");
+            }
+        }
+
+        internal static void SetPublicKeyHeader(ECDsa keys, byte[] buffer)
+        {
+            switch (keys.ExportParameters(false).Curve.Oid.FriendlyName)
+            {
+                case "nistP256":
+                    Constants.MulticodecP256PublicKeyHeader.CopyTo(buffer.AsSpan());
+                    break;
+                case "nistP384":
+                    Constants.MulticodecP384PublicKeyHeader.CopyTo(buffer.AsSpan());
+                    break;
+                case "nistP521":
+                    Constants.MulticodecP521PublicKeyHeader.CopyTo(buffer.AsSpan());
+                    break;
+                default:
+                    throw new Exception("Unsupported curve.");
+            }
+        }
     }
 }
