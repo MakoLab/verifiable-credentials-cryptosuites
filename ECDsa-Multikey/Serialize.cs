@@ -1,4 +1,5 @@
-﻿using ECDsa_Multikey;
+﻿using Cryptosuite.Core;
+using ECDsa_Multikey;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -78,6 +79,11 @@ namespace ECDsa_Multikey
                 )
             }
         };
+
+        internal static KeyPair ImportKeyPair(MultikeyModel multikey)
+        {
+            return ImportKeyPair(multikey.Id, multikey.Controller, multikey.SecretKeyMultibase, multikey.PublicKeyMultibase);
+        }
 
         internal static KeyPair ImportKeyPair(string id, string controller, string secretKeyMultibase, string publicKeyMultibase)
         {

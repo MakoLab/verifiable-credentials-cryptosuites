@@ -43,7 +43,7 @@ namespace DataIntegrity
             _cryptoSuite = cryptoSuite;
             _date = date;
             _signer = signer;
-            _verificationMethod = signer?.VerificationMethod;
+            _verificationMethod = signer?.Id;
             if (_signer?.Algorithm != _cryptoSuite.RequiredAlgorithm)
             {
                 throw new ArgumentException($"The signer's algorithm {_signer?.Algorithm} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
@@ -124,7 +124,7 @@ namespace DataIntegrity
             }
         }
 
-        public Proof Sign(object verifyData, Proof proof)
+        public Proof Sign(byte[] verifyData, Proof proof)
         {
             if (_signer is null)
             {
@@ -135,12 +135,12 @@ namespace DataIntegrity
             return proof;
         }
 
-        public bool VerifySignature(object verifyData, VerificationMethod verificationMethod, Proof proof)
+        public bool VerifySignature(byte[] verifyData, VerificationMethod verificationMethod, Proof proof)
         {
             var verifier = _cryptoSuite.CreateVerifier(verificationMethod);
             if (_cryptoSuite.RequiredAlgorithm != verifier.Algorithm)
             {
-                throw new ArgumentException($"The verifier's algorithm {verifier.Algorithm} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
+                throw new ArgumentException($"The verifier's algorithm {verifier.Key} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
             }
             var proofValue = proof.ProofValue ?? throw new ArgumentException($"The proof does not include a valid {nameof(proof.ProofValue)} property.");
             var multibaseHeader = proofValue.Substring(0, 1);

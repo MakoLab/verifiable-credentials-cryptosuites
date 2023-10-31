@@ -11,13 +11,8 @@ namespace ECDsa_Multikey
         public string? PublicKeyMultibase { get; set; }
         public string? SecretKeyMultibase { get; set; }
 
-        public Verifier Verifier { get; set; }
-        public Signer Signer { get; set; }
-
-        public KeyPairInterface()
-        {
-
-        }
+        public Verifier? Verifier { get; set; }
+        public Signer? Signer { get; set; }
 
         public MultikeyModel Export(bool publicKey = true, bool secretKey = false, bool includeContext = true)
         {

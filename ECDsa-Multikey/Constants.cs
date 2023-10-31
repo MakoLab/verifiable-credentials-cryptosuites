@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -28,17 +29,11 @@ namespace ECDsa_Multikey
         internal static readonly byte[] MulticodecP521SecretKeyHeader = new byte[] { 0x88, 0x26 };
     }
 
-    internal static class ECDsaCurve
-    {
-        internal const string P256 = "P-256";
-        internal const string P384 = "P-384";
-        internal const string P521 = "P-521";
-    }
-
     internal static class ECDsaHashFunction
     {
         internal const string SHA256 = "SHA-256";
         internal const string SHA384 = "SHA-384";
         internal const string SHA512 = "SHA-512";
     }
+
 }

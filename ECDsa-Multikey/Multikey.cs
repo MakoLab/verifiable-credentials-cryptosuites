@@ -12,13 +12,23 @@ namespace ECDsa_Multikey
 {
     public class Multikey
     {
-        public ECDsa Algorithm { get; set; }
-        public string PublicKeyMultibase { get; set; }
-        public string SecretKeyMultibase { get; set; }
-
-        public object Export()
+        public static KeyPairInterface Generate(string id, string controller, string curve)
         {
-            return Algorithm.ExportSubjectPublicKeyInfo();
+            var eccurve = ECDsaCurve.ToECCurve(curve);
+            var keypair = new KeyPair
+            {
+                Keys = ECDsa.Create(eccurve),
+            };
+            var kpi = CreateKeyPairInterface(keypair);
+            var exported = kpi.Export(publicKey: true);
+            var publicKeyMultibase = exported.PublicKeyMultibase;
+            if (controller is not null && id is null)
+            {
+                id = $"{controller}#{publicKeyMultibase}";
+            }
+            kpi.Id = id;
+            kpi.Controller = controller;
+            return kpi;
         }
 
         public static KeyPairInterface From(MultikeyModel multikey)
@@ -40,8 +50,28 @@ namespace ECDsa_Multikey
 
         private static KeyPairInterface CreateKeyPairInterface(MultikeyModel multikey)
         {
-            throw new NotImplementedException();
+            var keypair = Serialize.ImportKeyPair(multikey);
+            return CreateKeyPairInterface(keypair);
+        }
 
+        private static KeyPairInterface CreateKeyPairInterface(KeyPair keyPair)
+        {
+            if (keyPair.Keys is null)
+            {
+                throw new ArgumentException("Key pair does not contain keys.");
+            }
+            var multi = Serialize.ExportKeyPair(keyPair, true, true, true);
+            var kpi = new KeyPairInterface
+            {
+                Id = keyPair.Id,
+                Controller = keyPair.Controller,
+                Keys = keyPair.Keys,
+                PublicKeyMultibase = multi.PublicKeyMultibase,
+                SecretKeyMultibase = multi.SecretKeyMultibase,
+                Verifier = new Verifier(keyPair.Id, keyPair.Keys),
+                Signer = new Signer(keyPair.Id, keyPair.Keys),
+            };
+            return kpi;
         }
 
         private static void AssertMultikey(MultikeyModel key)
