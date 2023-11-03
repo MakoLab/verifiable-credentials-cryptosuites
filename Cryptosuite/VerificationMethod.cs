@@ -11,5 +11,6 @@ namespace Cryptosuite.Core
         public string? Id { get; set; }
         public string? Type { get; set; }
         public string? Controller { get; set; }
+        public IEnumerable<VerificationMethod>? AssertionMethod { get; set; }
     }
 }
