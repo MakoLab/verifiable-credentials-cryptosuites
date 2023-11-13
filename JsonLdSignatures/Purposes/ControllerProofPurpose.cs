@@ -4,8 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using JsonLD.Core;
 using Cryptosuite.Core;
+using JsonLdExtensions;
 
 namespace JsonLdSignatures.Purposes
 {
@@ -31,7 +31,7 @@ namespace JsonLdSignatures.Purposes
             _termDefinedByDIDContext = DidVrTerms.Contains(term);
         }
 
-        public Result Validate(Proof proof, VerificationMethod verificationMethod, DocumentLoader documentLoader)
+        public Result Validate(Proof proof, VerificationMethod verificationMethod, IDocumentLoader documentLoader)
         {
             var result = base.Validate(proof);
             if (result.IsFailed) return result;

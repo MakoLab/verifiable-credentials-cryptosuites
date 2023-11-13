@@ -3,7 +3,7 @@ using Cryptosuite.Core.Interfaces;
 using Cryptosuite.Core.Util;
 using ECDsa_2019_Cryptosuite;
 using FluentResults;
-using JsonLD.Core;
+using JsonLdExtensions;
 using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
 using JsonLdSignatures.Suites;
@@ -16,6 +16,7 @@ using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using VDS.RDF.JsonLd;
 
 namespace DataIntegrity
 {
@@ -38,21 +39,16 @@ namespace DataIntegrity
 
         public string ContextUrl { get; set; } = DataIntegrityContext;
 
-        public DataIntegrityProof(Signer signer, DateTime date, ICryptosuite cryptoSuite) : base(ProofType)
+        public DataIntegrityProof(ICryptosuite cryptoSuite, Signer? signer = null, DateTime? date = null) : base(ProofType)
         {
             _cryptoSuite = cryptoSuite;
             _date = date;
-            _signer = signer;
-            _verificationMethod = signer?.Id;
-            if (_signer?.Algorithm != _cryptoSuite.RequiredAlgorithm)
-            {
-                throw new ArgumentException($"The signer's algorithm {_signer?.Algorithm} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
-            }
+            (_signer, _verificationMethod) = ProcessSignatureParams(signer, _cryptoSuite.RequiredAlgorithm);
             _serializer = new JsonSerializer();
             _serializer.Converters.Add(new SingleArrayConverter<string>());
         }
 
-        public override object CreateProof(string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public override object CreateProof(string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
         {
             var proof = _proof is null ? new Proof() : new Proof(_proof);
             proof.Type = Type;
@@ -89,7 +85,7 @@ namespace DataIntegrity
             return proof;
         }
 
-        public override object Derive(string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public override object Derive(string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
         {
             if (_cryptoSuite is IDerive cs)
             {
@@ -101,7 +97,7 @@ namespace DataIntegrity
             }
         }
 
-        public override Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public override Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
         {
             byte[] verifyData;
             if (_cryptoSuite is ICreateVerifyData csv)
@@ -160,12 +156,12 @@ namespace DataIntegrity
             return verifier.Verify(verifyData, signature);
         }
 
-        public Proof UpdateProof(string document, Proof proof, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public Proof UpdateProof(string document, Proof proof, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
         {
             return proof;
         }
 
-        public byte[] CreateVerifyData(string document, Proof proof, DocumentLoader documentLoader)
+        public byte[] CreateVerifyData(string document, Proof proof, IDocumentLoader documentLoader)
         {
             byte[] cachedDocHash;
             if (_hashCache is not null && _hashDocument == document)
@@ -177,7 +173,7 @@ namespace DataIntegrity
                 if (_cryptoSuite is ICanonize cs)
                 {
                     _hashDocument = document;
-                    var canon = cs.Canonize(document, new JsonLdOptions { documentLoader = documentLoader });
+                    var canon = cs.Canonize(JObject.FromObject(proof), new JsonLdNormalizerOptions { DocumentLoader = documentLoader.LoadDocument });
                     _hashCache = Sha256Digest(canon);
                     cachedDocHash = _hashCache;
                 }
@@ -190,7 +186,7 @@ namespace DataIntegrity
             return cachedDocHash.Concat(proofHash).ToArray();
         }
 
-        private string CanonizeProof(Proof proof, string document, DocumentLoader documentLoader)
+        private string CanonizeProof(Proof proof, string document, IDocumentLoader documentLoader)
         {
             var jDoc = JObject.Parse(document);
             proof.Context = jDoc["@context"]?.ToObject<IEnumerable<string>>(_serializer);
@@ -198,8 +194,8 @@ namespace DataIntegrity
             proof.ProofValue = null;
             if (_cryptoSuite is ICanonize cs)
             {
-                var load = JsonConvert.SerializeObject(proof);
-                return cs.Canonize(load, new JsonLdOptions { documentLoader = documentLoader });
+                var load = JObject.FromObject(proof);
+                return cs.Canonize(load, new JsonLdNormalizerOptions { DocumentLoader = documentLoader.LoadDocument });
             }
             else
             {
@@ -223,7 +219,7 @@ namespace DataIntegrity
             }
         }
 
-        private VerificationMethod GetVerificationMethod(Proof proof, DocumentLoader documentLoader)
+        private VerificationMethod GetVerificationMethod(Proof proof, IDocumentLoader documentLoader)
         {
             var verificationMethod = proof.VerificationMethod;
             if (verificationMethod is null)
@@ -232,14 +228,27 @@ namespace DataIntegrity
             }
             try
             {
-                var result = documentLoader.LoadDocument(verificationMethod);
-                var doc = result.Document.ToObject<VerificationMethod>() ?? throw new ArgumentException($"Could not load verification method {verificationMethod}.");
+                var result = documentLoader.LoadDocument(new Uri(verificationMethod), new JsonLdLoaderOptions());
+                var doc = result.GetDocument().ToObject<VerificationMethod>() ?? throw new ArgumentException($"Could not load verification method {verificationMethod}.");
                 return doc;
             }
             catch (Exception ex)
             {
                 throw new ArgumentException($"Could not load verification method {verificationMethod}.", ex);
             }
+        }
+
+        private (Signer? _signer, string? _verificationMethod) ProcessSignatureParams(Signer? signer, string requiredAlgorithm)
+        {
+            if (signer is null)
+            {
+                return (null, null);
+            }
+            if (signer.Algorithm != requiredAlgorithm)
+            {
+                throw new ArgumentException($"The signer's algorithm {signer.Algorithm} does not match the required algorithm for the cryptosuite {requiredAlgorithm}.");
+            }
+            return (signer, signer.Id);
         }
 
         private static byte[] Sha256Digest(string message)

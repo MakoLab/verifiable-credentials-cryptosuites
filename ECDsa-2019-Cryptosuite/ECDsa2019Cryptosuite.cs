@@ -1,13 +1,14 @@
 ﻿using Cryptosuite.Core;
 using Cryptosuite.Core.Interfaces;
 using ECDsa_Multikey;
-using JsonLD.Core;
+using JsonLdExtensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VDS.RDF.JsonLd;
 
 namespace ECDsa_2019_Cryptosuite
 {
@@ -27,23 +28,9 @@ namespace ECDsa_2019_Cryptosuite
             return key.Verifier;
         }
 
-        public string Canonize(string input, object options)
+        public string Canonize(JToken input, JsonLdNormalizerOptions options)
         {
-            if (options is JsonLdOptions opts)
-            {
-            }
-            else
-            {
-                opts = new JsonLdOptions();
-                foreach (var prop in options.GetType().GetProperties())
-                {
-                    //if prop.Name is in opts, set it
-                    var propInfo = opts.GetType().GetProperty(prop.Name);
-                    propInfo?.SetValue(opts, prop.GetValue(options));
-                }
-            }
-            opts.format = "application/n-quads";
-            return (string)JsonLdProcessor.Normalize(input, opts);
+            return JsonLdNormalizer.Normalize(input, options);
         }
     }
 }

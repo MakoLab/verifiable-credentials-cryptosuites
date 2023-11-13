@@ -1,3 +1,4 @@
+using Newtonsoft.Json.Linq;
 using System.Security.Cryptography;
 using Xunit.Abstractions;
 
@@ -29,6 +30,13 @@ namespace ECDsa_Multikey.Tests
             _output.WriteLine(Convert.ToHexString(pkcs8));
             _output.WriteLine(Convert.ToHexString(d));
             _output.WriteLine(param.Curve.Oid.FriendlyName);
+        }
+
+        [Fact]
+        public void Test2()
+        {
+            var token = JToken.Parse("{}");
+            Assert.NotNull(token);
         }
     }
 }

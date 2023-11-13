@@ -15,7 +15,7 @@ namespace Cryptosuite.Core.Util
             return objectType.IsAssignableFrom(typeof(IEnumerable<T>));
         }
 
-        public override IEnumerable<T> ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
+        public override IEnumerable<T>? ReadJson(JsonReader reader, Type objectType, object? existingValue, JsonSerializer serializer)
         {
             JToken token = JToken.Load(reader);
 
@@ -23,11 +23,16 @@ namespace Cryptosuite.Core.Util
             {
                 return token.ToObject<List<T>>();
             }
-
-            return new List<T> { token.ToObject<T>() };
+            var t = token.ToObject<T>();
+            var list = new List<T>();
+            if (t is not null)
+            {
+                list.Add(t);
+            }
+            return list;
         }
 
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, object? value, JsonSerializer serializer)
         {
             if (value == null)
             {

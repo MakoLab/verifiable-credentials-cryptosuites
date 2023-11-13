@@ -1,6 +1,6 @@
 ﻿using Cryptosuite.Core;
 using FluentResults;
-using JsonLD.Core;
+using JsonLdExtensions;
 using JsonLdSignatures.Purposes;
 using System;
 using System.Collections.Generic;
@@ -15,17 +15,17 @@ namespace JsonLdSignatures.Suites
         public LinkedDataSignature(string type) : base(type)
         {
         }
-        public override object CreateProof(string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public override object CreateProof(string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
         {
             throw new NotImplementedException();
         }
 
-        public override object Derive(string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public override object Derive(string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
         {
             throw new NotImplementedException();
         }
 
-        public override Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, DocumentLoader documentLoader)
+        public override Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
         {
             throw new NotImplementedException();
         }

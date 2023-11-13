@@ -13,7 +13,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
     {
         private const string publicKeyMultibase = "zDnaekGZTbQBerwcehBSXLqAg6s55hVEBms1zFy89VHXtJSa9";
         private const string secretKeyMultibase = "z42tqZ5smVag3DtDhjY9YfVwTMyVHW6SCHJi2ZMrD23DGYS3";
-        private readonly string id = $"{controller}#{publicKeyMultibase}";
+        private readonly string id = $"{Controller}#{publicKeyMultibase}";
         private const string credString = """
             {
               "@context": [
@@ -38,48 +38,48 @@ namespace ECDsa_2019_Cryptosuite.Tests
             }
             """;
 
-        internal const string controller = "https://example.edu/issuers/565049";
-        internal readonly MultikeyModel mockPublicEcdsaMultikey;
-        internal readonly MultikeyModel ecdsaMultikeyKeyPair;
-        internal readonly MultikeyModel ecdsaSecp256KeyPair;
-        internal readonly MultikeyModel controllerDocEcdsaMultikey;
-        internal readonly JToken credential = JToken.Parse(credString);
+        internal const string Controller = "https://example.edu/issuers/565049";
+        internal readonly MultikeyModel MockPublicEcdsaMultikey;
+        internal readonly MultikeyModel EcdsaMultikeyKeyPair;
+        internal readonly MultikeyModel EcdsaSecp256KeyPair;
+        internal readonly MultikeyModel ControllerDocEcdsaMultikey;
+        internal readonly JObject Credential = JObject.Parse(credString);
 
         internal MockData()
         {
-            mockPublicEcdsaMultikey = new MultikeyModel
+            MockPublicEcdsaMultikey = new MultikeyModel
             {
                 Contexts = new List<string> { "https://w3id.org/security/multikey/v1" },
                 Type = "MultiKey",
-                Controller = controller,
+                Controller = Controller,
                 Id = id,
                 PublicKeyMultibase = publicKeyMultibase,
             };
 
-            ecdsaMultikeyKeyPair = new MultikeyModel
+            EcdsaMultikeyKeyPair = new MultikeyModel
             {
                 Contexts = new List<string> { "https://w3id.org/security/multikey/v1" },
                 Type = "MultiKey",
-                Controller = controller,
+                Controller = Controller,
                 Id = id,
                 PublicKeyMultibase = publicKeyMultibase,
                 SecretKeyMultibase = secretKeyMultibase,
             };
 
-            ecdsaSecp256KeyPair = new MultikeyModel
+            EcdsaSecp256KeyPair = new MultikeyModel
             {
                 Type = "EcdsaSecp256r1VerificationKey2019",
-                Controller = controller,
+                Controller = Controller,
                 PublicKeyMultibase = publicKeyMultibase,
                 SecretKeyMultibase = secretKeyMultibase,
             };
 
-            controllerDocEcdsaMultikey = new MultikeyModel
+            ControllerDocEcdsaMultikey = new MultikeyModel
             {
                 Contexts = new List<string> { "https://www.w3.org/ns/did/v1", "https://w3id.org/security/multikey/v1" },
-                Controller = controller,
+                Controller = Controller,
                 Id = "https://example.edu/issuers/565049",
-                AssertionMethod = new List<VerificationMethod> { mockPublicEcdsaMultikey },
+                AssertionMethod = new List<VerificationMethod> { MockPublicEcdsaMultikey },
             };
         }
     }

@@ -1,4 +1,4 @@
-﻿using JsonLD.Core;
+﻿using JsonLdExtensions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +9,6 @@ namespace Cryptosuite.Core.Interfaces
 {
     public interface ICreateProofValue
     {
-        public string CreateProofValue(byte[] verifyData, string document, Proof proof, ProofSet proofSet, DocumentLoader documentLoader);
+        public string CreateProofValue(byte[] verifyData, string document, Proof proof, ProofSet proofSet, IDocumentLoader documentLoader);
     }
 }

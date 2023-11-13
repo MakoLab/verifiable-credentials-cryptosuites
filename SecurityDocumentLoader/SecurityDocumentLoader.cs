@@ -1,15 +1,15 @@
-﻿using JsonLD.Core;
-using JsonLdDocumentLoader;
+﻿using JsonLdExtensions;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VDS.RDF.JsonLd;
 
 namespace SecurityDocumentLoader
 {
-    public class SecurityDocumentLoader : JsonLdDocumentLoader.JsonLdDocumentLoader
+    public class SecurityDocumentLoader : JsonLdDocumentLoader
     {
         public SecurityDocumentLoader()
         {
@@ -20,11 +20,15 @@ namespace SecurityDocumentLoader
             AddStatic(Constants.VeresOneContextV1Url, Contexts.VeresOneContextV1);
         }
 
-        public override RemoteDocument LoadDocument(string url)
+        public override RemoteDocument LoadDocument(Uri url, JsonLdLoaderOptions options)
         {
-            if (_documents.TryGetValue(url, out var document))
+            if (_documents.TryGetValue(url.AbsoluteUri, out var document))
             {
-                return new RemoteDocument(url, document);
+                return new RemoteDocument()
+                {
+                    DocumentUrl = url,
+                    Document = document,
+                };
             }
             throw new ArgumentException($"{nameof(SecurityDocumentLoader)} supports static documents only.");
         }
