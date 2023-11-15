@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VDS.RDF.JsonLd;
 
-namespace JsonLdExtensions
+namespace JsonLdExtensions.Canonicalization
 {
     public class JsonLdNormalizerOptions : JsonLdProcessorOptions
     {

@@ -13,5 +13,6 @@ namespace SecurityDocumentLoader
         internal const string X25519KeyAgreement2020V1ContextUrl = "https://w3id.org/security/suites/x25519-2020/v1";
         internal const string CredentialsContextV1Url = "https://www.w3.org/2018/credentials/v1";
         internal const string DidContextV1Url = "https://www.w3.org/ns/did/v1";
+        internal const string DataIntegrityV1Url = "https://w3id.org/security/data-integrity/v1";
     }
 }

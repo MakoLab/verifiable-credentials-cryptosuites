@@ -8,7 +8,7 @@ using VDS.RDF;
 using VDS.RDF.JsonLd;
 using VDS.RDF.Parsing;
 
-namespace JsonLdExtensions
+namespace JsonLdExtensions.Canonicalization
 {
     public static class JsonLdNormalizer
     {
@@ -27,7 +27,7 @@ namespace JsonLdExtensions
                 var expanded = JsonLdProcessor.Expand(input, options);
                 ts.LoadFromString(expanded.ToString(), parser);
             }
-            return ts.Normalize(options);
+            return ts.Normalize(options).Serialize();
         }
     }
 }

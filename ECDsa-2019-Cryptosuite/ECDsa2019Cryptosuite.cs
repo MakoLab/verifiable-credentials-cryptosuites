@@ -1,7 +1,7 @@
 ﻿using Cryptosuite.Core;
 using Cryptosuite.Core.Interfaces;
 using ECDsa_Multikey;
-using JsonLdExtensions;
+using JsonLdExtensions.Canonicalization;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

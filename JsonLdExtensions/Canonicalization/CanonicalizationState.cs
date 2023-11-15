@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using VDS.RDF;
 
-namespace JsonLdExtensions
+namespace JsonLdExtensions.Canonicalization
 {
     internal class CanonicalizationState
     {
@@ -13,16 +13,16 @@ namespace JsonLdExtensions
         internal Dictionary<string, IList<string>> HashToBlankNodeIdentifier { get; set; } = new();
         private IdentifierIssuer CanonicalIssuer { get; set; } = new(Constants.CanonicalPrefix);
 
-        internal void AddQuadToBlankNode(string blankNode, string graph, Triple triple)
+        internal void AddQuadToBlankNode(string blankNode, Quad q)
         {
             if (!BlankNodeToQuads.ContainsKey(blankNode))
             {
                 BlankNodeToQuads.Add(blankNode, new List<Quad>());
             }
-            BlankNodeToQuads[blankNode].Add(new Quad(new UriNode(UriFactory.Create(graph)), triple));
+            BlankNodeToQuads[blankNode].Add(new Quad(q));
         }
 
-        internal void AddQuadToBlankNode(string blankNode, IRefNode graph, Triple triple)
+        internal void AddQuadToBlankNode(string blankNode, IGraph graph, Triple triple)
         {
             if (!BlankNodeToQuads.ContainsKey(blankNode))
             {

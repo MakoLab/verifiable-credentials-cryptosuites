@@ -38,5 +38,13 @@ namespace ECDsa_Multikey.Tests
             var token = JToken.Parse("{}");
             Assert.NotNull(token);
         }
+
+        [Fact]
+        public void Test3()
+        {
+            var uri = new Uri("https://schema.org#AlumniCredential");
+            var s = uri.OriginalString;
+            Assert.NotNull(uri);
+        }
     }
 }

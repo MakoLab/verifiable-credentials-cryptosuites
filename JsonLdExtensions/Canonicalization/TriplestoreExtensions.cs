@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 using VDS.RDF;
 using VDS.RDF.Writing.Formatting;
 
-namespace JsonLdExtensions
+namespace JsonLdExtensions.Canonicalization
 {
     public static class TriplestoreExtensions
     {
-        public static string Normalize(this ITripleStore ts, JsonLdNormalizerOptions? options = null)
+        public static NormalizedTriplestore Normalize(this ITripleStore ts, JsonLdNormalizerOptions? options = null)
         {
             if (ts is null)
             {
@@ -22,20 +22,21 @@ namespace JsonLdExtensions
             // 1) Create the canonicalization state.
             var state = new CanonicalizationState();
             // 2) For every quad in input dataset:
-            foreach (var g in ts.Graphs)
+            foreach (var q in ts.GetQuads())
             {
-                foreach (var t in g.Triples)
+                // 2.1) For each blank node that occurs in the quad, add a reference to the quad using the blank node
+                // identifier in the blank node to quads map, creating a new entry if necessary.
+                if (q.Object is IBlankNode bn)
                 {
-                    // 2.1) For each blank node that occurs in the quad, add a reference to the quad using the blank node
-                    // identifier in the blank node to quads map, creating a new entry if necessary.
-                    if (t.Object is IBlankNode bn)
-                    {
-                        state.AddQuadToBlankNode(bn.InternalID, g.BaseUri.AbsoluteUri, t);
-                    }
-                    if (t.Subject is IBlankNode bn2)
-                    {
-                        state.AddQuadToBlankNode(bn2.InternalID, g.BaseUri.AbsoluteUri, t);
-                    }
+                    state.AddQuadToBlankNode(bn.InternalID, q);
+                }
+                if (q.Subject is IBlankNode bn2)
+                {
+                    state.AddQuadToBlankNode(bn2.InternalID, q);
+                }
+                if (q.Graph.Name is IBlankNode bn3)
+                {
+                    state.AddQuadToBlankNode(bn3.InternalID, q);
                 }
             }
             // 3) Create a list of non-normalized blank node identifiers non-normalized identifiers and populate it using the
@@ -84,7 +85,7 @@ namespace JsonLdExtensions
             {
                 // 6.1) Create hash path list where each item will be a result of running the Hash N-Degree Quads
                 // algorithm.
-                var hashPathList = new List<(string, IdentifierIssuer)>();
+                var hashPathList = new List<(string Hash, IdentifierIssuer Issuer)>();
                 // 6.2) For each blank node identifier identifier in identifier list:
                 foreach (var identifier in kv.Value)
                 {
@@ -104,10 +105,65 @@ namespace JsonLdExtensions
                     hashPathList.Add(HashNDegreeQuads(tempBNodeIdentifier, state, issuer));
                 }
                 // 6.3) For each result in the hash path list, lexicographically-sorted by the hash in result:
-
+                foreach (var result in hashPathList.OrderBy(r => r.Hash))
+                {
+                    // 6.3.1) For each blank node identifier, existing identifier, that was issued a temporary identifier by
+                    // identifier issuer in result, issue a canonical identifier, in the same order, using the Issue Identifier
+                    // algorithm, passing canonical issuer and existing identifier.
+                    foreach (var existingIdentifier in result.Issuer.GetExistingIdentifiers())
+                    {
+                        state.IssueIdentifier(existingIdentifier);
+                    }
+                }
             }
+            var normalizedDataset = new TripleStore();
+            // 7) For each quad, quad, in input dataset:
+            foreach (var g in ts.Graphs)
+            {
+                // 7.1) Create a copy, quad copy, of quad and replace any existing blank node identifiers using the
+                // canonical identifiers previously issued by canonical issuer.
+                if (g.Name is BlankNode gn)
+                {
+                    gn = new BlankNode(state.GetIdentifier(gn.InternalID));
+                }
+                var graphCopy = new Graph(g.Name);
+                foreach (var t in g.Triples)
+                {
+                    var tripleCopy = CreateTripleCopy(t, state);
+                    graphCopy.Assert(tripleCopy);
+                }
+                // 7.2) Add quad, which is now in sorted canonical form, to the normalized dataset.
+                normalizedDataset.Add(graphCopy);
+            }
+            // 8) Return the normalized dataset.
+            return new NormalizedTriplestore(normalizedDataset);
+        }
 
-            throw new NotImplementedException();
+        public static IEnumerable<Quad> GetQuads(this ITripleStore ts)
+        {
+            foreach (var g in ts.Graphs)
+            {
+                foreach (var t in g.Triples)
+                {
+                    yield return new Quad(g, t);
+                }
+            }
+        }
+
+        private static Triple CreateTripleCopy(Triple triple, CanonicalizationState state)
+        {
+            var s = triple.Subject;
+            var p = triple.Predicate;
+            var o = triple.Object;
+            if (s is IBlankNode sn)
+            {
+                s = new BlankNode(state.GetIdentifier(sn.InternalID));
+            }
+            if (triple.Object is IBlankNode on)
+            {
+                o = new BlankNode(state.GetIdentifier(on.InternalID));
+            }
+            return new Triple(s, p, o);
         }
 
         private static string HashString(string input)
@@ -129,18 +185,16 @@ namespace JsonLdExtensions
             // 3) For each quad quad in quads:
             foreach (var quad in quads)
             {
-                var s = quad.Triple.Subject;
-                var p = quad.Triple.Predicate;
-                var o = quad.Triple.Object;
                 // 3.1) Serialize the quad in N-Quads format with the following special rule:
-                // 3.1.1) If any component in quad is an blank node, then serialize it using a special identifier as follows:
-                // 3.1.1.1) If the blank node's existing blank node identifier matches the reference blank node identifier then use the blank node
-                // identifier _:a, otherwise, use the blank node identifier _:z.
-                s = RenameBNode(referenceBNodeIdentfier, s);
-                p = RenameBNode(referenceBNodeIdentfier, p);
-                o = RenameBNode(referenceBNodeIdentfier, o);
-                quad.Graph = (IRefNode)RenameBNode(referenceBNodeIdentfier, quad.Graph);
-                nquads.Add(formatter.Format(new Triple(s, p, o), quad.Graph));
+                // 3.1.1) If any component in quad is an blank node, then serialize it using a special identifier as
+                // follows:
+                // 3.1.1.1) If the blank node's existing blank node identifier matches the reference blank node
+                // identifier then use the blank node identifier _:a, otherwise, use the blank node identifier _:z.
+                var s = RenameBNodes(referenceBNodeIdentfier, quad.Subject);
+                var p = RenameBNodes(referenceBNodeIdentfier, quad.Predicate);
+                var o = RenameBNodes(referenceBNodeIdentfier, quad.Object);
+                var g = (IRefNode)RenameBNodes(referenceBNodeIdentfier, quad.Graph.Name);
+                nquads.Add(formatter.Format(new Triple(s, p, o), g));
             }
             // 4) Sort nquads in lexicographical order.
             nquads.Sort();
@@ -163,7 +217,7 @@ namespace JsonLdExtensions
             // 3) If position is not g, append <, the value of the predicate in quad, and > to input.
             if (position != "g")
             {
-                input.Append($"<{quad.Triple.Predicate}>");
+                input.Append($"<{quad.Predicate}>");
             }
             // 4) Append identifier to input.
             input.Append(identifier);
@@ -293,7 +347,7 @@ namespace JsonLdExtensions
             return (HashString(dataToHash.ToString()), issuer);
         }
 
-        private static INode RenameBNode(string referenceBNodeIdentfier, INode node)
+        private static INode RenameBNodes(string referenceBNodeIdentfier, INode node)
         {
             if (node is IBlankNode bn)
             {
@@ -311,11 +365,11 @@ namespace JsonLdExtensions
 
         private static IEnumerable<KeyValuePair<string, string>> GetBNodeIdentifiers(Quad quad)
         {
-            if (quad.Triple.Subject is IBlankNode bn)
+            if (quad.Subject is IBlankNode bn)
             {
                 yield return KeyValuePair.Create("s", bn.InternalID);
             }
-            if (quad.Triple.Object is IBlankNode bn2)
+            if (quad.Object is IBlankNode bn2)
             {
                 yield return KeyValuePair.Create("o", bn2.InternalID);
             }

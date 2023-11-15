@@ -4,6 +4,7 @@ using Cryptosuite.Core.Util;
 using ECDsa_2019_Cryptosuite;
 using FluentResults;
 using JsonLdExtensions;
+using JsonLdExtensions.Canonicalization;
 using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
 using JsonLdSignatures.Suites;
@@ -27,6 +28,7 @@ namespace DataIntegrity
         private const string VC20Context = "https://www.w3.org/ns/credentials/v2";
         private const string MultiBaseBase58BtcHeader = "z";
         private const string MultiBaseBase64UrlHeader = "u";
+
         private readonly ICryptosuite _cryptoSuite;
         private readonly Signer? _signer;
         private readonly DateTime? _date;

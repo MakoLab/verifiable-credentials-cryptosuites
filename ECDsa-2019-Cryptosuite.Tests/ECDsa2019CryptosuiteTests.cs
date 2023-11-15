@@ -1,4 +1,5 @@
 ﻿using JsonLdExtensions;
+using JsonLdExtensions.Canonicalization;
 using SecurityDocumentLoader;
 using System;
 using System.Collections.Generic;
@@ -23,8 +24,9 @@ namespace ECDsa_2019_Cryptosuite.Tests
                 <http://example.edu/credentials/1872> <https://www.w3.org/2018/credentials#credentialSubject> <https://example.edu/students/alice> .
                 <http://example.edu/credentials/1872> <https://www.w3.org/2018/credentials#issuanceDate> "2010-01-01T19:23:24Z"^^<http://www.w3.org/2001/XMLSchema#dateTime> .
                 <http://example.edu/credentials/1872> <https://www.w3.org/2018/credentials#issuer> <https://example.edu/issuers/565049> .
-                <https://example.edu/students/alice> <https://schema.org#alumniOf> "Example University" .\n
-                """;
+                <https://example.edu/students/alice> <https://schema.org#alumniOf> "Example University" .
+
+                """.Replace("\r", String.Empty);
             var credential = mockData.Credential;
             var cryptosuite = new ECDsa2019Cryptosuite();
             var canonized = cryptosuite.Canonize(credential, new JsonLdNormalizerOptions() { DocumentLoader = documentLoader.LoadDocument });

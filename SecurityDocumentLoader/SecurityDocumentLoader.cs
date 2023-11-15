@@ -18,6 +18,7 @@ namespace SecurityDocumentLoader
             AddStatic(Constants.CredentialsContextV1Url, Contexts.CredentialsContextV1);
             AddStatic(Constants.DidContextV1Url, Contexts.DidContextV1);
             AddStatic(Constants.VeresOneContextV1Url, Contexts.VeresOneContextV1);
+            AddStatic(Constants.DataIntegrityV1Url, Contexts.DataIntegrityV1);
         }
 
         public override RemoteDocument LoadDocument(Uri url, JsonLdLoaderOptions options)

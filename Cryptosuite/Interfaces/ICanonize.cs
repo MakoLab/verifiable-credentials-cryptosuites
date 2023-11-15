@@ -1,4 +1,4 @@
-﻿using JsonLdExtensions;
+﻿using JsonLdExtensions.Canonicalization;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;

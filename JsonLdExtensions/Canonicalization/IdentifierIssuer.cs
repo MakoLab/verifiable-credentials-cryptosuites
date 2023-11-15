@@ -1,10 +1,12 @@
-﻿namespace JsonLdExtensions
+﻿using System.Collections.Specialized;
+
+namespace JsonLdExtensions.Canonicalization
 {
     internal class IdentifierIssuer
     {
-        internal string Prefix {get; private set;}
+        internal string Prefix { get; private set; }
         int IdentifierCounter { get; set; } = 0;
-        Dictionary<string, string> IssuedIdentifiers { get; set; } = new Dictionary<string, string>();
+        OrderedDictionary IssuedIdentifiers { get; set; } = new();
 
         internal IdentifierIssuer(string prefix)
         {
@@ -15,16 +17,19 @@
         {
             Prefix = issuer.Prefix;
             IdentifierCounter = issuer.IdentifierCounter;
-            IssuedIdentifiers = new Dictionary<string, string>(issuer.IssuedIdentifiers);
+            foreach (var key in issuer.IssuedIdentifiers.Keys)
+            {
+                IssuedIdentifiers.Add(key, issuer.IssuedIdentifiers[key]);
+            }
         }
 
         // 4.5 Issue Identifier Algorithm
         internal string IssueIdentifier(string identifier)
         {
             // 1) If there is already an issued identifier for existing identifier in issued identifiers list, return it.
-            if (IssuedIdentifiers.ContainsKey(identifier))
+            if (IssuedIdentifiers.Contains(identifier))
             {
-                return IssuedIdentifiers[identifier];
+                return (string)IssuedIdentifiers[identifier]!;
             }
             // 2) Generate issued identifier by concatenating identifier prefix with the string value of identifier counter.
             var issuedIdentifier = $"{Prefix}{IdentifierCounter}";
@@ -38,16 +43,21 @@
 
         internal string? GetIdentifier(string identifier)
         {
-            if (IssuedIdentifiers.ContainsKey(identifier))
+            if (IssuedIdentifiers.Contains(identifier))
             {
-                return IssuedIdentifiers[identifier];
+                return (string)IssuedIdentifiers[identifier]!;
             }
             return null;
         }
 
         internal bool IsIssued(string identifier)
         {
-            return IssuedIdentifiers.ContainsKey(identifier);
+            return IssuedIdentifiers.Contains(identifier);
+        }
+
+        internal IEnumerable<string> GetExistingIdentifiers()
+        {
+            return IssuedIdentifiers.Keys.Cast<string>();
         }
     }
 }
