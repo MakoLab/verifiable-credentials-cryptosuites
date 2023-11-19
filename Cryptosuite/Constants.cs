@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -34,5 +35,15 @@ namespace Cryptosuite.Core
                 _ => throw new Exception($"Unsupported curve: {curve.Oid.FriendlyName}"),
             };
         }
+    }
+
+    public class SecurityConstants
+    {
+        public const string Ed25519Signature2020ContextUrl = "https://w3id.org/security/suites/ed25519-2020/v1";
+        public const string VeresOneContextV1Url = "https://w3id.org/veres-one/v1";
+        public const string X25519KeyAgreement2020V1ContextUrl = "https://w3id.org/security/suites/x25519-2020/v1";
+        public const string CredentialsContextV1Url = "https://www.w3.org/2018/credentials/v1";
+        public const string DidContextV1Url = "https://www.w3.org/ns/did/v1";
+        public const string DataIntegrityV1Url = "https://w3id.org/security/data-integrity/v1";
     }
 }

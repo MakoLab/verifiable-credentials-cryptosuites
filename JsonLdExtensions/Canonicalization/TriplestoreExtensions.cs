@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,6 +12,8 @@ namespace JsonLdExtensions.Canonicalization
 {
     public static class TriplestoreExtensions
     {
+        private static HashAlgorithm HashAlgorithm { get; set; } = SHA256.Create();
+
         public static NormalizedTriplestore Normalize(this ITripleStore ts, JsonLdNormalizerOptions? options = null)
         {
             if (ts is null)
@@ -18,6 +21,15 @@ namespace JsonLdExtensions.Canonicalization
                 throw new ArgumentNullException(nameof(ts));
             }
             options ??= new JsonLdNormalizerOptions();
+            if (options.HashAlgorithm != HashAlgorithmType.Sha256)
+            {
+                HashAlgorithm = options.HashAlgorithm switch
+                {
+                    HashAlgorithmType.Sha384 => SHA384.Create(),
+                    HashAlgorithmType.Sha512 => SHA512.Create(),
+                    _ => throw new ArgumentException($"Invalid hash algorithm {nameof(options.HashAlgorithm)}")
+                };
+            }
 
             // 1) Create the canonicalization state.
             var state = new CanonicalizationState();
@@ -148,29 +160,6 @@ namespace JsonLdExtensions.Canonicalization
                     yield return new Quad(g, t);
                 }
             }
-        }
-
-        private static Triple CreateTripleCopy(Triple triple, CanonicalizationState state)
-        {
-            var s = triple.Subject;
-            var p = triple.Predicate;
-            var o = triple.Object;
-            if (s is IBlankNode sn)
-            {
-                s = new BlankNode(state.GetIdentifier(sn.InternalID));
-            }
-            if (triple.Object is IBlankNode on)
-            {
-                o = new BlankNode(state.GetIdentifier(on.InternalID));
-            }
-            return new Triple(s, p, o);
-        }
-
-        private static string HashString(string input)
-        {
-            var bytes = Encoding.UTF8.GetBytes(input);
-            var hash = SHA256.HashData(bytes);
-            return Convert.ToHexString(hash).ToLower();
         }
 
         // 4.6 Hash First Degree Quads
@@ -345,6 +334,29 @@ namespace JsonLdExtensions.Canonicalization
             }
             // 6) Return issuer, and the hash that results from passing data to hash through the hash algorithm.
             return (HashString(dataToHash.ToString()), issuer);
+        }
+
+        private static Triple CreateTripleCopy(Triple triple, CanonicalizationState state)
+        {
+            var s = triple.Subject;
+            var p = triple.Predicate;
+            var o = triple.Object;
+            if (s is IBlankNode sn)
+            {
+                s = new BlankNode(state.GetIdentifier(sn.InternalID));
+            }
+            if (triple.Object is IBlankNode on)
+            {
+                o = new BlankNode(state.GetIdentifier(on.InternalID));
+            }
+            return new Triple(s, p, o);
+        }
+
+        private static string HashString(string input)
+        {
+            var bytes = Encoding.UTF8.GetBytes(input);
+            var hash = HashAlgorithm.ComputeHash(bytes);
+            return Convert.ToHexString(hash).ToLower();
         }
 
         private static INode RenameBNodes(string referenceBNodeIdentfier, INode node)

@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using VDS.RDF.JsonLd;
+using Cryptosuite.Core;
 
 namespace SecurityDocumentLoader
 {
@@ -13,12 +14,12 @@ namespace SecurityDocumentLoader
     {
         public SecurityDocumentLoader()
         {
-            AddStatic(Constants.Ed25519Signature2020ContextUrl, Contexts.Ed25519Signature2020Context);
-            AddStatic(Constants.X25519KeyAgreement2020V1ContextUrl, Contexts.X25519KeyAgreement2020V1Context);
-            AddStatic(Constants.CredentialsContextV1Url, Contexts.CredentialsContextV1);
-            AddStatic(Constants.DidContextV1Url, Contexts.DidContextV1);
-            AddStatic(Constants.VeresOneContextV1Url, Contexts.VeresOneContextV1);
-            AddStatic(Constants.DataIntegrityV1Url, Contexts.DataIntegrityV1);
+            AddStatic(SecurityConstants.Ed25519Signature2020ContextUrl, Contexts.Ed25519Signature2020Context);
+            AddStatic(SecurityConstants.X25519KeyAgreement2020V1ContextUrl, Contexts.X25519KeyAgreement2020V1Context);
+            AddStatic(SecurityConstants.CredentialsContextV1Url, Contexts.CredentialsContextV1);
+            AddStatic(SecurityConstants.DidContextV1Url, Contexts.DidContextV1);
+            AddStatic(SecurityConstants.VeresOneContextV1Url, Contexts.VeresOneContextV1);
+            AddStatic(SecurityConstants.DataIntegrityV1Url, Contexts.DataIntegrityV1);
         }
 
         public override RemoteDocument LoadDocument(Uri url, JsonLdLoaderOptions options)

@@ -5,9 +5,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace SecurityDocumentLoader
+namespace Cryptosuite.Core
 {
-    internal class Contexts
+    public class Contexts
     {
         const string Ed25519Signature2020ContextString = """
             {
@@ -621,11 +621,11 @@ namespace SecurityDocumentLoader
             }
             """;
 
-        internal static readonly JToken VeresOneContextV1 = JToken.Parse(VeresOneContextV1String);
-        internal static readonly JToken Ed25519Signature2020Context = JToken.Parse(Ed25519Signature2020ContextString);
-        internal static readonly JToken X25519KeyAgreement2020V1Context = JToken.Parse(X25519KeyAgreement2020V1ContextString);
-        internal static readonly JToken CredentialsContextV1 = JToken.Parse(CredentialsContextV1String);
-        internal static readonly JToken DidContextV1 = JToken.Parse(DidContextV1String);
-        internal static readonly JToken DataIntegrityV1 = JToken.Parse(DataIntegrityV1String);
+        public static readonly JToken VeresOneContextV1 = JToken.Parse(VeresOneContextV1String);
+        public static readonly JToken Ed25519Signature2020Context = JToken.Parse(Ed25519Signature2020ContextString);
+        public static readonly JToken X25519KeyAgreement2020V1Context = JToken.Parse(X25519KeyAgreement2020V1ContextString);
+        public static readonly JToken CredentialsContextV1 = JToken.Parse(CredentialsContextV1String);
+        public static readonly JToken DidContextV1 = JToken.Parse(DidContextV1String);
+        public static readonly JToken DataIntegrityV1 = JToken.Parse(DataIntegrityV1String);
     }
 }

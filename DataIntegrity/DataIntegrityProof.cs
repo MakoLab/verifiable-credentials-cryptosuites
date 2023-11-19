@@ -188,6 +188,22 @@ namespace DataIntegrity
             return cachedDocHash.Concat(proofHash).ToArray();
         }
 
+        public void EnsureSuiteContext(Proof proof, bool addSuiteContext)
+        {
+            if ((proof.Context?.Contains(ContextUrl) ?? false) || (proof.Context?.Contains(VC20Context) ?? false))
+            {
+                return;
+            }
+            if (addSuiteContext)
+            {
+                proof.Context = proof.Context?.Append(ContextUrl);
+            }
+            else
+            {
+                throw new ArgumentException($"The document to be signed must contain this suite's @context: {ContextUrl}.");
+            }
+        }
+
         private string CanonizeProof(Proof proof, string document, IDocumentLoader documentLoader)
         {
             var jDoc = JObject.Parse(document);
@@ -202,22 +218,6 @@ namespace DataIntegrity
             else
             {
                 throw new InvalidOperationException($"The cryptosuite {_cryptoSuite.Name} does not support canonization.");
-            }
-        }
-
-        private void EnsureSuiteContext(Proof proof, bool addSuiteContext)
-        {
-            if ((proof.Context?.Contains(ContextUrl) ?? false) || (proof.Context?.Contains(VC20Context) ?? false))
-            {
-                return;
-            }
-            if (addSuiteContext)
-            {
-                proof.Context = proof.Context?.Append(ContextUrl);
-            }
-            else
-            {
-                throw new ArgumentException($"The document to be signed must contain this suite's @context: {ContextUrl}.");
             }
         }
 

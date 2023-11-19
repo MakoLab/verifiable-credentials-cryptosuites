@@ -31,7 +31,7 @@ namespace JsonLdSignatures.Purposes
             _termDefinedByDIDContext = DidVrTerms.Contains(term);
         }
 
-        public Result Validate(Proof proof, VerificationMethod verificationMethod, IDocumentLoader documentLoader)
+        public virtual Result Validate(Proof proof, VerificationMethod verificationMethod, IDocumentLoader documentLoader)
         {
             var result = base.Validate(proof);
             if (result.IsFailed) return result;
