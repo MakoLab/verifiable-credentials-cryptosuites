@@ -16,17 +16,17 @@ namespace JsonLdSignatures.Suites
         public LinkedDataSignature(string type) : base(type)
         {
         }
-        public override object CreateProof(string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
+        public override Proof CreateProof(JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             throw new NotImplementedException();
         }
 
-        public override object Derive(string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
+        public override JObject Derive(JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             throw new NotImplementedException();
         }
 
-        public override Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
+        public override Result VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             throw new NotImplementedException();
         }

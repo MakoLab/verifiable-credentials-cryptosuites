@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace JsonLdSignatures.Purposes
 {
-    public class ProofPurpose
+    public class ProofPurpose : IProofPurpose
     {
         private string Term { get; }
         private DateTime Date { get; }

@@ -35,7 +35,7 @@ namespace DataIntegrity
         private readonly string? _verificationMethod;
         private Proof? _proof;
         private byte[]? _hashCache;
-        private string? _hashDocument;
+        private JObject? _hashDocument;
         private readonly JsonSerializer _serializer;
         private static readonly SHA256 SHA256 = SHA256.Create();
 
@@ -50,7 +50,7 @@ namespace DataIntegrity
             _serializer.Converters.Add(new SingleArrayConverter<string>());
         }
 
-        public override object CreateProof(string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
+        public override Proof CreateProof(JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             var proof = _proof is null ? new Proof() : new Proof(_proof);
             proof.Type = Type;
@@ -87,7 +87,7 @@ namespace DataIntegrity
             return proof;
         }
 
-        public override object Derive(string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
+        public override JObject Derive(JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             if (_cryptoSuite is IDerive cs)
             {
@@ -99,7 +99,7 @@ namespace DataIntegrity
             }
         }
 
-        public override Result VerifyProof(Proof proof, string document, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
+        public override Result VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             byte[] verifyData;
             if (_cryptoSuite is ICreateVerifyData csv)
@@ -158,12 +158,12 @@ namespace DataIntegrity
             return verifier.Verify(verifyData, signature);
         }
 
-        public Proof UpdateProof(string document, Proof proof, ProofPurpose purpose, ProofSet proofSet, IDocumentLoader documentLoader)
+        public Proof UpdateProof(JObject document, Proof proof, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             return proof;
         }
 
-        public byte[] CreateVerifyData(string document, Proof proof, IDocumentLoader documentLoader)
+        public byte[] CreateVerifyData(JObject document, Proof proof, IDocumentLoader documentLoader)
         {
             byte[] cachedDocHash;
             if (_hashCache is not null && _hashDocument == document)
@@ -188,27 +188,45 @@ namespace DataIntegrity
             return cachedDocHash.Concat(proofHash).ToArray();
         }
 
-        public void EnsureSuiteContext(Proof proof, bool addSuiteContext)
+        public JObject EnsureSuiteContext(JObject document, bool addSuiteContext)
         {
-            if ((proof.Context?.Contains(ContextUrl) ?? false) || (proof.Context?.Contains(VC20Context) ?? false))
+            if (IncludesContext(document, ContextUrl) || IncludesContext(document, VC20Context))
             {
-                return;
+                return document;
             }
-            if (addSuiteContext)
+            if (!addSuiteContext)
             {
-                proof.Context = proof.Context?.Append(ContextUrl);
+                throw new ArgumentException($"The document to be signed must contain this suite's @context, {ContextUrl}");
+            }
+            if (document["@context"] is JArray contextArray)
+            {
+                contextArray.Add(ContextUrl);
+            }
+            else if (document["@context"] is JProperty contextString)
+            {
+                document["@context"] = new JArray(contextString, ContextUrl);
             }
             else
             {
-                throw new ArgumentException($"The document to be signed must contain this suite's @context: {ContextUrl}.");
+                document["@context"] = ContextUrl;
             }
+            return document;
         }
 
-        private string CanonizeProof(Proof proof, string document, IDocumentLoader documentLoader)
+        private bool IncludesContext(JObject document, string context)
         {
-            var jDoc = JObject.Parse(document);
-            proof.Context = jDoc["@context"]?.ToObject<IEnumerable<string>>(_serializer);
-            EnsureSuiteContext(proof, true);
+            var contextArray = document["@context"] as JArray;
+            if (contextArray is null)
+            {
+                return false;
+            }
+            return contextArray.Any(c => c.ToString() == context);
+        }
+
+        private string CanonizeProof(Proof proof, JObject document, IDocumentLoader documentLoader)
+        {
+            proof.Context = document["@context"];
+            EnsureSuiteContext(JObject.FromObject(proof), true);
             proof.ProofValue = null;
             if (_cryptoSuite is ICanonize cs)
             {

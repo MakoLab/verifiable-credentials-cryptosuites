@@ -12,8 +12,8 @@ namespace Cryptosuite.Core
     public class Proof
     {
         public string? Id { get; set; }
-        [JsonConverter(typeof(SingleArrayConverter<string>))]
-        public IEnumerable<string>? Context { get; set; }
+        [JsonProperty("@context")]
+        public JToken? Context { get; set; }
         public string? Type { get; set; }
         public DateTime? Created { get; set; }
         public DateTime? Expires { get; set; }

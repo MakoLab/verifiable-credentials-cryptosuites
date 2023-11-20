@@ -45,5 +45,8 @@ namespace Cryptosuite.Core
         public const string CredentialsContextV1Url = "https://www.w3.org/2018/credentials/v1";
         public const string DidContextV1Url = "https://www.w3.org/ns/did/v1";
         public const string DataIntegrityV1Url = "https://w3id.org/security/data-integrity/v1";
+        public const string SecurityContextV1Url = "https://w3id.org/security/v1";
+        public const string SecurityContextV2Url = "https://w3id.org/security/v2";
+        public const string SecurityContextUrl = "https://w3id.org/security/v2";
     }
 }

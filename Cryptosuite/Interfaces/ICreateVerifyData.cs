@@ -1,4 +1,5 @@
 ﻿using JsonLdExtensions;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Cryptosuite.Core.Interfaces
 {
     public interface ICreateVerifyData
     {
-        public byte[] CreateVerifyData(string document, Proof proof, ProofSet proofSet, IDocumentLoader documentLoader);
+        public byte[] CreateVerifyData(JObject document, Proof proof, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader);
     }
 }

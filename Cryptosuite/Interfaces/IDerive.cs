@@ -1,4 +1,5 @@
 ﻿using JsonLdExtensions;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Cryptosuite.Core.Interfaces
 {
     public interface IDerive
     {
-        public string Derive(string document, IProofPurpose proofPurpose, ProofSet proofSet, IDocumentLoader documentLoader);
+        public JObject Derive(JObject document, IProofPurpose proofPurpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader);
     }
 }
