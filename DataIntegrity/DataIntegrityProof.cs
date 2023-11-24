@@ -122,6 +122,11 @@ namespace DataIntegrity
             }
         }
 
+        public override bool MatchProof(Proof proof)
+        {
+            return proof.Type == Type && proof.CryptoSuiteName == _cryptoSuite.Name;
+        }
+
         public Proof Sign(byte[] verifyData, Proof proof)
         {
             if (_signer is null)

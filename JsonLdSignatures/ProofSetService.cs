@@ -105,9 +105,55 @@ namespace JsonLdSignatures
             return proofSet;
         }
 
-        private IEnumerable<Result> Verify(JObject document, LinkedDataSignature[] suites, IEnumerable<Proof> proofSet, ProofPurpose purpose, IDocumentLoader documentLoader)
+        private IEnumerable<Result> Verify(JObject document, LinkedDataSignature[] suites, IEnumerable<Proof> proofSet, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
         {
-            throw new NotImplementedException();
+            var purposeToProofs = new Dictionary<ProofPurpose, List<Proof>>();
+            var proofToSuite = new Dictionary<Proof, LinkedDataSignature>();
+            foreach (var purpose in purposes)
+            {
+                MatchProofSet(proofSet, suites, purpose, purposeToProofs, proofToSuite);
+            }
+            if (purposeToProofs.Count < purposes.Count)
+            {
+                return new List<Result>() { Result.Fail("Insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
+            }
+            foreach (var kv in proofToSuite)
+            {
+                var purpose = new ProofPurpose(kv.Key.Type, DateTime.UtcNow);
+                var result = kv.Value.VerifyProof(kv.Key, document, )
+            }
+        }
+
+        private void MatchProofSet(
+            IEnumerable<Proof> proofSet,
+            LinkedDataSignature[] suites,
+            ProofPurpose purpose,
+            Dictionary<ProofPurpose, List<Proof>> purposeToProofs,
+            Dictionary<Proof, LinkedDataSignature> proofToSuite)
+        {
+            foreach (var proof in proofSet)
+            {
+                if (!purpose.Match(proof))
+                {
+                    continue;
+                }
+                var matched = false;
+                foreach (var suite in suites)
+                {
+                    if (suite.MatchProof(proof))
+                    {
+                        matched = true;
+                        proofToSuite.Add(proof, suite);
+                        break;
+                    }
+                }
+                if (matched)
+                {
+                    var matches = purposeToProofs.ContainsKey(purpose) ? purposeToProofs[purpose] : new List<Proof>();
+                    matches.Add(proof);
+                    purposeToProofs[purpose] = matches;
+                }
+            }
         }
     }
 }

@@ -31,7 +31,7 @@ namespace JsonLdSignatures.Suites
 
         public abstract Result VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader);
 
-        public bool MatchProof(Proof proof)
+        public virtual bool MatchProof(Proof proof)
         {
             return proof.Type == Type;
         }
