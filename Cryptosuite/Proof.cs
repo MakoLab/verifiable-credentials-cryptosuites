@@ -14,7 +14,7 @@ namespace Cryptosuite.Core
         public string? Id { get; set; }
         [JsonProperty("@context")]
         public JToken? Context { get; set; }
-        public string? Type { get; set; }
+        public string Type { get; set; }
         public DateTime? Created { get; set; }
         public DateTime? Expires { get; set; }
         public string? ProofPurpose { get; set; }

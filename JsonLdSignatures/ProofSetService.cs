@@ -51,7 +51,7 @@ namespace JsonLdSignatures
             return newDocument;
         }
 
-        public IEnumerable<Result> Verify(JObject document, LinkedDataSignature[] suites, ProofPurpose purpose, IDocumentLoader documentLoader)
+        public IEnumerable<Result> Verify(JObject document, LinkedDataSignature[] suites, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
         {
             IDocumentLoader loader;
             if (documentLoader is null)
@@ -69,7 +69,7 @@ namespace JsonLdSignatures
                 return new List<Result>() { Result.Fail("No matching proofs found in the given document.") };
             }
             doc.Remove("proof");
-            var results = Verify(document, suites, proofSet, purpose, loader);
+            var results = Verify(document, suites, proofSet, purposes, loader);
             if (!results.Any())
             {
                 return new List<Result>() { Result.Fail("Did not verify any proofs; insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
@@ -105,7 +105,7 @@ namespace JsonLdSignatures
             return proofSet;
         }
 
-        private IEnumerable<Result> Verify(JObject document, LinkedDataSignature[] suites, IEnumerable<Proof> proofSet, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
+        private IEnumerable<Result<(Proof, VerificationMethod)>> Verify(JObject document, LinkedDataSignature[] suites, IEnumerable<Proof> proofSet, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
         {
             var purposeToProofs = new Dictionary<ProofPurpose, List<Proof>>();
             var proofToSuite = new Dictionary<Proof, LinkedDataSignature>();
@@ -117,10 +117,11 @@ namespace JsonLdSignatures
             {
                 return new List<Result>() { Result.Fail("Insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
             }
-            foreach (var kv in proofToSuite)
+            foreach (var (proof, suite) in proofToSuite)
             {
-                var purpose = new ProofPurpose(kv.Key.Type, DateTime.UtcNow);
-                var result = kv.Value.VerifyProof(kv.Key, document, )
+                var purpose = new ProofPurpose(proof.Type, DateTime.UtcNow);
+                var result = suite.VerifyProof(proof, document, purpose, proofSet, documentLoader);
+                yield return result.IsSuccess ? Result.Ok((proof, result.Value)) : Result.Fail()
             }
         }
 

@@ -29,7 +29,7 @@ namespace JsonLdSignatures.Suites
 
         public abstract JObject Derive(JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader);
 
-        public abstract Result VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader);
+        public abstract Result<VerificationMethod> VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader);
 
         public virtual bool MatchProof(Proof proof)
         {

@@ -31,9 +31,9 @@ namespace JsonLdSignatures
             return _proofSetService.Add(document, suite, purpose, documentLoader);
         }
 
-        public IEnumerable<Result> Verify(JObject document, LinkedDataSignature[] suites, ProofPurpose purpose, IDocumentLoader documentLoader)
+        public IEnumerable<Result> Verify(JObject document, LinkedDataSignature[] suites, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
         {
-            return _proofSetService.Verify(document, suites, purpose, documentLoader);
+            return _proofSetService.Verify(document, suites, purposes, documentLoader);
         }
     }
 }

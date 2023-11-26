@@ -99,7 +99,7 @@ namespace DataIntegrity
             }
         }
 
-        public override Result VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
+        public override Result<VerificationMethod> VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             byte[] verifyData;
             if (_cryptoSuite is ICreateVerifyData csv)
@@ -114,7 +114,7 @@ namespace DataIntegrity
             var verified = VerifySignature(verifyData, verificationMethod, proof);
             if (verified)
             {
-                return Result.Ok();
+                return Result.Ok(verificationMethod);
             }
             else
             {

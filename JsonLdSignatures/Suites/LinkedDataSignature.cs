@@ -26,7 +26,7 @@ namespace JsonLdSignatures.Suites
             throw new NotImplementedException();
         }
 
-        public override Result VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
+        public override Result<VerificationMethod> VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
             throw new NotImplementedException();
         }
