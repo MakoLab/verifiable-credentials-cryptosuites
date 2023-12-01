@@ -51,7 +51,7 @@ namespace JsonLdSignatures
             return newDocument;
         }
 
-        public IEnumerable<Result> Verify(JObject document, LinkedDataSignature[] suites, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
+        public IEnumerable<Result<VerificationResult>> Verify(JObject document, LinkedDataSignature[] suites, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
         {
             IDocumentLoader loader;
             if (documentLoader is null)
@@ -66,13 +66,13 @@ namespace JsonLdSignatures
             var proofSet = GetProofs(doc);
             if (!proofSet.Any())
             {
-                return new List<Result>() { Result.Fail("No matching proofs found in the given document.") };
+                return new List<Result<VerificationResult>>() { Result.Fail("No matching proofs found in the given document.") };
             }
             doc.Remove("proof");
             var results = Verify(document, suites, proofSet, purposes, loader);
             if (!results.Any())
             {
-                return new List<Result>() { Result.Fail("Did not verify any proofs; insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
+                return new List<Result<VerificationResult>>() { Result.Fail("Did not verify any proofs; insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
             }
             return results;
         }
@@ -105,7 +105,7 @@ namespace JsonLdSignatures
             return proofSet;
         }
 
-        private IEnumerable<Result<(Proof, VerificationMethod)>> Verify(JObject document, LinkedDataSignature[] suites, IEnumerable<Proof> proofSet, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
+        private IEnumerable<Result<VerificationResult>> Verify(JObject document, LinkedDataSignature[] suites, IEnumerable<Proof> proofSet, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
         {
             var purposeToProofs = new Dictionary<ProofPurpose, List<Proof>>();
             var proofToSuite = new Dictionary<Proof, LinkedDataSignature>();
@@ -115,14 +115,41 @@ namespace JsonLdSignatures
             }
             if (purposeToProofs.Count < purposes.Count)
             {
-                return new List<Result>() { Result.Fail("Insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
+                return new List<Result<VerificationResult>>() { Result.Fail("Insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
             }
+            var results = new List<Result<VerificationResult>>();
             foreach (var (proof, suite) in proofToSuite)
             {
                 var purpose = new ProofPurpose(proof.Type, DateTime.UtcNow);
                 var result = suite.VerifyProof(proof, document, purpose, proofSet, documentLoader);
-                yield return result.IsSuccess ? Result.Ok((proof, result.Value)) : Result.Fail()
+                if (result.IsSuccess)
+                {
+                    results.Add(Result.Ok(new VerificationResult() { Proof = proof, VerificationMethod = result.Value }));
+                }
+                else
+                {
+                    var r = Result.Fail<VerificationResult>(result.Errors.First());
+                    r.Value.PurposeValidation = new List<Result>();
+                    results.Add(r);
+
+                }
             }
+            foreach (var (purpose, proofs) in purposeToProofs)
+            {
+                foreach (var proof in proofs)
+                {
+                    var result = results.FirstOrDefault(r => r.Value.Proof == proof);
+                    if (!result!.IsSuccess)
+                    {
+                        continue;
+                    }
+                    var vm = result.Value.VerificationMethod;
+                    var suite = proofToSuite[proof];
+                    var purposeResult = ((ControllerProofPurpose)purpose).Validate(proof, vm, documentLoader);
+                    result.Value.PurposeValidation.Add(purposeResult);
+                }
+            }
+            return results;
         }
 
         private void MatchProofSet(

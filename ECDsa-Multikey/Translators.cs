@@ -1,4 +1,5 @@
 ﻿using Cryptosuite.Core;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,14 +17,14 @@ namespace ECDsa_Multikey
             {
                 throw new Exception($"Unsupported key type {keyPair.Type}");
             }
-            keyPair.Contexts ??= new List<string> { Constants.ECDsa2019SuiteContextV1Url };
+            keyPair.Context ??= new JValue(Constants.ECDsa2019SuiteContextV1Url);
             if (!IncludesContext(keyPair, Constants.ECDsa2019SuiteContextV1Url))
             {
-                throw new Exception($"Context not supported {keyPair.Contexts}");
+                throw new Exception($"Context not supported {keyPair.Context}");
             }
             return new MultikeyModel
             {
-                Contexts = new List<string> { Constants.MultikeyContextV1Url },
+                Context = new JValue(Constants.MultikeyContextV1Url),
                 Type = "Multikey",
                 Id = keyPair.Id,
                 Controller = keyPair.Controller,
@@ -34,7 +35,7 @@ namespace ECDsa_Multikey
 
         private static bool IncludesContext(MultikeyModel keyPair, string contextUrl)
         {
-            return keyPair.Contexts?.Contains(contextUrl) ?? false;
+            return keyPair.Context?.Contains(contextUrl) ?? false;
         }
     }
 }

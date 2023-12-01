@@ -1,5 +1,6 @@
 ﻿using Cryptosuite.Core;
 using ECDsa_Multikey;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -140,7 +141,7 @@ namespace ECDsa_Multikey
             };
             if (includeContext)
             {
-                multiKey.Contexts = new List<string> { Constants.MultikeyContextV1Url };
+                multiKey.Context = new JValue(Constants.MultikeyContextV1Url);
             }
             var parameters = keyPair.Keys.ExportParameters(includePrivateParameters: true);
             if (publicKey)

@@ -39,7 +39,7 @@ namespace ECDsa_Multikey
                 return CreateKeyPairInterface(multikey);
             }
             multikey.Type ??= "Multikey";
-            multikey.Contexts ??= new List<string> { Constants.MultikeyContextV1Url };
+            multikey.Context ??= new JValue(Constants.MultikeyContextV1Url);
             if (multikey.Controller is not null && multikey.Id is null)
             {
                 multikey.Id = $"{multikey.Controller}#{multikey.PublicKeyMultibase}";
@@ -80,7 +80,7 @@ namespace ECDsa_Multikey
             {
                 throw new Exception("'key' must be a Multikey with type 'Multikey'.");
             }
-            if (key.Contexts is null || !key.Contexts.Contains(Constants.MultikeyContextV1Url))
+            if (key.Context is null || !key.Context.Contains(Constants.MultikeyContextV1Url))
             {
                 throw new Exception($"'key' must be a Multikey with context {Constants.MultikeyContextV1Url}");
             }

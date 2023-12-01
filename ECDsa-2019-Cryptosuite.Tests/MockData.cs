@@ -49,7 +49,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
         {
             MockPublicEcdsaMultikey = new MultikeyModel
             {
-                Contexts = new List<string> { "https://w3id.org/security/multikey/v1" },
+                Context = new JValue("https://w3id.org/security/multikey/v1"),
                 Type = "MultiKey",
                 Controller = Controller,
                 Id = id,
@@ -58,7 +58,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
 
             EcdsaMultikeyKeyPair = new MultikeyModel
             {
-                Contexts = new List<string> { "https://w3id.org/security/multikey/v1" },
+                Context = new JValue("https://w3id.org/security/multikey/v1"),
                 Type = "MultiKey",
                 Controller = Controller,
                 Id = id,
@@ -76,7 +76,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
 
             ControllerDocEcdsaMultikey = new MultikeyModel
             {
-                Contexts = new List<string> { "https://www.w3.org/ns/did/v1", "https://w3id.org/security/multikey/v1" },
+                Context = new JArray { "https://www.w3.org/ns/did/v1", "https://w3id.org/security/multikey/v1" },
                 Controller = Controller,
                 Id = "https://example.edu/issuers/565049",
                 AssertionMethod = new List<VerificationMethod> { MockPublicEcdsaMultikey },
