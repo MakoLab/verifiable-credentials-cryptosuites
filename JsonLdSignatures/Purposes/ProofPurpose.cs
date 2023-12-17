@@ -22,7 +22,7 @@ namespace JsonLdSignatures.Purposes
             MaxTimestampDelta = maxTimestampDelta;
         }
 
-        public Result Validate(Proof proof)
+        public Result<ValidationResult> Validate(Proof proof)
         {
             if (MaxTimestampDelta != Int32.MaxValue)
             {

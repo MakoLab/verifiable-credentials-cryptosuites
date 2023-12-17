@@ -21,7 +21,7 @@ namespace JsonLdSignatures.Purposes
             _domain = domain;
         }
 
-        public override Result Validate(Proof proof, VerificationMethod verificationMethod, IDocumentLoader documentLoader)
+        public override Result<ValidationResult> Validate(Proof proof, VerificationMethod verificationMethod, IDocumentLoader documentLoader)
         {
             if (proof.Challenge != _challenge)
             {

@@ -11,19 +11,31 @@ namespace Cryptosuite.Core
 {
     public class Proof
     {
+        [JsonProperty("id")]
         public string? Id { get; set; }
         [JsonProperty("@context")]
         public JToken? Context { get; set; }
-        public string Type { get; set; }
+        [JsonProperty("type")]
+        public string? Type { get; set; }
+        [JsonProperty("created")]
         public DateTime? Created { get; set; }
+        [JsonProperty("expires")]
         public DateTime? Expires { get; set; }
+        [JsonProperty("proofPurpose")]
         public string? ProofPurpose { get; set; }
+        [JsonProperty("proofValue")]
         public string? ProofValue { get; set; }
+        [JsonProperty("verificationMethod")]
         public string? VerificationMethod { get; set; }
+        [JsonProperty("domain")]
         public IEnumerable<string>? Domain { get; set; }
+        [JsonProperty("challenge")]
         public string? Challenge { get; set; }
+        [JsonProperty("previousProof")]
         public string? PreviousProof { get; set; }
+        [JsonProperty("nonce")]
         public string? Nonce { get; set; }
+        [JsonProperty("cryptosuite")]
         public string? CryptoSuiteName { get; set; }
 
         public Proof()

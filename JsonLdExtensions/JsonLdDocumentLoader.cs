@@ -17,6 +17,11 @@ namespace JsonLdExtensions
             _documents.Add(url, document);
         }
 
+        public virtual RemoteDocument LoadDocument(Uri url)
+        {
+            return LoadDocument(url, new JsonLdLoaderOptions());
+        }
+
         public virtual RemoteDocument LoadDocument(Uri url, JsonLdLoaderOptions options)
         {
             if (_documents.TryGetValue(url.AbsoluteUri, out var document))

@@ -129,7 +129,7 @@ namespace JsonLdSignatures
                 else
                 {
                     var r = Result.Fail<VerificationResult>(result.Errors.First());
-                    r.Value.PurposeValidation = new List<Result>();
+                    r.Value.PurposeValidation = new List<Result<ValidationResult>>();
                     results.Add(r);
 
                 }

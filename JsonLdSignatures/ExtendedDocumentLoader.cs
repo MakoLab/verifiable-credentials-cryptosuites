@@ -24,6 +24,11 @@ namespace JsonLdSignatures
             _documentLoader = documentLoader;
         }
 
+        public RemoteDocument LoadDocument(Uri url)
+        {
+            return LoadDocument(url, new JsonLdLoaderOptions());
+        }
+
         public RemoteDocument LoadDocument(Uri url, JsonLdLoaderOptions options)
         {
             if (_contexts.ContainsKey(url.OriginalString))
@@ -41,6 +46,11 @@ namespace JsonLdSignatures
 
     internal class StrictDocumentLoader : IDocumentLoader
     {
+        public RemoteDocument LoadDocument(Uri url)
+        {
+            throw new ArgumentException($"{url} not found");
+        }
+
         public RemoteDocument LoadDocument(Uri url, JsonLdLoaderOptions options)
         {
             throw new ArgumentException($"{url} not found");

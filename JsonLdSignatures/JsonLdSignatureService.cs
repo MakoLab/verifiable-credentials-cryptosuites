@@ -1,4 +1,5 @@
-﻿using FluentResults;
+﻿using Cryptosuite.Core;
+using FluentResults;
 using JsonLdExtensions;
 using JsonLdSignatures.Purposes;
 using JsonLdSignatures.Suites;
