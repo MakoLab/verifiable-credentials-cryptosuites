@@ -4,6 +4,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Numerics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
@@ -104,8 +105,9 @@ namespace ECDsa_Multikey
                 Id = id,
                 Controller = controller
             };
-            var spki = ToSpki(publicMultikey);
             keyPair.Keys = ECDsa.Create(curve);
+            var param = keyPair.Keys.ExportParameters(includePrivateParameters: true);
+            var spki = ToSpki(publicMultikey, param.Curve);
             keyPair.Keys.ImportSubjectPublicKeyInfo(spki, out _);
 
             if (secretKeyMultibase is not null)
@@ -175,14 +177,15 @@ namespace ECDsa_Multikey
             return multiKey;
         }
 
-        private static byte[] ToSpki(byte[] publicMultikey)
+        private static byte[] ToSpki(byte[] publicMultikey, ECCurve curve)
         {
+            var uncompressed = DecompressKey(publicMultikey.AsSpan()[2..], curve);  // do not include multikey 2-byte header
             var header = SpkiPrefixes[Helpers.GetNamedCurveFromPublicMultikey(publicMultikey)];
-            var spki = new byte[header.Length + publicMultikey.Length - 2]; // do not include multikey 2-byte header
+            var spki = new byte[header.Length + uncompressed.Length];
             var offset = 0;
             header.CopyTo(spki, offset);
             offset += header.Length;
-            publicMultikey.AsSpan()[2..].CopyTo(spki.AsSpan()[offset..]);
+            uncompressed.AsSpan().CopyTo(spki.AsSpan()[offset..]);
             return spki;
         }
 
@@ -199,6 +202,29 @@ namespace ECDsa_Multikey
             offset += pub.Length;
             publicMultikey.AsSpan()[2..].CopyTo(pkcs8.AsSpan()[offset..]);
             return pkcs8;
+        }
+
+        private static byte[] DecompressKey(Span<byte> key, ECCurve curve)
+        {
+            if (curve.Prime is null || curve.A is null || curve.B is null)
+            {
+                throw new Exception("Curve parameters are missing.");
+            }
+            var p = new BigInteger(curve.Prime);
+            var x = new BigInteger(key[1..]);
+            var a = new BigInteger(curve.A);
+            var b = new BigInteger(curve.B);
+            var ysq = (BigInteger.ModPow(x, 3, p) + a * x + b) % p;
+            var y = BigInteger.ModPow(ysq, (p + 1) / 4, p);
+            if (y % 2 != key[0] % 2)
+            {
+                y = p - y;
+            }
+            var result = new byte[key.Length * 2 - 1];
+            result[0] = 0x04;
+            x.ToByteArray(isBigEndian: false, isUnsigned: true).CopyTo(result.AsSpan()[1..]);
+            y.ToByteArray(isBigEndian: false, isUnsigned: true).CopyTo(result.AsSpan()[(1 + x.ToByteArray().Length)..]);
+            return result;
         }
 
         private static void EnsureMultikeyHeadersMatch(byte[] publicMultikey, byte[] secretMultikey)

@@ -15,7 +15,7 @@ namespace RDFDatasetCanonicalization.Tests
         public RDFCTestData()
         {
             // Read manifest.jsonld
-            var manifest = JObject.Parse(System.IO.File.ReadAllText("manifest.jsonld"));
+            var manifest = JObject.Parse(File.ReadAllText("manifest.jsonld"));
             var entries = manifest["entries"];
             foreach (var entry in entries!)
             {
@@ -23,9 +23,12 @@ namespace RDFDatasetCanonicalization.Tests
                 var isPositive = entry.Value<string>("type") != "rdfc:RDFC10NegativeEvalTest";
                 if (isPositive)
                 {
-                    var input = Path.Combine("TestCases", entry["action"]?.ToString());
-                    var expected = Path.Combine("Results", entry["result"]?.ToString());
-                    Add(name, File.ReadAllText(input), File.ReadAllText(expected));
+                    var input = Path.Combine("TestCases", entry["action"].ToString().Remove(0, 7));
+                    var expected = Path.Combine("Results", entry["result"].ToString().Remove(0, 7));
+                    if (name != null && input != null && expected != null)
+                    {
+                        Add(name, File.ReadAllText(input), File.ReadAllText(expected));
+                    }
                 }
             }
         }

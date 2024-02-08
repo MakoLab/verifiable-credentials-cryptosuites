@@ -80,10 +80,31 @@ namespace ECDsa_Multikey
             {
                 throw new Exception("'key' must be a Multikey with type 'Multikey'.");
             }
-            if (key.Context is null || !key.Context.Contains(Constants.MultikeyContextV1Url))
-            {
-                throw new Exception($"'key' must be a Multikey with context {Constants.MultikeyContextV1Url}");
-            }
+            AssertContext(key.Context);
         }
+
+        private static void AssertContext(JToken? context)
+        {
+            if (context is null)
+            {
+                throw new Exception("'key' must be a Multikey with a context.");
+            }
+            if (context is JValue v)
+            {
+                if (v.Value?.ToString() == Constants.MultikeyContextV1Url)
+                {
+                    return;
+                }
+            }
+            if (context is JArray a)
+            {
+                if (a.Select(i => i.ToString()).Contains(Constants.MultikeyContextV1Url))
+                {
+                    return;
+                }
+            }
+            throw new Exception($"'key' must be a Multikey with a context of '{Constants.MultikeyContextV1Url}'.");
+        }
+
     }
 }

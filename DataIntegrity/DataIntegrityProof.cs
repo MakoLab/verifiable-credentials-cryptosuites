@@ -21,7 +21,7 @@ using VDS.RDF.JsonLd;
 
 namespace DataIntegrity
 {
-    internal class DataIntegrityProof : LinkedDataProof
+    public class DataIntegrityProof : LinkedDataSignature
     {
         private const string ProofType = "DataIntegrityProof";
         private const string DataIntegrityContext = "https://w3id.org/security/data-integrity/v1";
