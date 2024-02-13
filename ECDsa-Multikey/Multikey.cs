@@ -1,10 +1,13 @@
 ﻿using Cryptosuite.Core;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto.Generators;
+using Org.BouncyCastle.Crypto.Parameters;
+using Org.BouncyCastle.Security;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -12,14 +15,23 @@ namespace ECDsa_Multikey
 {
     public class Multikey
     {
-        public static KeyPairInterface Generate(string id, string controller, string curve)
+        public static KeyPairInterface Generate(string id, string controller, string curveName)
         {
-            var eccurve = ECDsaCurve.ToECCurve(curve);
-            var keypair = new KeyPair
+            // generate bouncy castle ecdsa key pair
+            var curve = ECNamedCurveTable.GetByName(curveName);
+            var domainParams = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H, curve.GetSeed());
+            var keyParams = new ECKeyGenerationParameters(domainParams, new SecureRandom());
+            var generator = new ECKeyPairGenerator("ECDSA");
+            generator.Init(keyParams);
+            var keys = generator.GenerateKeyPair();
+            var keyPair = new KeyPair
             {
-                Keys = ECDsa.Create(eccurve),
+                Id = id,
+                Controller = controller,
+                Algorithm = curveName,
+                Keys = keys,
             };
-            var kpi = CreateKeyPairInterface(keypair);
+            var kpi = CreateKeyPairInterface(keyPair);
             var exported = kpi.Export(publicKey: true);
             var publicKeyMultibase = exported.PublicKeyMultibase;
             if (controller is not null && id is null)
@@ -66,10 +78,11 @@ namespace ECDsa_Multikey
                 Id = keyPair.Id,
                 Controller = keyPair.Controller,
                 Keys = keyPair.Keys,
+                Algorithm = keyPair.Algorithm,
                 PublicKeyMultibase = multi.PublicKeyMultibase,
                 SecretKeyMultibase = multi.SecretKeyMultibase,
-                Verifier = new Verifier(keyPair.Id, keyPair.Keys),
-                Signer = new Signer(keyPair.Id, keyPair.Keys),
+                Verifier = new Verifier(keyPair.Id, keyPair.Keys, keyPair.Algorithm),
+                Signer = new Signer(keyPair.Id, keyPair.Keys, keyPair.Algorithm),
             };
             return kpi;
         }

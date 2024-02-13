@@ -1,4 +1,7 @@
-﻿using System;
+﻿using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Crypto;
+using Org.BouncyCastle.Security;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Security.Cryptography;
@@ -9,28 +12,26 @@ namespace Cryptosuite.Core
 {
     public class Verifier
     {
-        private readonly HashAlgorithmName _hashAlgorithmName;
+        private readonly ISigner _verifier;
         public string? Id { get; set; }
-        public string Algorithm { get; private set; }
-        public ECDsa Key { get; set; }
+        public DerObjectIdentifier Algorithm { get; private set; }
+        public AsymmetricCipherKeyPair Key { get; set; }
 
-        public Verifier(string? id, ECDsa key)
+        public Verifier(string? id, AsymmetricCipherKeyPair key, string algorithm)
         {
-            _hashAlgorithmName = key.KeySize switch
-            {
-                256 => HashAlgorithmName.SHA256,
-                384 => HashAlgorithmName.SHA384,
-                512 => HashAlgorithmName.SHA512,
-                _ => throw new System.Exception("Unsupported key size.")
-            };
             Id = id;
             Key = key;
-            Algorithm = ECDsaCurve.FromECCurve(key.ExportParameters(false).Curve);
+            Algorithm = ECDsaCurve.ToDerObjectIdentifier(algorithm);
+            _verifier = SignerUtilities.GetSigner(Algorithm);
+            _verifier.Init(false, Key.Public);
         }
 
         public bool Verify(byte[] verifyData, byte[] signature)
         {
-            return Key.VerifyData(verifyData, signature, _hashAlgorithmName);
+            _verifier.BlockUpdate(verifyData, 0, verifyData.Length);
+            var result = _verifier.VerifySignature(signature);
+            _verifier.Reset();
+            return result;
         }
     }
 }

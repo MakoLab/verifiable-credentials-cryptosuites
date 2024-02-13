@@ -16,6 +16,7 @@ namespace JsonLdExtensions.Canonicalization
         {
             options ??= new JsonLdNormalizerOptions();
             options.ProduceGeneralizedRdf = false;
+            options.FrameExpansion = true;
             var ts = new TripleStore();
             var parser = new JsonLdParser(options);
             if (options.SkipExpansion)

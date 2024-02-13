@@ -31,7 +31,7 @@ namespace JsonLdSignatures.Suites
             throw new NotImplementedException();
         }
 
-        public void EnsureSuiteContext(JObject document, bool addSuiteContext)
+        public virtual void EnsureSuiteContext(JObject document, bool addSuiteContext)
         {
             throw new NotImplementedException();
         }

@@ -1,4 +1,5 @@
 ﻿using Cryptosuite.Core;
+using Org.BouncyCastle.Crypto;
 using System.Security.Cryptography;
 
 namespace ECDsa_Multikey
@@ -7,7 +8,8 @@ namespace ECDsa_Multikey
     {
         public string? Id { get; set; }
         public string? Controller { get; set; }
-        public ECDsa? Keys { get; set; }
+        public AsymmetricCipherKeyPair? Keys { get; set; }
+        public string? Algorithm { get; set; }
         public string? PublicKeyMultibase { get; set; }
         public string? SecretKeyMultibase { get; set; }
 
@@ -21,6 +23,7 @@ namespace ECDsa_Multikey
                 Id = Id,
                 Controller = Controller,
                 Keys = Keys,
+                Algorithm = Algorithm,
             };
             return Serialize.ExportKeyPair(keyPair, publicKey, secretKey, includeContext);
         }

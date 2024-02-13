@@ -141,7 +141,7 @@ namespace DataIntegrity
         public bool VerifySignature(byte[] verifyData, VerificationMethod verificationMethod, Proof proof)
         {
             var verifier = _cryptoSuite.CreateVerifier(verificationMethod);
-            if (_cryptoSuite.RequiredAlgorithm != verifier.Algorithm)
+            if (_cryptoSuite.RequiredAlgorithm != verifier.Algorithm.ToAlgorithmName())
             {
                 throw new ArgumentException($"The verifier's algorithm {verifier.Key} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
             }
@@ -193,11 +193,11 @@ namespace DataIntegrity
             return cachedDocHash.Concat(proofHash).ToArray();
         }
 
-        public JObject EnsureSuiteContext(JObject document, bool addSuiteContext)
+        public override void EnsureSuiteContext(JObject document, bool addSuiteContext)
         {
             if (IncludesContext(document, ContextUrl) || IncludesContext(document, VC20Context))
             {
-                return document;
+                return;
             }
             if (!addSuiteContext)
             {
@@ -215,7 +215,6 @@ namespace DataIntegrity
             {
                 document["@context"] = ContextUrl;
             }
-            return document;
         }
 
         private bool IncludesContext(JObject document, string context)
@@ -269,7 +268,7 @@ namespace DataIntegrity
             {
                 return (null, null);
             }
-            if (signer.Algorithm != requiredAlgorithm)
+            if (signer.Algorithm.ToAlgorithmName() != requiredAlgorithm)
             {
                 throw new ArgumentException($"The signer's algorithm {signer.Algorithm} does not match the required algorithm for the cryptosuite {requiredAlgorithm}.");
             }

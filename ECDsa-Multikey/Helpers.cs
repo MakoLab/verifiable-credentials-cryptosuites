@@ -1,4 +1,6 @@
 ﻿using Cryptosuite.Core;
+using Org.BouncyCastle.Asn1.X9;
+using Org.BouncyCastle.Crypto.Parameters;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -50,28 +52,28 @@ namespace ECDsa_Multikey
             throw new Exception("Unsupported secret multikey header.");
         }
 
-        internal static int GetSecretKeySize(ECDsa keys)
+        internal static int GetSecretKeySize(string? algorithm)
         {
-            return keys.ExportParameters(true).Curve.Oid.FriendlyName switch
+            return algorithm switch
             {
-                "nistP256" => 32,
-                "nistP384" => 48,
-                "nistP521" => 66,
+                ECDsaCurve.P256 => 32,
+                ECDsaCurve.P384 => 48,
+                ECDsaCurve.P521 => 66,
                 _ => throw new Exception("Unsupported curve.")
             };
         }
 
-        internal static void SetSecretKeyHeader(ECDsa keys, byte[] buffer)
+        internal static void SetSecretKeyHeader(string? algorithm, byte[] buffer)
         {
-            switch (keys.ExportParameters(true).Curve.Oid.FriendlyName)
+            switch (algorithm)
             {
-                case "nistP256":
+                case ECDsaCurve.P256:
                     Constants.MulticodecP256SecretKeyHeader.CopyTo(buffer.AsSpan());
                     break;
-                case "nistP384":
+                case ECDsaCurve.P384:
                     Constants.MulticodecP384SecretKeyHeader.CopyTo(buffer.AsSpan());
                     break;
-                case "nistP521":
+                case ECDsaCurve.P521:
                     Constants.MulticodecP521SecretKeyHeader.CopyTo(buffer.AsSpan());
                     break;
                 default:
@@ -79,17 +81,17 @@ namespace ECDsa_Multikey
             }
         }
 
-        internal static void SetPublicKeyHeader(ECDsa keys, byte[] buffer)
+        internal static void SetPublicKeyHeader(string? algorithm, byte[] buffer)
         {
-            switch (keys.ExportParameters(false).Curve.Oid.FriendlyName)
+            switch (algorithm)
             {
-                case "nistP256":
+                case ECDsaCurve.P256:
                     Constants.MulticodecP256PublicKeyHeader.CopyTo(buffer.AsSpan());
                     break;
-                case "nistP384":
+                case ECDsaCurve.P384:
                     Constants.MulticodecP384PublicKeyHeader.CopyTo(buffer.AsSpan());
                     break;
-                case "nistP521":
+                case ECDsaCurve.P521:
                     Constants.MulticodecP521PublicKeyHeader.CopyTo(buffer.AsSpan());
                     break;
                 default:
