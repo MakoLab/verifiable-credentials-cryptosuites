@@ -36,5 +36,44 @@ namespace JsonLdSignatures
         {
             return _proofSetService.Verify(document, suites, purposes, documentLoader);
         }
+
+        public IEnumerable<Result<VerificationResult>> Verify(JObject document, LinkedDataSignature suite, ProofPurpose purpose, IDocumentLoader documentLoader)
+        {
+            return _proofSetService.Verify(document, new[] { suite }, new List<ProofPurpose>() { purpose }, documentLoader);
+        }
+
+        public JObject ToJsonResult(IEnumerable<Result<VerificationResult>> results)
+        {
+            var json = new JObject();
+            var array = new JArray();
+            var errors = new JArray();
+            foreach (var result in results)
+            {
+                var verificationResult = result.ValueOrDefault;
+                if (verificationResult != null)
+                {
+                    var verificationResultJson = JObject.FromObject(verificationResult);
+                    array.Add(verificationResultJson);
+                }
+                else
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        errors.Add(JValue.CreateString(error.Message));
+                    }
+                }
+            }
+            json.Add("results", array);
+            json.Add("errors", errors);
+            if (array.Count > 0)
+            {
+                json.Add("verified", true);
+            }
+            else
+            {
+                json.Add("verified", false);
+            }
+            return json;
+        }
     }
 }

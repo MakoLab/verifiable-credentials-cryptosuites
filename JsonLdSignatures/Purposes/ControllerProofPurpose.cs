@@ -29,7 +29,7 @@ namespace JsonLdSignatures.Purposes
         private readonly bool _termDefinedByDIDContext;
         private readonly string _term;
 
-        public ControllerProofPurpose(string term, Controller? controller, DateTime date, int maxTimestampDelta = int.MaxValue)
+        public ControllerProofPurpose(string term, Controller? controller, DateTime? date, int maxTimestampDelta = int.MaxValue)
             : base(term, date, maxTimestampDelta)
         {
             _controller = controller;

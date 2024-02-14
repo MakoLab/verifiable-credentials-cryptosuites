@@ -12,10 +12,10 @@ namespace JsonLdSignatures.Purposes
     public class ProofPurpose : IProofPurpose
     {
         private string Term { get; }
-        private DateTime Date { get; }
+        private DateTime? Date { get; }
         private int MaxTimestampDelta { get; }
 
-        public ProofPurpose(string term, DateTime date, int maxTimestampDelta = Int32.MaxValue)
+        public ProofPurpose(string term, DateTime? date, int maxTimestampDelta = Int32.MaxValue)
         {
             Term = term;
             Date = date;
@@ -24,17 +24,24 @@ namespace JsonLdSignatures.Purposes
 
         public Result<ValidationResult> Validate(Proof proof)
         {
-            if (MaxTimestampDelta != Int32.MaxValue)
+            try
             {
-                var expected = Date.TimeOfDay.TotalMilliseconds;
-                var delta = MaxTimestampDelta * 1000;
-                var created = proof.Created?.TimeOfDay.TotalMilliseconds;
-                if (created <= expected - delta || created >= expected + delta)
+                if (MaxTimestampDelta != Int32.MaxValue)
                 {
-                    return Result.Fail("The proof's created timestamp is out of range.");
+                    var expected = (Date ?? DateTimeOffset.UtcNow).ToUnixTimeMilliseconds();
+                    var delta = MaxTimestampDelta * 1000;
+                    var created = proof.Created?.TimeOfDay.TotalMilliseconds;
+                    if (created <= expected - delta || created >= expected + delta)
+                    {
+                        return Result.Fail("The proof's created timestamp is out of range.");
+                    }
                 }
+                return Result.Ok();
             }
-            return Result.Ok();
+            catch (Exception ex)
+            {
+                return Result.Fail(ex.Message);
+            }
         }
 
         public Proof Update(Proof proof)

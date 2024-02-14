@@ -72,8 +72,29 @@ app.MapPost("/verifiers/credentials/verify", ([FromBody] object json) =>
 {
     var jsonStr = JsonSerializer.Serialize(json);
     var jsonObj = JObject.Parse(jsonStr);
-    app.Logger.LogDebug("Verify");
-    return Results.Json(jsonObj);
+    var keypair = Multikey.From(new MultikeyModel
+    {
+        PublicKeyMultibase = MockData.PublicKeyMultibase,
+        SecretKeyMultibase = MockData.SecretKeyMultibase,
+        Controller = MockData.Controller
+    });
+    var crypto = new ECDsa2019Cryptosuite();
+    var suite = new DataIntegrityProof(crypto, keypair.Signer);
+    var jsonld = new JsonLdSignatureService();
+    var loader = new SecurityDocumentLoader.SecurityDocumentLoader();
+    try
+    {
+        var result = jsonld.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
+        app.Logger.LogDebug("Verify");
+        jsonObj = jsonld.ToJsonResult(result);
+        return Results.Json(jsonObj);
+    }
+    catch (Exception e)
+    {
+        app.Logger.LogError(e.Message);
+        return Results.BadRequest(e.Message);
+    }
+    
 })
 .WithName("Verifier")
 .WithOpenApi();
