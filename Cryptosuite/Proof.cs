@@ -5,10 +5,12 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace Cryptosuite.Core
 {
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore)]
     public class Proof
     {
         [JsonProperty("id")]
