@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace ECDsa_2019_Cryptosuite.Tests
 {
-    internal class MockData
+    public class MockData
     {
         private const string publicKeyMultibase = "zDnaekGZTbQBerwcehBSXLqAg6s55hVEBms1zFy89VHXtJSa9";
         private const string secretKeyMultibase = "z42tqZ5smVag3DtDhjY9YfVwTMyVHW6SCHJi2ZMrD23DGYS3";
@@ -39,18 +39,18 @@ namespace ECDsa_2019_Cryptosuite.Tests
             """;
 
         internal const string Controller = "https://example.edu/issuers/565049";
-        internal readonly MultikeyModel MockPublicEcdsaMultikey;
-        internal readonly MultikeyModel EcdsaMultikeyKeyPair;
-        internal readonly MultikeyModel EcdsaSecp256KeyPair;
-        internal readonly MultikeyModel ControllerDocEcdsaMultikey;
-        internal readonly JObject Credential = JObject.Parse(credString);
+        public readonly MultikeyModel MockPublicEcdsaMultikey;
+        public readonly MultikeyModel EcdsaMultikeyKeyPair;
+        public readonly MultikeyModel EcdsaSecp256KeyPair;
+        public readonly MultikeyModel ControllerDocEcdsaMultikey;
+        public readonly JObject Credential = JObject.Parse(credString);
 
-        internal MockData()
+        public MockData()
         {
             MockPublicEcdsaMultikey = new MultikeyModel
             {
                 Context = new JValue("https://w3id.org/security/multikey/v1"),
-                Type = "MultiKey",
+                Type = "Multikey",
                 Controller = Controller,
                 Id = id,
                 PublicKeyMultibase = publicKeyMultibase,
@@ -59,7 +59,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
             EcdsaMultikeyKeyPair = new MultikeyModel
             {
                 Context = new JValue("https://w3id.org/security/multikey/v1"),
-                Type = "MultiKey",
+                Type = "Multikey",
                 Controller = Controller,
                 Id = id,
                 PublicKeyMultibase = publicKeyMultibase,

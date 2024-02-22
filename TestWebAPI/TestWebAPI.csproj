@@ -15,6 +15,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DataIntegrity\DataIntegrity.csproj" />
+    <ProjectReference Include="..\ECDsa-2019-Cryptosuite.Tests\ECDsa-2019-Cryptosuite.Tests.csproj" />
     <ProjectReference Include="..\ECDsa-2019-Cryptosuite\ECDsa-2019-Cryptosuite.csproj" />
     <ProjectReference Include="..\ECDsa-Multikey\ECDsa-Multikey.csproj" />
     <ProjectReference Include="..\JsonLdSignatures\JsonLdSignatures.csproj" />

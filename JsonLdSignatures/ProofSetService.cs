@@ -131,7 +131,6 @@ namespace JsonLdSignatures
                     var r = Result.Fail<VerificationResult>(result.Errors.First());
                     r.Value.PurposeValidation = new List<Result<ValidationResult>>();
                     results.Add(r);
-
                 }
             }
             foreach (var (purpose, proofs) in purposeToProofs)

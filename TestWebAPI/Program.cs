@@ -71,7 +71,11 @@ app.MapPost("/issuers/credentials/issue", ([FromBody] object json) =>
 app.MapPost("/verifiers/credentials/verify", ([FromBody] object json) =>
 {
     var jsonStr = JsonSerializer.Serialize(json);
-    var jsonObj = JObject.Parse(jsonStr);
+    var jsonObj = JObject.Parse(jsonStr).ParseJson();
+    if (jsonObj is null)
+    {
+        return Results.BadRequest("Invalid JSON");
+    }
     var keypair = Multikey.From(new MultikeyModel
     {
         PublicKeyMultibase = MockData.PublicKeyMultibase,
@@ -81,7 +85,7 @@ app.MapPost("/verifiers/credentials/verify", ([FromBody] object json) =>
     var crypto = new ECDsa2019Cryptosuite();
     var suite = new DataIntegrityProof(crypto, keypair.Signer);
     var jsonld = new JsonLdSignatureService();
-    var loader = new SecurityDocumentLoader.SecurityDocumentLoader();
+    var loader = new TestWebDocumentLoader();
     try
     {
         var result = jsonld.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
@@ -100,3 +104,11 @@ app.MapPost("/verifiers/credentials/verify", ([FromBody] object json) =>
 .WithOpenApi();
 
 app.Run("http://localhost:40443");
+
+public static class RequestParser
+{
+    public static JObject? ParseJson(this JObject json)
+    {
+        return json["verifiableCredential"] as JObject;
+    }
+}

@@ -12,5 +12,10 @@ namespace Cryptosuite.Core
         public string? Type { get; set; }
         public string? Controller { get; set; }
         public IEnumerable<VerificationMethod>? AssertionMethod { get; set; }
+
+        public virtual VerificationMethod FromJson(string json)
+        {
+            return JsonConvert.DeserializeObject<VerificationMethod>(json);
+        }
     }
 }

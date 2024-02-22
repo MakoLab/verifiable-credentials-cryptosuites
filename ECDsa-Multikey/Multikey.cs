@@ -45,7 +45,7 @@ namespace ECDsa_Multikey
 
         public static KeyPairInterface From(MultikeyModel multikey)
         {
-            if (multikey.Type is not null && multikey.Type != "Multikey")
+            if (multikey.Type is not null && multikey.Type.ToLower() != "multikey")
             {
                 multikey = Translators.ToMultikey(multikey);
                 return CreateKeyPairInterface(multikey);
@@ -89,7 +89,7 @@ namespace ECDsa_Multikey
 
         private static void AssertMultikey(MultikeyModel key)
         {
-            if (key.Type is not null && key.Type != "Multikey")
+            if (key.Type is not null && key.Type.ToLower() != "multikey")
             {
                 throw new Exception("'key' must be a Multikey with type 'Multikey'.");
             }

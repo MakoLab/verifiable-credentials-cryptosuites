@@ -2,6 +2,7 @@
 using Cryptosuite.Core.Interfaces;
 using Cryptosuite.Core.Util;
 using ECDsa_2019_Cryptosuite;
+using ECDsa_Multikey;
 using FluentResults;
 using JsonLdExtensions;
 using JsonLdExtensions.Canonicalization;
@@ -229,7 +230,10 @@ namespace DataIntegrity
 
         private string CanonizeProof(Proof proof, JObject document, IDocumentLoader documentLoader)
         {
-            proof.Context = document["@context"];
+            proof = new Proof(proof)
+            {
+                Context = document["@context"]
+            };
             EnsureSuiteContext(JObject.FromObject(proof), true);
             proof.ProofValue = null;
             if (_cryptoSuite is ICanonize cs)
@@ -253,7 +257,15 @@ namespace DataIntegrity
             try
             {
                 var result = documentLoader.LoadDocument(new Uri(verificationMethod), new JsonLdLoaderOptions());
-                var doc = result.GetDocument().ToObject<VerificationMethod>() ?? throw new ArgumentException($"Could not load verification method {verificationMethod}.");
+                var doc = result.GetDocument().ToObject<VerificationMethod>();
+                if (doc?.Type?.ToLower() == "multikey")
+                {
+                    doc = result.GetDocument().ToObject<MultikeyModel>();
+                }
+                if (doc is null)
+                {
+                    throw new ArgumentException($"Could not load verification method {verificationMethod}.");
+                }
                 return doc;
             }
             catch (Exception ex)

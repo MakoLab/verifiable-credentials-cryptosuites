@@ -20,7 +20,7 @@ namespace ECDsa_2019_Cryptosuite
 
         public Verifier CreateVerifier(VerificationMethod verificationMethod)
         {
-            if (verificationMethod is not MultikeyModel)
+            if (verificationMethod.Type?.ToLower() != "multikey")
             {
                 throw new Exception("VerificationMethod must be a MultikeyModel");
             }
