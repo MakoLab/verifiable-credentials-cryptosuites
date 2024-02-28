@@ -91,14 +91,14 @@ app.MapPost("/verifiers/credentials/verify", ([FromBody] object json) =>
         var result = jsonld.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
         app.Logger.LogDebug("Verify");
         jsonObj = jsonld.ToJsonResult(result);
-        return Results.Json(jsonObj);
+        return Results.Content(jsonObj.ToString(), contentType: "application/json", statusCode: 200);
     }
     catch (Exception e)
     {
-        app.Logger.LogError(e.Message);
-        return Results.BadRequest(e.Message);
+        app.Logger.LogError("{Exception message}", e.Message);
+        app.Logger.LogError("{Exception stack trace}", e.StackTrace);
+        return Results.Content(jsonld.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString(), contentType: "application/json", statusCode: 400);
     }
-    
 })
 .WithName("Verifier")
 .WithOpenApi();

@@ -7,6 +7,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -45,7 +46,7 @@ namespace JsonLdSignatures
         public JObject ToJsonResult(IEnumerable<Result<VerificationResult>> results)
         {
             var json = new JObject();
-            var array = new JArray();
+            var goods = new JArray();
             var errors = new JArray();
             foreach (var result in results)
             {
@@ -53,7 +54,7 @@ namespace JsonLdSignatures
                 if (verificationResult != null)
                 {
                     var verificationResultJson = JObject.FromObject(verificationResult);
-                    array.Add(verificationResultJson);
+                    goods.Add(verificationResultJson);
                 }
                 else
                 {
@@ -63,15 +64,51 @@ namespace JsonLdSignatures
                     }
                 }
             }
-            json.Add("results", array);
+            json.Add("results", goods);
             json.Add("errors", errors);
-            if (array.Count > 0)
+            if (goods.Count > 0)
             {
                 json.Add("verified", true);
+                var res = new JObject
+                {
+                    { "results", goods },
+                    { "status", 200 }
+                };
+                json.Add("result", res);
             }
             else
             {
                 json.Add("verified", false);
+                var res = new JObject
+                {
+                    { "errors", errors },
+                    { "status", 400 }
+                };
+                json.Add("error", res);
+            }
+            return json;
+        }
+
+        public JObject ToJsonResult(string message, HttpStatusCode status)
+        {
+            var json = new JObject();
+            if (status == HttpStatusCode.OK)
+            {
+                var res = new JObject()
+                {
+                    { "status", (int)status },
+                    { "results", new JArray() { message } }
+                };
+                json.Add("result", res);
+            }
+            else
+            {
+                var res = new JObject
+                {
+                    { "status", (int)status },
+                    { "errors", new JArray() { message } }
+                };
+                json.Add("error", res);
             }
             return json;
         }

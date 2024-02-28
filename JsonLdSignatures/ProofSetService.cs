@@ -129,7 +129,7 @@ namespace JsonLdSignatures
                 else
                 {
                     var r = Result.Fail<VerificationResult>(result.Errors.First());
-                    r.Value.PurposeValidation = new List<Result<ValidationResult>>();
+                    //r.Value.PurposeValidation = new List<Result<ValidationResult>>();
                     results.Add(r);
                 }
             }
@@ -137,8 +137,8 @@ namespace JsonLdSignatures
             {
                 foreach (var proof in proofs)
                 {
-                    var result = results.FirstOrDefault(r => r.Value.Proof == proof);
-                    if (!result!.IsSuccess)
+                    var result = results.FirstOrDefault(r => r.IsSuccess && r.Value.Proof == proof);
+                    if (result is null || !result.IsSuccess)
                     {
                         continue;
                     }
