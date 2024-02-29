@@ -64,8 +64,6 @@ namespace JsonLdSignatures
                     }
                 }
             }
-            json.Add("results", goods);
-            json.Add("errors", errors);
             if (goods.Count > 0)
             {
                 json.Add("verified", true);
