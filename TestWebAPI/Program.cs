@@ -34,6 +34,11 @@ app.MapGet("/", () =>
 .WithName("Root")
 .WithOpenApi();
 
+app.MapGet("/issuers/" + MockData.PublicKeyMultibase, () =>
+{
+    return Results.Content(MockData.GetVerificationMethodDocument(), contentType: "application/json", statusCode: 200);
+});
+
 app.MapPost("/issuers/credentials/issue", ([FromBody] object json) =>
 {
     // Deserialize the JSON object
@@ -90,14 +95,16 @@ app.MapPost("/verifiers/credentials/verify", ([FromBody] object json) =>
     {
         var result = jsonld.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
         app.Logger.LogDebug("Verify");
-        jsonObj = jsonld.ToJsonResult(result);
-        return Results.Content(jsonObj.ToString(), contentType: "application/json", statusCode: 200);
+        var response = jsonld.ToJsonResult(result).ToString();
+        app.Logger.LogDebug("{Response}", response);
+        return Results.Content(response, contentType: "application/json", statusCode: 200);
     }
     catch (Exception e)
     {
+        var response = jsonld.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString();
         app.Logger.LogError("{Exception message}", e.Message);
-        app.Logger.LogError("{Exception stack trace}", e.StackTrace);
-        return Results.Content(jsonld.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString(), contentType: "application/json", statusCode: 400);
+        app.Logger.LogError("{Response}",response);
+        return Results.Content(response, contentType: "application/json", statusCode: 400);
     }
 })
 .WithName("Verifier")

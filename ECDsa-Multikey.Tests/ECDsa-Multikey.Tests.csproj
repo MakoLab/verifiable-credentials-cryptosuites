@@ -23,4 +23,8 @@
     </PackageReference>
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\ECDsa-2019-Cryptosuite.Tests\ECDsa-2019-Cryptosuite.Tests.csproj" />
+  </ItemGroup>
+
 </Project>
