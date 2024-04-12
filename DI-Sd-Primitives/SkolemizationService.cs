@@ -8,12 +8,16 @@ using System.Text.RegularExpressions;
 using JsonLdExtensions.Canonicalization;
 using JsonLdExtensions;
 using VDS.RDF.Writing.Formatting;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using VDS.RDF.JsonLd;
+using VDS.RDF.Writing;
 
 namespace DI_Sd_Primitives
 {
-    public class SkolemizationService
+    public static class SkolemizationService
     {
-        public List<string> Skolemize(List<string> nQuads, string urnScheme)
+        public static List<string> Skolemize(List<string> nQuads, string urnScheme)
         {
             var ts = new TripleStore();
             ts.LoadFromString(string.Join("\n", nQuads));
@@ -31,7 +35,7 @@ namespace DI_Sd_Primitives
             return sts.GetQuads().Select(q => q.ToNQuad(formatter)).ToList();
         }
 
-        public List<string> Deskolemize(List<string> nQuads, string urnScheme)
+        public static List<string> Deskolemize(List<string> nQuads, string urnScheme)
         {
             var ts = new TripleStore();
             ts.LoadFromString(string.Join("\n", nQuads));
@@ -45,6 +49,79 @@ namespace DI_Sd_Primitives
             }
             var formatter = new NQuadsCanonFormatter();
             return sts.GetQuads().Select(q => q.ToNQuad(formatter)).ToList();
+        }
+
+        public static JToken SkolemizeExpandedJsonLd(JToken expandedJson, string urnScheme, string guid, ref int count)
+        {
+            var skolemizedExpandedDocument = new JObject();
+            foreach (var token in expandedJson)
+            {
+                //If either element is not an object or it contains the key @value, append a copy of element to
+                //skolemizedExpandedDocument and continue to the next element.
+                if (token.Type != JTokenType.Object || token["@value"] != null)
+                {
+                    skolemizedExpandedDocument.Add(token);
+                    continue;
+                }
+                //Otherwise, initialize skolemizedNode to an object, and for each property and value in element:
+                var skolemizedNode = new JObject();
+                foreach (var (key, value) in (JObject)token)
+                {
+                    //If value is an array, set the value of property in skolemizedNode to the result of calling this
+                    //algorithm recursively passing value for expanded and keeping the other parameters the same.
+                    if (value is JArray array)
+                    {
+                        skolemizedNode.Add(key, SkolemizeExpandedJsonLd(value, urnScheme, guid, ref count));
+                    }
+                    //Otherwise, set the value of property in skolemizedNode to the first element in the array result
+                    //of calling this algorithm recursively passing an array with value as its only element for
+                    //expanded and keeping the other parameters the same.
+                    else
+                    {
+                        skolemizedNode.Add(key, SkolemizeExpandedJsonLd(new JArray(value), urnScheme, guid, ref count));
+                    }
+                }
+                //If skolemizedNode has no @id property, set the value of the @id property in skolemizedNode to the
+                //concatenation of "urn:", urnScheme, "_", randomString, "_" and the value of count, incrementing the
+                //value of count afterwards.
+                if (skolemizedNode["@id"] is null)
+                {
+                    skolemizedNode.Add("@id", $"urn{urnScheme}_{guid}_{count++}");
+                }
+                //Otherwise, if the value of the @id property in skolemizedNode starts with "_:", preserve the existing
+                //blank node identifier when skolemizing by setting the value of the @id property in skolemizedNode to
+                //the concatenation of "urn:", urnScheme, and the blank node identifier (i.e., the existing value of
+                //the @id property minus the "_:" prefix; e.g., if the existing value of the @id property is _:b0, the
+                //blank node identifier is b0).
+                else if (skolemizedNode["@id"]!.ToString().StartsWith("_:"))
+                {
+                    skolemizedNode["@id"] = $"urn:{urnScheme}_{skolemizedNode["@id"]!.ToString()[2..]}";
+                }
+                //Append skolemizedNode to skolemizedExpandedDocument.
+                skolemizedExpandedDocument.Add(skolemizedNode);
+            }
+            return skolemizedExpandedDocument;
+        }
+
+        public static (JToken skolemizedExpandedDocument, JToken skolemizedCompactDocument) SkolemizeCompactJsonLd(JToken compactJson, string urnScheme)
+        {
+            var context = compactJson["@context"];
+            var expandedJson = JsonLdProcessor.Expand(compactJson);
+            var count = 0;
+            var skolemizedExpandedDocument = SkolemizeExpandedJsonLd(expandedJson, urnScheme, Guid.NewGuid().ToString(), ref count);
+            var skolemizedCompactDocument = JsonLdProcessor.Compact(skolemizedExpandedDocument, context, new JsonLdProcessorOptions());
+            return (skolemizedExpandedDocument, skolemizedCompactDocument);
+        }
+
+        public static List<string> ToDeskolemizedNQuads(this JToken skolemizedDocument)
+        {
+            var triplestore = new TripleStore();
+            triplestore.LoadFromString(skolemizedDocument.ToString());
+            var nQuadsWriter = new NQuadsWriter();
+            var data = VDS.RDF.Writing.StringWriter.Write(triplestore, nQuadsWriter);
+            var nQuads = data.Split("\n").ToList();
+            var deskolemizedNQuads = Deskolemize(nQuads, "custom-scheme");
+            return deskolemizedNQuads;
         }
 
         private static INode SkolemizeNode(INode node, string urnScheme)
