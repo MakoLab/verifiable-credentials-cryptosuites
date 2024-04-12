@@ -17,13 +17,12 @@ namespace DI_Sd_Primitives.Tests
         public void Skolemize_ReturnsSkolemizedNQuads(string nQuad, string expectedSkolemizedNQuad)
         {
             // Arrange
-            var service = new SkolemizationService();
             var nQuads = nQuad.Split('\n').ToList();
             var expectedNQuads = expectedSkolemizedNQuad.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(l => l + "\n").ToList();
             var urnScheme = "example";
 
             // Act
-            var skolemizedNQuads = service.Skolemize(nQuads, urnScheme);
+            var skolemizedNQuads = SkolemizationService.Skolemize(nQuads, urnScheme);
 
             // Assert
             var i = 0;
@@ -31,7 +30,7 @@ namespace DI_Sd_Primitives.Tests
             {
                 Assert.Equal(expectedNQuads[i++], skolemizedNQuad);
             }
-            
+
         }
 
         [Theory]
@@ -43,14 +42,13 @@ namespace DI_Sd_Primitives.Tests
         public void Deskolemize_ReturnsDeskolemizedNQuads(string nQuad, string expectedDeskolemizedNQuad)
         {
             // Arrange
-            var service = new SkolemizationService();
             var nQuads = nQuad.Split('\n').ToList();
             var expectedNQuads = expectedDeskolemizedNQuad.Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(l => l + "\n").ToList();
 
             var urnScheme = "example";
 
             // Act
-            var deskolemizedNQuads = service.Deskolemize(nQuads, urnScheme);
+            var deskolemizedNQuads = SkolemizationService.Deskolemize(nQuads, urnScheme);
 
             // Assert
             var i = 0;
