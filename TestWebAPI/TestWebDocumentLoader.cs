@@ -8,8 +8,8 @@ namespace TestWebAPI
         public TestWebDocumentLoader()
         {
             var mockData = new ECDsa_2019_Cryptosuite.Tests.MockData();
-            AddStatic(mockData.EcdsaMultikeyKeyPair.Id, JObject.FromObject(mockData.EcdsaMultikeyKeyPair));
-            AddStatic(mockData.ControllerDocEcdsaMultikey.Id, JObject.FromObject(mockData.ControllerDocEcdsaMultikey));
+            AddStatic(mockData.EcdsaMultikeyKeyPair.Id!, JObject.FromObject(mockData.EcdsaMultikeyKeyPair));
+            AddStatic(mockData.ControllerDocEcdsaMultikey.Id!, JObject.FromObject(mockData.ControllerDocEcdsaMultikey));
         }
     }
 }

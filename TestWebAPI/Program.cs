@@ -34,7 +34,7 @@ app.MapGet("/", () =>
 .WithName("Root")
 .WithOpenApi();
 
-app.MapGet("/issuers/" + MockData.PublicKeyMultibase, () =>
+app.MapGet("/issuers", () =>
 {
     return Results.Content(MockData.GetVerificationMethodDocument(), contentType: "application/json", statusCode: 200);
 });
@@ -65,7 +65,7 @@ app.MapPost("/issuers/credentials/issue", ([FromBody] object json) =>
     }
     catch (Exception e)
     {
-        app.Logger.LogError(e.Message);
+        app.Logger.LogError("{Error message}", e.Message);
         return Results.BadRequest(e.Message);
     }
     
