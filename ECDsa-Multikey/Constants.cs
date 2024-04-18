@@ -10,6 +10,7 @@ namespace ECDsa_Multikey
     internal static class Constants
     {
         internal const string Algorithm = "ECDSA";
+        internal const string MultikeyString = "Multikey";
         internal const bool IsExtractable = true;
 
         internal const string ECDsa2019Secp256KeyType = "EcdsaSecp256r1VerificationKey2019";
