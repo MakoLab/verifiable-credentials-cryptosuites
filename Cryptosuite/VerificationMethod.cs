@@ -1,9 +1,11 @@
 ﻿using Cryptosuite.Core.Util;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using Newtonsoft.Json.Serialization;
 
 namespace Cryptosuite.Core
 {
+    [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
     public class VerificationMethod
     {
         [JsonProperty("@context")]
