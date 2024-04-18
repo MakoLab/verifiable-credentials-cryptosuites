@@ -51,9 +51,9 @@ namespace DI_Sd_Primitives
             return sts.GetQuads().Select(q => q.ToNQuad(formatter)).ToList();
         }
 
-        public static JToken SkolemizeExpandedJsonLd(JToken expandedJson, string urnScheme, string guid, ref int count)
+        public static JArray SkolemizeExpandedJsonLd(JArray expandedJson, string urnScheme, string guid, ref int count)
         {
-            var skolemizedExpandedDocument = new JObject();
+            var skolemizedExpandedDocument = new JArray();
             foreach (var token in expandedJson)
             {
                 //If either element is not an object or it contains the key @value, append a copy of element to
@@ -71,14 +71,14 @@ namespace DI_Sd_Primitives
                     //algorithm recursively passing value for expanded and keeping the other parameters the same.
                     if (value is JArray array)
                     {
-                        skolemizedNode.Add(key, SkolemizeExpandedJsonLd(value, urnScheme, guid, ref count));
+                        skolemizedNode.Add(key, SkolemizeExpandedJsonLd(array, urnScheme, guid, ref count));
                     }
                     //Otherwise, set the value of property in skolemizedNode to the first element in the array result
                     //of calling this algorithm recursively passing an array with value as its only element for
                     //expanded and keeping the other parameters the same.
                     else
                     {
-                        skolemizedNode.Add(key, SkolemizeExpandedJsonLd(new JArray(value), urnScheme, guid, ref count));
+                        skolemizedNode.Add(key, SkolemizeExpandedJsonLd(new JArray(value!), urnScheme, guid, ref count).First());
                     }
                 }
                 //If skolemizedNode has no @id property, set the value of the @id property in skolemizedNode to the
@@ -86,7 +86,7 @@ namespace DI_Sd_Primitives
                 //value of count afterwards.
                 if (skolemizedNode["@id"] is null)
                 {
-                    skolemizedNode.Add("@id", $"urn{urnScheme}_{guid}_{count++}");
+                    skolemizedNode.Add("@id", $"urn:{urnScheme}_{guid}_{count++}");
                 }
                 //Otherwise, if the value of the @id property in skolemizedNode starts with "_:", preserve the existing
                 //blank node identifier when skolemizing by setting the value of the @id property in skolemizedNode to

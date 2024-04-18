@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -56,6 +57,45 @@ namespace DI_Sd_Primitives.Tests
             {
                 Assert.Equal(expectedNQuads[i++], deskolemizedNQuad);
             }
+        }
+
+        [Theory]
+        [InlineData("""
+            [
+              {
+                "@id": "_:subject",
+                "http://example.org/predicate": [
+                  {
+                    "@id": "_:object"
+                  }
+                ]
+              }
+            ]
+            """, """
+            [
+              {
+                "@id": "urn:example_subject",
+                "http://example.org/predicate": [
+                  {
+                    "@id": "urn:example_object"
+                  }
+                ]
+              }
+            ]
+            """)]
+        public void SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLd(string json, string expectedJson)
+        {
+            // Arrange
+            var urnScheme = "example";
+            var guid = "guid";
+            var count = 0;
+            var jArray = JArray.Parse(json);
+
+            // Act
+            var skolemizedExpandedJson = SkolemizationService.SkolemizeExpandedJsonLd(jArray, urnScheme, guid, ref count).ToString();
+
+            // Assert
+            Assert.Equal(expectedJson, skolemizedExpandedJson);
         }
     }
 }
