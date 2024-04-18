@@ -6,7 +6,7 @@ namespace JsonLdExtensions.Canonicalization
     {
         internal string Prefix { get; private set; }
         int IdentifierCounter { get; set; } = 0;
-        OrderedDictionary IssuedIdentifiers { get; set; } = new();
+        internal OrderedDictionary IssuedIdentifiers { get; private set; } = new();
 
         internal IdentifierIssuer(string prefix)
         {

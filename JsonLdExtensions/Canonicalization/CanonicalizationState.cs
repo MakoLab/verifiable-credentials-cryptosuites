@@ -11,7 +11,7 @@ namespace JsonLdExtensions.Canonicalization
     {
         internal Dictionary<string, IList<Quad>> BlankNodeToQuads { get; set; } = new();
         internal Dictionary<string, IList<string>> HashToBlankNodeIdentifier { get; set; } = new();
-        private IdentifierIssuer CanonicalIssuer { get; set; } = new(Constants.CanonicalPrefix);
+        internal IdentifierIssuer CanonicalIssuer { get; private set; } = new(Constants.CanonicalPrefix);
 
         internal void AddQuadToBlankNode(string blankNode, Quad q)
         {

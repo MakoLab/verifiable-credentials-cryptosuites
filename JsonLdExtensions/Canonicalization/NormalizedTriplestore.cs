@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Specialized;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,23 +11,46 @@ namespace JsonLdExtensions.Canonicalization
 {
     public class NormalizedTriplestore
     {
-        private readonly TripleStore _store;
+        public TripleStore Store { get; private set; }
+        public OrderedDictionary IssuedIdentifiers { get; private set; }
 
-        public NormalizedTriplestore(TripleStore store)
+        public NormalizedTriplestore(TripleStore store, OrderedDictionary identifierIssuerMap)
         {
-            _store = store;
+            Store = store;
+            IssuedIdentifiers = identifierIssuerMap;
         }
 
         public string Serialize()
         {
+            return String.Join("", SerializeToList());
+        }
+
+        public string Serialize(NQuadsCanonFormatter formatter)
+        {
+            return String.Join("", SerializeToList(formatter));
+        }
+
+        public List<string> SerializeToList()
+        {
             var formatter = new NQuadsCanonFormatter(preserveOriginalUriString: true);
             var lines = new List<string>();
-            foreach (var quad in _store.GetQuads())
+            foreach (var quad in Store.GetQuads())
             {
                 lines.Add(formatter.Format(quad.Triple, quad.Graph.Name));
             }
             lines.Sort();
-            return string.Join("", lines);
+            return lines;
+        }
+
+        public string SerializeToList(NQuadsCanonFormatter formatter)
+        {
+            var lines = new List<string>();
+            foreach (var quad in Store.GetQuads())
+            {
+                lines.Add(formatter.Format(quad.Triple, quad.Graph.Name));
+            }
+            lines.Sort();
+            return String.Join("", lines);
         }
     }
 }

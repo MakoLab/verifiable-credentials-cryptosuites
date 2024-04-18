@@ -148,7 +148,7 @@ namespace JsonLdExtensions.Canonicalization
                 normalizedDataset.Add(graphCopy);
             }
             // 8) Return the normalized dataset.
-            return new NormalizedTriplestore(normalizedDataset);
+            return new NormalizedTriplestore(normalizedDataset, state.CanonicalIssuer.IssuedIdentifiers);
         }
 
         public static IEnumerable<Quad> GetQuads(this ITripleStore ts)
@@ -159,6 +159,24 @@ namespace JsonLdExtensions.Canonicalization
                 {
                     yield return new Quad(g, t);
                 }
+            }
+        }
+
+        public static int CountQuads(this ITripleStore ts)
+        {
+            return ts.Graphs.Sum(g => g.Triples.Count);
+        }
+
+        public static void Add(this ITripleStore ts, Quad quad)
+        {
+            if (ts.HasGraph(quad.Graph.Name))
+            {
+                var g = ts.Graphs[quad.Graph.Name];
+                g.Assert(quad.Triple);
+            }
+            else
+            {
+                ts.Add(quad.Graph);
             }
         }
 

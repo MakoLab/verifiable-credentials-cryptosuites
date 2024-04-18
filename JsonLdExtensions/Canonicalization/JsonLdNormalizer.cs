@@ -12,7 +12,7 @@ namespace JsonLdExtensions.Canonicalization
 {
     public static class JsonLdNormalizer
     {
-        public static string Normalize(JToken input, JsonLdNormalizerOptions? options = null)
+        public static NormalizedTriplestore Normalize(JToken input, JsonLdNormalizerOptions? options = null)
         {
             options ??= new JsonLdNormalizerOptions();
             options.ProduceGeneralizedRdf = false;
@@ -27,7 +27,7 @@ namespace JsonLdExtensions.Canonicalization
                 var expanded = JsonLdProcessor.Expand(input, options);
                 ts.LoadFromString(expanded.ToString(), parser);
             }
-            return ts.Normalize(options).Serialize();
+            return ts.Normalize(options);
         }
     }
 }

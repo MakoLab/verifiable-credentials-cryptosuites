@@ -1,4 +1,5 @@
 ﻿using VDS.RDF;
+using VDS.RDF.Writing.Formatting;
 
 namespace JsonLdExtensions
 {
@@ -12,6 +13,13 @@ namespace JsonLdExtensions
         public INode Predicate => _triple.Predicate;
         public INode Object => _triple.Object;
         public Triple Triple => _triple;
+
+        /// <summary>
+        /// Gets the components of the quad.
+        /// </summary>
+        /// <remarks>
+        /// Components are the Graph, Subject, Predicate, and Object of the quad.
+        /// </remarks>
         public IEnumerable<INode> Components
         {
             get
@@ -27,6 +35,14 @@ namespace JsonLdExtensions
         {
             _graph = graph;
             _triple = triple;
+            _graph.Assert(_triple);
+        }
+
+        public Quad(INode graphName, INode subject, INode predicate, INode @object)
+        {
+            _graph = new Graph(graphName as IRefNode);
+            _triple = new Triple(subject, predicate, @object);
+            _graph.Assert(_triple);
         }
 
         //Deep copy constructor
@@ -38,6 +54,26 @@ namespace JsonLdExtensions
             var o = CopyNode(quad.Object);
             _triple = new Triple(s, p, o);
             _graph.Assert(_triple);
+        }
+
+        /// <summary>
+        /// Converts the quad to N-Quads format.
+        /// </summary>
+        /// <returns>Formatted string.</returns>
+        /// <remarks>Uses the default <see cref="NQuadsFormatter"/>.</remarks>
+        public string ToNQuad()
+        {
+            return new NQuadsFormatter().Format(_triple, _graph.Name);
+        }
+
+        /// <summary>
+        /// Converts the quad to N-Quads format.
+        /// </summary>
+        /// <param name="formatter">Formatter to use for serialization.</param>
+        /// <returns>Formatted string.</returns>
+        public string ToNQuad(NQuadsFormatter formatter)
+        {
+            return formatter.Format(_triple, _graph.Name);
         }
 
         private static INode CopyNode(INode node)
