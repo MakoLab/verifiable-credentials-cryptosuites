@@ -16,7 +16,7 @@ namespace ECDsa_2019_Cryptosuite
     {
         public string RequiredAlgorithm { get { return "P-256"; } }
 
-        public string Name { get { return "ecdsa-2019"; } }
+        public string Name { get { return "ecdsa-rdfc-2019"; } }
 
         public Verifier CreateVerifier(VerificationMethod verificationMethod)
         {
@@ -30,7 +30,7 @@ namespace ECDsa_2019_Cryptosuite
 
         public string Canonize(JToken input, JsonLdNormalizerOptions options)
         {
-            return JsonLdNormalizer.Normalize(input, options);
+            return JsonLdNormalizer.Normalize(input, options).Serialize();
         }
     }
 }
