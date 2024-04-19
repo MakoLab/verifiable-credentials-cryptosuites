@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using DI_Sd_Primitives.Tests.InlineTestData;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -60,29 +61,7 @@ namespace DI_Sd_Primitives.Tests
         }
 
         [Theory]
-        [InlineData("""
-            [
-              {
-                "@id": "_:subject",
-                "http://example.org/predicate": [
-                  {
-                    "@id": "_:object"
-                  }
-                ]
-              }
-            ]
-            """, """
-            [
-              {
-                "@id": "urn:example_subject",
-                "http://example.org/predicate": [
-                  {
-                    "@id": "urn:example_object"
-                  }
-                ]
-              }
-            ]
-            """)]
+        [ClassData(typeof(SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLdTestData))]
         public void SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLd(string json, string expectedJson)
         {
             // Arrange
