@@ -51,6 +51,14 @@ namespace DI_Sd_Primitives
             return sts.GetQuads().Select(q => q.ToNQuad(formatter)).ToList();
         }
 
+        /// <summary>
+        /// Replaces all blank node identifiers in an expanded JSON-LD document with custom-scheme URNs, including assigning such URNs to blank nodes that are unlabeled.
+        /// </summary>
+        /// <param name="expandedJson">Expanded JSON-LD document.</param>
+        /// <param name="urnScheme">Custom URN scheme.</param>
+        /// <param name="guid">UUID string.</param>
+        /// <param name="count">Shared integer counter.</param>
+        /// <returns>Skolemized expanded document.</returns>
         public static JArray SkolemizeExpandedJsonLd(JArray expandedJson, string urnScheme, string guid, ref int count)
         {
             var skolemizedExpandedDocument = new JArray();

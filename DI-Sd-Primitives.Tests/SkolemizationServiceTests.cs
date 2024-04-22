@@ -76,5 +76,23 @@ namespace DI_Sd_Primitives.Tests
             // Assert
             Assert.Equal(expectedJson, skolemizedExpandedJson);
         }
+
+        [Fact]
+        public void SkolemizeCompactJsonLd_ReturnsSkolemizedDocuments()
+        {
+            // Arrange
+            var compactJson = JToken.Parse("{\"@context\": \"http://schema.org/\",\"@type\": \"Person\",\"name\": \"John Doe\"}");
+            var urnScheme = "example";
+
+            // Act
+            var (skolemizedExpandedDocument, skolemizedCompactDocument) = SkolemizationService.SkolemizeCompactJsonLd(compactJson, urnScheme);
+
+            // Assert
+            Assert.NotNull(skolemizedExpandedDocument);
+            Assert.NotNull(skolemizedCompactDocument);
+            Assert.True(skolemizedExpandedDocument["@id"].ToString().StartsWith($"urn:{urnScheme}"));
+            Assert.True(skolemizedCompactDocument["@id"].ToString().StartsWith($"urn:{urnScheme}"));
+        }
+
     }
 }
