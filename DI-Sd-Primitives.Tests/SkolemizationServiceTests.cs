@@ -90,8 +90,8 @@ namespace DI_Sd_Primitives.Tests
             // Assert
             Assert.NotNull(skolemizedExpandedDocument);
             Assert.NotNull(skolemizedCompactDocument);
-            Assert.True(skolemizedExpandedDocument["@id"].ToString().StartsWith($"urn:{urnScheme}"));
-            Assert.True(skolemizedCompactDocument["@id"].ToString().StartsWith($"urn:{urnScheme}"));
+            Assert.StartsWith($"urn:{urnScheme}", skolemizedExpandedDocument["@id"]?.ToString());
+            Assert.StartsWith($"urn:{urnScheme}", skolemizedCompactDocument["@id"]?.ToString());
         }
 
     }
