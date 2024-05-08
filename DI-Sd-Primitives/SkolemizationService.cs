@@ -134,103 +134,7 @@ namespace DI_Sd_Primitives
             return deskolemizedNQuads;
         }
 
-        /// <summary>
-        /// Converts a JSON Pointer to an array of paths into a JSON tree.
-        /// </summary>
-        /// <param name="jsonPointer">JSON Pointer string.</param>
-        /// <returns>An array of paths.</returns>
-        public static List<OneOf<string, int>> JsonPointerToPaths(string jsonPointer)
-        {
-            var paths = new List<OneOf<string, int>>();
-            var splitPath = jsonPointer.Split('/')[..1];
-            foreach (var path in splitPath)
-            {
-                if (path.Contains('~'))
-                    paths.Add(path.UnescapeJsonPointer());
-                else
-                    paths.Add(Int32.TryParse(path, out var number) ? number : path);
-            }
-            return paths;
-        }
-
-        /// <summary>
-        /// Creates an initial selection (a fragment of a JSON-LD document) based on a JSON-LD object.
-        /// </summary>
-        /// <param name="source">JSON-LD object.</param>
-        /// <returns>JSON-LD document fragment object.</returns>
-        public static JObject CreateInitialSelection(JObject source)
-        {
-            var selection = new JObject();
-            var id = source["id"];
-            if (id is not null && id.Type == JTokenType.String)
-            {
-                var idString = id.ToString();
-                if (!idString.StartsWith("_:"))
-                {
-                    selection.Add("id", idString);
-                }
-            }
-            if (source["type"] is not null)
-            {
-                selection.Add(source["type"]);
-            }
-            return selection;
-        }
-
-        /// <summary>
-        /// Selects a portion of a compact JSON-LD document using paths parsed from a parsed JSON Pointer.
-        /// </summary>
-        /// <param name="paths">An array of paths parsed from a JSON Pointer.</param>
-        /// <param name="document">A compact JSON-LD document.</param>
-        /// <param name="selectionDocument">A selection document to be populated.</param>
-        /// <param name="arrays">An array of arrays for tracking selected arrays.</param>
-        public static void SelectPaths(List<OneOf<string, int>> paths, JObject document, JObject selectionDocument, List<JArray> arrays)
-        {
-            JToken? parentValue = document;
-            JToken? value = parentValue;
-            JToken? selectedParent = selectionDocument;
-            JToken? selectedValue = selectedParent;
-            OneOf<string, int> lastPath = default;
-            foreach (var path in paths)
-            {
-                lastPath = path;
-                selectedParent = selectedValue;
-                parentValue = value;
-                value = parentValue.GetValue(path);
-                if (value is null)
-                {
-                    throw new ArgumentException("JSON pointer does not match the given document.");
-                }
-                selectedValue = selectedParent[path];
-                if (selectedValue is null)
-                {
-                    if (value.Type == JTokenType.Array)
-                    {
-                        selectedValue = new JArray();
-                        arrays.Add((JArray)selectedValue);
-                    }
-                    else
-                    {
-                        selectedValue = CreateInitialSelection((JObject)value);
-                    }
-                    ((JObject)selectedParent).Add(selectedValue);
-                }
-            }
-            if (value is JValue)
-            {
-                selectedValue = value;
-            }
-            else if (value is JArray)
-            {
-                selectedValue = new JArray(value);
-            }
-            else
-            {
-                selectedValue = new JObject(selectedValue);
-                ((JObject)selectedValue).Merge((JObject)value);
-            }
-            selectedParent[lastPath] = selectedValue;
-        }
+        
 
         private static INode SkolemizeNode(INode node, string urnScheme)
         {
@@ -260,23 +164,6 @@ namespace DI_Sd_Primitives
         private static string Deskolemize(string nQuad, string replacement, Regex regex)
         {
             return regex.Replace(nQuad, replacement);
-        }
-
-        private static JToken? GetValue(this JToken jToken, OneOf<string, int> key)
-        {
-            if (key.IsT0)
-            {
-                return jToken[key.AsT0];
-            }
-            if (key.IsT1)
-            {
-                if (jToken.Type == JTokenType.Array)
-                {
-                    return ((JArray)jToken)[key.AsT1];
-                }
-                return null;
-            }
-            return null;
         }
     }
 }

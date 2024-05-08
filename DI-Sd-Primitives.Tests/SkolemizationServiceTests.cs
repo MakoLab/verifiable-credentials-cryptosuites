@@ -81,7 +81,7 @@ namespace DI_Sd_Primitives.Tests
         public void SkolemizeCompactJsonLd_ReturnsSkolemizedDocuments()
         {
             // Arrange
-            var compactJson = JToken.Parse("{\"@context\": \"http://schema.org/\",\"@type\": \"Person\",\"name\": \"John Doe\"}");
+            var compactJson = JToken.Parse("{\"@context\": \"http://schema.org/\",\"type\": \"Person\",\"name\": \"John Doe\"}");
             var urnScheme = "example";
 
             // Act
