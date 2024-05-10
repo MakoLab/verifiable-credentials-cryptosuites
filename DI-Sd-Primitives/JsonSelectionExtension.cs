@@ -79,19 +79,23 @@ namespace DI_Sd_Primitives
                 {
                     throw new ArgumentException("JSON pointer does not match the given document.");
                 }
-                selectedValue = selectedParent[path];
+                selectedValue = selectedParent.GetValue(path);
                 if (selectedValue is null)
                 {
-                    if (value.Type == JTokenType.Array)
+                    switch (value.Type)
                     {
-                        selectedValue = new JArray();
-                        arrays.Add((JArray)selectedValue);
+                        case JTokenType.Array:
+                            selectedValue = new JArray();
+                            arrays.Add((JArray)selectedValue);
+                            break;
+                        case JTokenType.Object:
+                            selectedValue = CreateInitialSelection((JObject)value);
+                            break;
+                        default:
+                            selectedValue = value;
+                            break;
                     }
-                    else
-                    {
-                        selectedValue = CreateInitialSelection((JObject)value);
-                    }
-                    ((JObject)selectedParent).Add(selectedValue);
+                    ((JObject)selectedParent).SetValue(path, selectedValue);
                 }
             }
             switch (value)
@@ -107,7 +111,7 @@ namespace DI_Sd_Primitives
                     ((JObject)selectedValue).Merge((JObject)value);
                     break;
             }
-            selectedParent[lastPath] = selectedValue;
+            selectedParent.SetValue(lastPath, selectedValue);
         }
 
         /// <summary>
@@ -155,6 +159,25 @@ namespace DI_Sd_Primitives
                 return null;
             }
             return null;
+        }
+
+        private static void SetValue(this JToken jToken, OneOf<string, int> key, JToken value)
+        {
+            if (key.IsT0)
+            {
+                var added = ((JObject)jToken).TryAdd(key.AsT0, value);
+                if (!added)
+                {
+                    ((JObject)jToken)[key.AsT0] = value;
+                }
+            }
+            else if (key.IsT1)
+            {
+                if (jToken.Type == JTokenType.Array)
+                {
+                    ((JArray)jToken)[key.AsT1] = value;
+                }
+            }
         }
     }
 }
