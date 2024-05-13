@@ -61,7 +61,7 @@ namespace DI_Sd_Primitives.Tests
         }
 
         [Theory]
-        [ClassData(typeof(SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLdTestData))]
+        [ClassData(typeof(SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLd_TestData))]
         public void SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLd(string json, string expectedJson)
         {
             // Arrange

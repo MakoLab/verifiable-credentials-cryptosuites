@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace DI_Sd_Primitives.Tests.InlineTestData
 {
-    public class SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLdTestData : TheoryData<string, string>
+    public class SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLd_TestData : TheoryData<string, string>
     {
-        public SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLdTestData()
+        public SkolemizeExpandedJsonLd_ReturnsSkolemizedExpandedJsonLd_TestData()
         {
             Add(
                 """
@@ -38,9 +38,9 @@ namespace DI_Sd_Primitives.Tests.InlineTestData
         }
     }
 
-    public class SkolemizeCompactJsonLd_ReturnsSkolemizedDocumentsTestData : TheoryData<string, string, string>
+    public class SkolemizeCompactJsonLd_ReturnsSkolemizedDocuments_TestData : TheoryData<string, string, string>
     {
-        public SkolemizeCompactJsonLd_ReturnsSkolemizedDocumentsTestData()
+        public SkolemizeCompactJsonLd_ReturnsSkolemizedDocuments_TestData()
         {
             Add(
                 """

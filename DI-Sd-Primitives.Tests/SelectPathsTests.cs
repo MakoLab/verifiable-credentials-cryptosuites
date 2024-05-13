@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json.Linq;
+﻿using DI_Sd_Primitives.Tests.InlineTestData;
+using Newtonsoft.Json.Linq;
 using OneOf;
 using System;
 using System.Collections.Generic;
@@ -10,22 +11,13 @@ namespace DI_Sd_Primitives.Tests
 {
     public class SelectPathsTests
     {
-        [Fact]
-        public void SelectPaths_ReturnsSelectedPaths()
+        [Theory]
+        [ClassData(typeof(SelectPaths_ReturnsSelectedPaths_TestData))]
+        public void SelectPaths_ReturnsSelectedPaths(string data, string path, string expected)
         {
             // Arrange
-            var document = JObject.Parse("""
-                    {
-                        "@context": {
-                            "@vocab": "http://example.org/"
-                        },
-                        "urn:example_subject": {
-                            "http://example.org/property1": "value1",
-                            "http://example.org/property2": "value2"
-                        }
-                    }
-                """);
-            var paths = new List<OneOf<string, int>> { "urn:example_subject", "http://example.org/property1" };
+            var document = JObject.Parse(data);
+            var paths = JsonSelectionExtension.JsonPointerToPaths(path);
             var arrays = new List<JArray>();
             var selectionDocument = new JObject();
 
@@ -33,7 +25,7 @@ namespace DI_Sd_Primitives.Tests
             JsonSelectionExtension.SelectPaths(document, paths, selectionDocument, arrays);
 
             // Assert
-            Assert.Equal("value1", selectionDocument["urn:example_subject"]?["http://example.org/property1"]);
+            Assert.Equal(expected, selectionDocument.SelectToken(JsonSelectionExtension.JsonPointerToJsonPath(path)));
         }
     }
 }

@@ -144,6 +144,24 @@ namespace DI_Sd_Primitives
             return selectionDocument;
         }
 
+        public static string JsonPointerToJsonPath(string jsonPointer)
+        {
+            var paths = JsonPointerToPaths(jsonPointer);
+            var jsonPath = new StringBuilder();
+            foreach (var path in paths)
+            {
+                if (path.IsT0)
+                {
+                    jsonPath.Append($".{path.AsT0}");
+                }
+                else if (path.IsT1)
+                {
+                    jsonPath.Append($"[{path.AsT1}]");
+                }
+            }
+            return jsonPath.ToString();
+        }
+
         private static JToken? GetValue(this JToken jToken, OneOf<string, int> key)
         {
             if (key.IsT0)
