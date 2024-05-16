@@ -8,7 +8,7 @@ namespace DI_Sd_Primitives.Tests.InlineTestData
 {
     public class SelectPaths_ReturnsSelectedPaths_TestData : TheoryData<string, string, string>
     {
-        const string CredentialJson = """
+        public const string CredentialJson = """
             {
               "payload": {
                 "name": "Course credential",

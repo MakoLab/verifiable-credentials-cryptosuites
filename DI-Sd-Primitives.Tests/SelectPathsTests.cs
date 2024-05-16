@@ -3,9 +3,11 @@ using Newtonsoft.Json.Linq;
 using OneOf;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace DI_Sd_Primitives.Tests
 {
@@ -26,6 +28,25 @@ namespace DI_Sd_Primitives.Tests
 
             // Assert
             Assert.Equal(expected, selectionDocument.SelectToken(JsonSelectionExtension.JsonPointerToJsonPath(path)));
+        }
+
+        [Fact]
+        public void SelectPaths_ReturnsIdAndType()
+        {
+            // Arrange
+            var document = JObject.Parse(SelectPaths_ReturnsSelectedPaths_TestData.CredentialJson);
+            var paths = JsonSelectionExtension.JsonPointerToPaths("/payload/issuer/name");
+            var arrays = new List<JArray>();
+            var selectionDocument = new JObject();
+
+            // Act
+            JsonSelectionExtension.SelectPaths(document, paths, selectionDocument, arrays);
+
+            // Assert
+            Assert.Equal("Zealopia Business Institute", selectionDocument.SelectToken("payload.issuer.name"));
+            Assert.Equal("did:key:z6Mkr9f7o82NFLRFTTCWRR1GiZpca22Xf6YKo2zKThrZMA2w", selectionDocument.SelectToken("payload.issuer.id"));
+            Assert.Equal(2, Assert.IsType<JArray>(selectionDocument.SelectToken("payload.type")).Count);
+            Assert.Equal("EducationalOccupationalCredential", selectionDocument.SelectToken("payload.type[0]"));
         }
     }
 }

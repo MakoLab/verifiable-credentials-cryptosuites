@@ -94,5 +94,34 @@ namespace DI_Sd_Primitives.Tests
             Assert.StartsWith($"urn:{urnScheme}", skolemizedCompactDocument["id"]?.ToString());
         }
 
+        [Fact]
+        public void RelabelBlankNodes_ReturnsRelabeledNQuads()
+        {
+            // Arrange
+            var nQuads = new List<string>()
+            {
+                "<urn:example:subject> <urn:example:predicate> _:object <graph:example.com> .",
+                "_:object <urn:example:predicate2> _:object2 <graph:example.com> ."
+            };
+            var labelMap = new Dictionary<string, string>()
+            {
+                { "_:object", "_:object1" },
+                { "_:object2", "_:object3" }
+            };
+            var expectedNQuads = new List<string>()
+            {
+                "<urn:example:subject> <urn:example:predicate> _:object1 <graph:example.com> .",
+                "_:object1 <urn:example:predicate2> _:object3 <graph:example.com> ."
+            };
+
+            // Act
+            var relabeledNQuads = SkolemizationService.RelabelBlankNodes(nQuads, labelMap);
+
+            // Assert
+            for (var i = 0; i < nQuads.Count; i++)
+            {
+                Assert.Equal(expectedNQuads[i], relabeledNQuads[i]);
+            }
+        }
     }
 }

@@ -134,7 +134,18 @@ namespace DI_Sd_Primitives
             return deskolemizedNQuads;
         }
 
-        
+        public static List<string> RelabelBlankNodes(List<string> nQuads, Dictionary<string, string> labelMap)
+        {
+            var formatter = new NQuadsReplacementFormatter(labelMap);
+            var ts = new TripleStore();
+            ts.LoadFromString(string.Join("\n", nQuads));
+            var result = new List<string>();
+            foreach (var quad in ts.GetQuads())
+            {
+                result.Add(quad.ToNQuad(formatter));
+            }
+            return result;
+        }
 
         private static INode SkolemizeNode(INode node, string urnScheme)
         {

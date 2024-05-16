@@ -140,6 +140,7 @@ namespace DI_Sd_Primitives
             }
             foreach (var array in arrays)
             {
+                array.ReplaceAll(array.Where(x => x is not null));
             }
             return selectionDocument;
         }
