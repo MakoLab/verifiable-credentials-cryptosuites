@@ -113,7 +113,7 @@ namespace DI_Sd_Primitives
             return skolemizedExpandedDocument;
         }
 
-        public static (JArray skolemizedExpandedDocument, JToken skolemizedCompactDocument) SkolemizeCompactJsonLd(JToken compactJson, string urnScheme)
+        public static (JArray skolemizedExpandedDocument, JObject skolemizedCompactDocument) SkolemizeCompactJsonLd(JToken compactJson, string urnScheme)
         {
             var context = compactJson["@context"];
             var expandedJson = JsonLdProcessor.Expand(compactJson, new JsonLdProcessorOptions() { RemoteContextLimit = -1 });

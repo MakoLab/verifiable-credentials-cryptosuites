@@ -105,13 +105,13 @@ namespace DI_Sd_Primitives.Tests
             };
             var labelMap = new Dictionary<string, string>()
             {
-                { "_:object", "_:object1" },
-                { "_:object2", "_:object3" }
+                { "object", "object1" },
+                { "object2", "object3" }
             };
             var expectedNQuads = new List<string>()
             {
-                "<urn:example:subject> <urn:example:predicate> _:object1 <graph:example.com> .",
-                "_:object1 <urn:example:predicate2> _:object3 <graph:example.com> ."
+                "<urn:example:subject> <urn:example:predicate> _:object1 <graph:example.com> .\n",
+                "_:object1 <urn:example:predicate2> _:object3 <graph:example.com> .\n"
             };
 
             // Act

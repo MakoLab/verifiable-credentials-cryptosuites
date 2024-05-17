@@ -1,4 +1,6 @@
 ﻿using AngleSharp.Dom;
+using DI_Sd_Primitives.Interfaces;
+using DI_Sd_Primitives.Results;
 using Microsoft.Json.Pointer;
 using Newtonsoft.Json.Linq;
 using OneOf;
@@ -12,6 +14,8 @@ namespace DI_Sd_Primitives
 {
     public static class JsonSelectionExtension
     {
+        public const string CustomUrnScheme = "ecdsa-sd-2023";
+
         /// <summary>
         /// Converts a JSON Pointer to an array of paths into a JSON tree.
         /// </summary>
@@ -143,6 +147,60 @@ namespace DI_Sd_Primitives
                 array.ReplaceAll(array.Where(x => x is not null));
             }
             return selectionDocument;
+        }
+
+        /// <summary>
+        /// Selects a portion of a skolemized compact JSON-LD document using an array of JSON Pointers, and outputs
+        /// the resulting canonical N-Quads with any blank node labels replaced using the given label map.
+        /// </summary>
+        /// <param name="skolemizedInputDocument">A skolemized compact JSON-LD document.</param>
+        /// <param name="jsonPointers">An array of JSON Pointers.</param>
+        /// <param name="labelMap">A blank node label map.</param>
+        /// <returns>Tuple containing selectionDocument, deskolemizedNQuads, and nquads</returns>
+        public static SelectCanonicalNQuadsResult SelectCanonicalNQuads(this JObject skolemizedInputDocument, IEnumerable<string> jsonPointers, Dictionary<string, string> labelMap)
+        {
+            var selectionDocument = skolemizedInputDocument.SelectJsonLd(jsonPointers)
+                ?? throw new ArgumentException("No selection was made.");
+            var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(selectionDocument);
+            var relabeledNQuads = SkolemizationService.RelabelBlankNodes(deskolemizedNQuads, labelMap);
+            return new SelectCanonicalNQuadsResult
+            {
+                SelectionDocument = selectionDocument,
+                DeskolemizedNQuads = deskolemizedNQuads,
+                NQuads = relabeledNQuads
+            };
+        }
+
+        /// <summary>
+        /// Outputs canonical N-Quad strings that match custom selections of a compact JSON-LD document.
+        /// </summary>
+        /// <param name="document">A compact JSON-LD document.</param>
+        /// <param name="labelMapFactoryFunction">A label map factory function.</param>
+        /// <param name="groupDefinitions">A map of named group definitions.</param>
+        /// <returns>An object containing the created groups, the skolemized compact JSON-LD document, the skolemized
+        /// expanded JSON-LD document, the deskolemized N-Quad strings, the blank node label map, and the canonical
+        /// N-Quad strings.</returns>
+        /// <remarks>
+        /// It does this by canonicalizing a compact JSON-LD document (replacing any blank node identifiers using
+        /// a label map) and grouping the resulting canonical N-Quad strings according to the selection associated
+        /// with each group. Each group will be defined using an assigned name and array of JSON pointers. The JSON
+        /// pointers will be used to select portions of the skolemized document, such that the output can be converted
+        /// to canonical N-Quads to perform group matching.
+        /// </remarks>
+        public static CanonicalizationAndGroupingResult CanonicalizeAndGroup(this JObject document, ILabelMapFactoryFunction labelMapFactoryFunction, Dictionary<string, List<string>> groupDefinitions)
+        {
+            var (skolemizedExpandedDocument, skolemizedCompactDocument) = SkolemizationService.SkolemizeCompactJsonLd(document, CustomUrnScheme);
+            var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(skolemizedExpandedDocument);
+            var canonicalizationService = new CanonicalizationService();
+            var (canonicalNQuads, labelMap) = canonicalizationService.LabelReplacementCanonicalize(skolemizedExpandedDocument, labelMapFactoryFunction);
+            var selections = new Dictionary<string, SelectCanonicalNQuadsResult>();
+            foreach (var (groupName, jsonPointers) in groupDefinitions)
+            {
+                var scnr = skolemizedCompactDocument.SelectCanonicalNQuads(jsonPointers, labelMap);
+                selections.Add(groupName, scnr);
+            }
+            //TODO: Process selections
+            throw new NotImplementedException();
         }
 
         public static string JsonPointerToJsonPath(string jsonPointer)
