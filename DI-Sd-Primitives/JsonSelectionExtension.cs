@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using VDS.RDF;
 
 namespace DI_Sd_Primitives
 {
@@ -191,16 +192,51 @@ namespace DI_Sd_Primitives
         {
             var (skolemizedExpandedDocument, skolemizedCompactDocument) = SkolemizationService.SkolemizeCompactJsonLd(document, CustomUrnScheme);
             var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(skolemizedExpandedDocument);
+            var deskolemizedTs = new TripleStore();
+            deskolemizedTs.LoadFromString(string.Join("\n", deskolemizedNQuads));
             var canonicalizationService = new CanonicalizationService();
-            var (canonicalNQuads, labelMap) = canonicalizationService.LabelReplacementCanonicalize(skolemizedExpandedDocument, labelMapFactoryFunction);
+            var (canonicalNQuads, labelMap) = canonicalizationService.LabelReplacementCanonicalize(deskolemizedTs, labelMapFactoryFunction);
             var selections = new Dictionary<string, SelectCanonicalNQuadsResult>();
             foreach (var (groupName, jsonPointers) in groupDefinitions)
             {
                 var scnr = skolemizedCompactDocument.SelectCanonicalNQuads(jsonPointers, labelMap);
                 selections.Add(groupName, scnr);
             }
-            //TODO: Process selections
-            throw new NotImplementedException();
+            var groups = new Dictionary<string, GroupResult>();
+            foreach (var (groupName, selection) in selections)
+            {
+                var selectedNQuads = selection.NQuads;
+                var selectedDeskolemizedNQuads = selection.DeskolemizedNQuads;
+                var matching = new Dictionary<int, string>();
+                var nonMatching = new Dictionary<int, string>();
+                for (var i = 0; i < canonicalNQuads.Count; i++)
+                {
+                    var nQuad = canonicalNQuads[i];
+                    if (selectedNQuads.Contains(nQuad))
+                    {
+                        matching.Add(i, nQuad);
+                    }
+                    else
+                    {
+                        nonMatching.Add(i, nQuad);
+                    }
+                }
+                groups.Add(groupName, new GroupResult
+                {
+                    Matching = matching,
+                    NonMatching = nonMatching,
+                    DeskolemizedNQuads = selectedDeskolemizedNQuads
+                });
+            }
+            return new CanonicalizationAndGroupingResult
+            {
+                Groups = groups,
+                SkolemizedCompactDocument = skolemizedCompactDocument,
+                SkolemizedExpandedDocument = skolemizedExpandedDocument,
+                DeskolemizedNQuads = deskolemizedNQuads,
+                LabelMap = labelMap,
+                CanonicalNQuads = canonicalNQuads
+            };
         }
 
         public static string JsonPointerToJsonPath(string jsonPointer)
