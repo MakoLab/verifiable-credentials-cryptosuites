@@ -77,9 +77,13 @@ namespace DataIntegrity
             {
                 verifyData = CreateVerifyData(document, proof, documentLoader);
             }
+            if (_signer is null)
+            {
+                throw new InvalidOperationException("The signer is not defined.");
+            }
             if (_cryptoSuite is ICreateProofValue csp)
             {
-                proof.ProofValue = csp.CreateProofValue(verifyData, document, proof, proofSet, documentLoader);
+                proof.ProofValue = csp.CreateProofValue(verifyData, document, proof, proofSet, documentLoader, _signer);
             }
             else
             {
@@ -102,6 +106,11 @@ namespace DataIntegrity
 
         public override Result<VerificationMethod> VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
+            Verifier verifier;
+            if (_cryptoSuite is ICreateVerifier cv)
+            {
+                verifier = cv.CreateVerifier(GetVerificationMethod(proof, documentLoader));
+            }
             byte[] verifyData;
             if (_cryptoSuite is ICreateVerifyData csv)
             {
@@ -128,72 +137,6 @@ namespace DataIntegrity
             return proof.Type == Type && proof.CryptoSuiteName == _cryptoSuite.Name;
         }
 
-        public Proof Sign(byte[] verifyData, Proof proof)
-        {
-            if (_signer is null)
-            {
-                throw new InvalidOperationException("The signer is not defined.");
-            }
-            var signatureBytes = _signer.Sign(verifyData);
-            proof.ProofValue = MultiBaseBase58BtcHeader + SimpleBase.Base58.Bitcoin.Encode(signatureBytes);
-            return proof;
-        }
-
-        public bool VerifySignature(byte[] verifyData, VerificationMethod verificationMethod, Proof proof)
-        {
-            var verifier = _cryptoSuite.CreateVerifier(verificationMethod);
-            if (_cryptoSuite.RequiredAlgorithm != verifier.Algorithm.ToAlgorithmName())
-            {
-                throw new ArgumentException($"The verifier's algorithm {verifier.Key} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
-            }
-            var proofValue = proof.ProofValue ?? throw new ArgumentException($"The proof does not include a valid {nameof(proof.ProofValue)} property.");
-            var multibaseHeader = proofValue.Substring(0, 1);
-            byte[] signature;
-            if (multibaseHeader == MultiBaseBase58BtcHeader)
-            {
-                signature = SimpleBase.Base58.Bitcoin.Decode(proofValue.AsSpan()[1..]);
-            }
-            else if (multibaseHeader == MultiBaseBase64UrlHeader)
-            {
-                signature = Convert.FromBase64String(proofValue[1..]);
-            }
-            else
-            {
-                throw new ArgumentException($"Only base58btc or base64url multibase encoding is supported.");
-            }
-            return verifier.Verify(verifyData, signature);
-        }
-
-        public Proof UpdateProof(JObject document, Proof proof, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
-        {
-            return proof;
-        }
-
-        public byte[] CreateVerifyData(JObject document, Proof proof, IDocumentLoader documentLoader)
-        {
-            byte[] cachedDocHash;
-            if (_hashCache is not null && _hashDocument == document)
-            {
-                cachedDocHash = _hashCache;
-            }
-            else
-            {
-                if (_cryptoSuite is ICanonize cs)
-                {
-                    _hashDocument = document;
-                    var canon = cs.Canonize(JObject.FromObject(proof), new JsonLdNormalizerOptions { DocumentLoader = documentLoader.LoadDocument });
-                    _hashCache = Sha256Digest(canon);
-                    cachedDocHash = _hashCache;
-                }
-                else
-                {
-                    throw new InvalidOperationException($"The cryptosuite {_cryptoSuite.Name} does not support canonization.");
-                }
-            }
-            var proofHash = Sha256Digest(CanonizeProof(proof, document, documentLoader));
-            return cachedDocHash.Concat(proofHash).ToArray();
-        }
-
         public override void EnsureSuiteContext(JObject document, bool addSuiteContext)
         {
             if (IncludesContext(document, ContextUrl) || IncludesContext(document, VC20Context))
@@ -218,10 +161,83 @@ namespace DataIntegrity
             }
         }
 
-        private bool IncludesContext(JObject document, string context)
+        private Proof Sign(byte[] verifyData, Proof proof)
         {
-            var contextArray = document["@context"] as JArray;
-            if (contextArray is null)
+            if (_signer is null)
+            {
+                throw new InvalidOperationException("The signer is not defined.");
+            }
+            var signatureBytes = _signer.Sign(verifyData);
+            proof.ProofValue = MultiBaseBase58BtcHeader + SimpleBase.Base58.Bitcoin.Encode(signatureBytes);
+            return proof;
+        }
+
+        private bool VerifySignature(byte[] verifyData, VerificationMethod verificationMethod, Proof proof)
+        {
+            Verifier verifier;
+            if (_cryptoSuite is ICreateVerifier cv)
+            {
+                verifier = cv.CreateVerifier(verificationMethod);
+            }
+            else
+            {
+                throw new InvalidOperationException($"The cryptosuite {_cryptoSuite.Name} does not support verification.");
+            }
+            if (_cryptoSuite.RequiredAlgorithm != verifier.Algorithm.ToAlgorithmName())
+            {
+                throw new ArgumentException($"The verifier's algorithm {verifier.Key} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
+            }
+            var proofValue = proof.ProofValue ?? throw new ArgumentException($"The proof does not include a valid {nameof(proof.ProofValue)} property.");
+            var multibaseHeader = proofValue[..1];
+            byte[] signature;
+            if (multibaseHeader == MultiBaseBase58BtcHeader)
+            {
+                signature = SimpleBase.Base58.Bitcoin.Decode(proofValue.AsSpan()[1..]);
+            }
+            else if (multibaseHeader == MultiBaseBase64UrlHeader)
+            {
+                signature = Convert.FromBase64String(proofValue[1..]);
+            }
+            else
+            {
+                throw new ArgumentException($"Only base58btc or base64url multibase encoding is supported.");
+            }
+            return verifier.Verify(verifyData, signature);
+        }
+
+        private Proof UpdateProof(JObject document, Proof proof, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
+        {
+            return proof;
+        }
+
+        private byte[] CreateVerifyData(JObject document, Proof proof, IDocumentLoader documentLoader)
+        {
+            byte[] cachedDocHash;
+            if (_hashCache is not null && _hashDocument == document)
+            {
+                cachedDocHash = _hashCache;
+            }
+            else
+            {
+                if (_cryptoSuite is ICanonize cs)
+                {
+                    _hashDocument = document;
+                    var canon = cs.Canonize(JObject.FromObject(proof), new JsonLdNormalizerOptions { DocumentLoader = documentLoader.LoadDocument });
+                    _hashCache = Sha256Digest(canon);
+                    cachedDocHash = _hashCache;
+                }
+                else
+                {
+                    throw new InvalidOperationException($"The cryptosuite {_cryptoSuite.Name} does not support canonization.");
+                }
+            }
+            var proofHash = Sha256Digest(CanonizeProof(proof, document, documentLoader));
+            return [..cachedDocHash, ..proofHash];
+        }
+
+        private static bool IncludesContext(JObject document, string context)
+        {
+            if (document["@context"] is not JArray contextArray)
             {
                 return false;
             }

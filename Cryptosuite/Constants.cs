@@ -69,4 +69,9 @@ namespace Cryptosuite.Core
         public const string SecurityContextV2Url = "https://w3id.org/security/v2";
         public const string SecurityContextUrl = "https://w3id.org/security/v2";
     }
+
+    public class Constants
+    {
+        public const char MultibaseBase64Header = 'u';
+    }
 }

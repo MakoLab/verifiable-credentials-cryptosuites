@@ -4,6 +4,5 @@
     {
         string RequiredAlgorithm { get; }
         string Name { get; }
-        Verifier CreateVerifier(VerificationMethod verificationMethod);
     }
 }

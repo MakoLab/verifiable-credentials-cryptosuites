@@ -12,7 +12,7 @@ using VDS.RDF.JsonLd;
 
 namespace ECDsa_2019_Cryptosuite
 {
-    public class ECDsa2019Cryptosuite : ICryptosuite, ICanonize
+    public class ECDsa2019Cryptosuite : ICryptosuite, ICanonize, ICreateVerifier
     {
         public string RequiredAlgorithm { get { return "P-256"; } }
 
@@ -30,7 +30,7 @@ namespace ECDsa_2019_Cryptosuite
 
         public string Canonize(JToken input, JsonLdNormalizerOptions options)
         {
-            return JsonLdNormalizer.Normalize(input, options).Serialize();
+            return JsonLdNormalizer.Normalize(input, options).SerializedNQuads.Replace("\r", String.Empty);
         }
     }
 }

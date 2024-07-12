@@ -1,5 +1,6 @@
 ﻿using Cryptosuite.Core;
 using Org.BouncyCastle.Crypto;
+using SimpleBase;
 using System.Security.Cryptography;
 
 namespace ECDsa_Multikey
@@ -12,8 +13,7 @@ namespace ECDsa_Multikey
         public string? Algorithm { get; set; }
         public string? PublicKeyMultibase { get; set; }
         public string? SecretKeyMultibase { get; set; }
-
-        public Verifier? Verifier { get; set; }
+        public required Verifier Verifier { get; set; }
         public Signer? Signer { get; set; }
 
         public MultikeyModel Export(bool publicKey = true, bool secretKey = false, bool includeContext = true)
@@ -26,6 +26,16 @@ namespace ECDsa_Multikey
                 Algorithm = Algorithm,
             };
             return Serialize.ExportKeyPair(keyPair, publicKey, secretKey, includeContext);
+        }
+
+        public byte[] GetPublicKey()
+        {
+            return Base58.Bitcoin.Decode(PublicKeyMultibase.AsSpan()[1..]);
+        }
+
+        public byte[] GetSecretKey()
+        {
+            return Base58.Bitcoin.Decode(SecretKeyMultibase.AsSpan()[1..]);
         }
     }
 }

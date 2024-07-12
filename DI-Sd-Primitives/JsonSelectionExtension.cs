@@ -158,7 +158,7 @@ namespace DI_Sd_Primitives
         /// <param name="jsonPointers">An array of JSON Pointers.</param>
         /// <param name="labelMap">A blank node label map.</param>
         /// <returns>Tuple containing selectionDocument, deskolemizedNQuads, and nquads</returns>
-        public static SelectCanonicalNQuadsResult SelectCanonicalNQuads(this JObject skolemizedInputDocument, IEnumerable<string> jsonPointers, Dictionary<string, string> labelMap)
+        public static SelectCanonicalNQuadsResult SelectCanonicalNQuads(this JObject skolemizedInputDocument, IEnumerable<string> jsonPointers, IDictionary<string, string> labelMap)
         {
             var selectionDocument = skolemizedInputDocument.SelectJsonLd(jsonPointers)
                 ?? throw new ArgumentException("No selection was made.");
@@ -188,7 +188,7 @@ namespace DI_Sd_Primitives
         /// pointers will be used to select portions of the skolemized document, such that the output can be converted
         /// to canonical N-Quads to perform group matching.
         /// </remarks>
-        public static CanonicalizationAndGroupingResult CanonicalizeAndGroup(this JObject document, ILabelMapFactoryFunction labelMapFactoryFunction, Dictionary<string, List<string>> groupDefinitions)
+        public static CanonicalizationAndGroupingResult CanonicalizeAndGroup(this JObject document, ILabelMapFactoryFunction labelMapFactoryFunction, IDictionary<string, IList<string>> groupDefinitions)
         {
             var (skolemizedExpandedDocument, skolemizedCompactDocument) = SkolemizationService.SkolemizeCompactJsonLd(document, CustomUrnScheme);
             var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(skolemizedExpandedDocument);

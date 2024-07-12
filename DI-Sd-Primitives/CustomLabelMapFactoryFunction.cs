@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace DI_Sd_Primitives
 {
-    public class CustomLabelMapFactoryFunction(Dictionary<string, string> labelMap) : ILabelMapFactoryFunction
+    public class CustomLabelMapFactoryFunction(IDictionary<string, string> labelMap) : ILabelMapFactoryFunction
     {
-        private readonly Dictionary<string, string> _labelMap = labelMap;
+        private readonly IDictionary<string, string> _labelMap = labelMap;
 
-        public Dictionary<string, string> CreateLabelMap(Dictionary<string, string> canonicalIdMap)
+        public IDictionary<string, string> CreateLabelMap(IDictionary<string, string> canonicalIdMap)
         {
             var bnodeIdMap = new Dictionary<string, string>();
             foreach (var entry in canonicalIdMap)

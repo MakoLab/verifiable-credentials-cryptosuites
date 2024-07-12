@@ -20,8 +20,12 @@ namespace JsonLdExtensions.Canonicalization
             _preserveOriginalUriString = preserveOriginalUriString;
         }
 
-        public override string Format(Triple t, IRefNode graph)
+        public override string Format(Triple t, IRefNode? graph)
         {
+            if (graph is null)
+            {
+                return base.Format(t) + '\n';
+            }
             return base.Format(t, graph) + '\n';
         }
 

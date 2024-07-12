@@ -8,7 +8,14 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <PackageReference Include="PeterO.Cbor" Version="4.5.3" />
     <PackageReference Include="System.Formats.Cbor" Version="8.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Cryptosuite\Cryptosuite.Core.csproj" />
+    <ProjectReference Include="..\DI-Sd-Primitives\DI-Sd-Primitives.csproj" />
   </ItemGroup>
 
 </Project>

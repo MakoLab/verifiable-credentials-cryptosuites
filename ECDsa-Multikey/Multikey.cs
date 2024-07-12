@@ -15,7 +15,7 @@ namespace ECDsa_Multikey
 {
     public class Multikey
     {
-        public static KeyPairInterface Generate(string id, string controller, string curveName)
+        public static KeyPairInterface Generate(string? id, string? controller, string curveName)
         {
             // generate bouncy castle ecdsa key pair
             var curve = ECNamedCurveTable.GetByName(curveName);

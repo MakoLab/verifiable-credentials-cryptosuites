@@ -19,38 +19,40 @@ namespace DI_Sd_Primitives
 {
     public static class SkolemizationService
     {
-        public static List<string> Skolemize(List<string> nQuads, string urnScheme)
+        public static IList<string> Skolemize(IList<string> nQuads, string urnScheme)
         {
             var ts = new TripleStore();
             ts.LoadFromString(string.Join("\n", nQuads));
-            var sts = new TripleStore();
-            foreach (var quad in ts.GetQuads())
-            {
-                var nodes = new List<INode>();
-                foreach (var node in quad.Components)
-                {
-                    nodes.Add(SkolemizeNode(node, urnScheme));
-                }
-                sts.Add(new Quad(nodes[0], nodes[1], nodes[2], nodes[3]));
-            }
             var formatter = new NQuadsCanonFormatter();
-            return sts.GetQuads().Select(q => q.ToNQuad(formatter)).ToList();
+            var list = new List<string>();
+            foreach (var quad in ts.Quads)
+            {
+                var sQuad = new Quad(
+                    SkolemizeNode(quad.Subject, urnScheme)!,
+                    SkolemizeNode(quad.Predicate, urnScheme)!,
+                    SkolemizeNode(quad.Object, urnScheme)!,
+                    SkolemizeNode(quad.Graph, urnScheme) as IRefNode
+                    );
+                list.Add(sQuad.ToNQuad(formatter));
+            }
+            return list;
         }
 
-        public static List<string> Deskolemize(List<string> nQuads, string urnScheme)
+        public static IList<string> Deskolemize(IList<string> nQuads, string urnScheme)
         {
             var ts = new TripleStore();
             ts.LoadFromString(string.Join("\n", nQuads));
-            var sts = new TripleStore();
-            foreach (var quad in ts.GetQuads())
-            {
-                var s = DeskolemizeNode(quad.Subject, urnScheme);
-                var o = DeskolemizeNode(quad.Object, urnScheme);
-                var g = DeskolemizeNode(quad.Graph.Name, urnScheme);
-                sts.Add(new Quad(g, s, quad.Predicate, o));
-            }
             var formatter = new NQuadsCanonFormatter();
-            return sts.GetQuads().Select(q => q.ToNQuad(formatter)).ToList();
+            var list = new List<string>();
+            foreach (var quad in ts.Quads)
+            {
+                var s = DeskolemizeNode(quad.Subject, urnScheme)!;
+                var o = DeskolemizeNode(quad.Object, urnScheme)!;
+                var g = DeskolemizeNode(quad.Graph, urnScheme) as IRefNode;
+                var dQuad = (new Quad(s, quad.Predicate, o, g));
+                list.Add(dQuad.ToNQuad(formatter));
+            }
+            return list;
         }
 
         /// <summary>
@@ -123,7 +125,7 @@ namespace DI_Sd_Primitives
             return (skolemizedExpandedDocument, skolemizedCompactDocument);
         }
 
-        public static List<string> ToDeskolemizedNQuads(this JToken skolemizedDocument)
+        public static IList<string> ToDeskolemizedNQuads(this JToken skolemizedDocument)
         {
             var triplestore = new TripleStore();
             triplestore.LoadFromString(skolemizedDocument.ToString());
@@ -134,7 +136,7 @@ namespace DI_Sd_Primitives
             return deskolemizedNQuads;
         }
 
-        public static List<string> RelabelBlankNodes(List<string> nQuads, Dictionary<string, string> labelMap)
+        public static IList<string> RelabelBlankNodes(IList<string> nQuads, IDictionary<string, string> labelMap)
         {
             var formatter = new NQuadsReplacementFormatter(labelMap);
             var ts = new TripleStore();
@@ -147,7 +149,7 @@ namespace DI_Sd_Primitives
             return result;
         }
 
-        private static INode SkolemizeNode(INode node, string urnScheme)
+        private static INode? SkolemizeNode(INode? node, string urnScheme)
         {
             return node switch
             {
@@ -156,7 +158,7 @@ namespace DI_Sd_Primitives
             };
         }
 
-        private static INode DeskolemizeNode(INode node, string urnScheme)
+        private static INode? DeskolemizeNode(INode? node, string urnScheme)
         {
             return node switch
             {

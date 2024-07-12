@@ -9,6 +9,9 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cryptosuite\Cryptosuite.Core.csproj" />
+    <ProjectReference Include="..\DI-Sd-Primitives\DI-Sd-Primitives.csproj" />
+    <ProjectReference Include="..\ECDsa-Multikey\ECDsa-Multikey.csproj" />
+    <ProjectReference Include="..\ECDsa-sd-2023-Functions\ECDsa-sd-2023-Functions.csproj" />
   </ItemGroup>
 
 </Project>

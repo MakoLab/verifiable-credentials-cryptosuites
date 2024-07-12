@@ -12,8 +12,8 @@ namespace DI_Sd_Primitives
 {
     internal class NQuadsReplacementFormatter : NQuadsCanonFormatter
     {
-        private readonly Dictionary<string, string> _labelMap;
-        internal NQuadsReplacementFormatter(Dictionary<string, string> labelMap)
+        private readonly IDictionary<string, string> _labelMap;
+        internal NQuadsReplacementFormatter(IDictionary<string, string> labelMap)
             : base(preserveOriginalUriString: true)
         {
             _labelMap = labelMap;

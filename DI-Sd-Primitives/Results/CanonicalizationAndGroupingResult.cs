@@ -9,11 +9,11 @@ namespace DI_Sd_Primitives.Results
 {
     public class CanonicalizationAndGroupingResult
     {
-        public required Dictionary<string, GroupResult> Groups { get; set; }
+        public required IDictionary<string, GroupResult> Groups { get; set; }
         public required JObject SkolemizedCompactDocument { get; set; }
         public required JArray SkolemizedExpandedDocument { get; set; }
-        public required List<string> DeskolemizedNQuads { get; set; }
-        public required Dictionary<string, string> LabelMap { get; set; }
-        public required List<string> CanonicalNQuads { get; set; }
+        public required IList<string> DeskolemizedNQuads { get; set; }
+        public required IDictionary<string, string> LabelMap { get; set; }
+        public required IList<string> CanonicalNQuads { get; set; }
     }
 }

@@ -26,7 +26,7 @@ namespace Cryptosuite.Core
             _verifier.Init(false, Key.Public);
         }
 
-        public bool Verify(byte[] verifyData, byte[] signature)
+        public virtual bool Verify(byte[] verifyData, byte[] signature)
         {
             _verifier.BlockUpdate(verifyData, 0, verifyData.Length);
             var result = _verifier.VerifySignature(signature);
