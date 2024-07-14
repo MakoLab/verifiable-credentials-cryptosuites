@@ -1,26 +1,32 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net8.0</TargetFramework>
-    <Nullable>enable</Nullable>
+    <RootNamespace>ECDsa_sd_2023_Cryptosuite.Tests</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
-    <InvariantGlobalization>true</InvariantGlobalization>
+    <Nullable>enable</Nullable>
+
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
-    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="coverlet.collector" Version="6.0.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
+    <PackageReference Include="xunit" Version="2.5.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\DataIntegrity\DataIntegrity.csproj" />
-    <ProjectReference Include="..\ECDsa-2019-Cryptosuite.Tests\ECDsa-2019-Cryptosuite.Tests.csproj" />
-    <ProjectReference Include="..\ECDsa-2019-Cryptosuite\ECDsa-2019-Cryptosuite.csproj" />
     <ProjectReference Include="..\ECDsa-Multikey\ECDsa-Multikey.csproj" />
     <ProjectReference Include="..\ECDsa-sd-2023-Cryptosuite\ECDsa-sd-2023-Cryptosuite.csproj" />
     <ProjectReference Include="..\JsonLdSignatures\JsonLdSignatures.csproj" />
     <ProjectReference Include="..\SecurityDocumentLoader\SecurityDocumentLoader.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Xunit" />
   </ItemGroup>
 
 </Project>

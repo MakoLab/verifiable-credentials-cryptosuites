@@ -14,6 +14,7 @@ using VDS.RDF.JsonLd;
 using VDS.RDF.Writing;
 using Microsoft.Json.Pointer;
 using OneOf;
+using VDS.RDF.Parsing;
 
 namespace DI_Sd_Primitives
 {
@@ -128,7 +129,7 @@ namespace DI_Sd_Primitives
         public static IList<string> ToDeskolemizedNQuads(this JToken skolemizedDocument)
         {
             var triplestore = new TripleStore();
-            triplestore.LoadFromString(skolemizedDocument.ToString());
+            triplestore.LoadFromString(skolemizedDocument.ToString(), new JsonLdParser());
             var nQuadsWriter = new NQuadsWriter();
             var data = VDS.RDF.Writing.StringWriter.Write(triplestore, nQuadsWriter);
             var nQuads = data.Split("\n").ToList();

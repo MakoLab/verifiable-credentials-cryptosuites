@@ -9,6 +9,7 @@ using JsonLdSignatures.Purposes;
 using Cryptosuite.Core;
 using SecurityDocumentLoader;
 using Microsoft.AspNetCore.Mvc;
+using ECDsa_sd_2023_Cryptosuite;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -39,10 +40,9 @@ app.MapGet("/issuers", () =>
     return Results.Content(MockData.GetVerificationMethodDocument(), contentType: "application/json", statusCode: 200);
 });
 
+//Issuers
 app.MapPost("/issuers/credentials/issue", ([FromBody] object json) =>
 {
-    // Deserialize the JSON object
-
     var jsonStr = JsonSerializer.Serialize(json);
     var jsonObj = JObject.Parse(jsonStr);
     var keypair = Multikey.From(new MultikeyModel
@@ -68,11 +68,42 @@ app.MapPost("/issuers/credentials/issue", ([FromBody] object json) =>
         app.Logger.LogError("{Error message}", e.Message);
         return Results.BadRequest(e.Message);
     }
-    
 })
 .WithName("Issuer")
 .WithOpenApi();
 
+app.MapPost("/issuers/sd/credentials/issue", ([FromBody] object json) =>
+{
+    var jsonStr = JsonSerializer.Serialize(json);
+    var jsonObj = JObject.Parse(jsonStr);
+    var keypair = Multikey.From(new MultikeyModel
+    {
+        PublicKeyMultibase = MockData.PublicKeyMultibase,
+        SecretKeyMultibase = MockData.SecretKeyMultibase,
+        Controller = MockData.Controller
+    });
+    var date = DateTime.Parse("2023-03-01T21:29:24Z");
+    var crypto = new ECDsaSd2023CreateProofCryptosuite();
+    var suite = new DataIntegrityProof(crypto, keypair.Signer, date);
+    var jsonLd = new JsonLdSignatureService();
+    var loader = new SecurityDocumentLoader.SecurityDocumentLoader();
+    try
+    {
+        var signed = jsonLd.Sign(jsonObj, suite, new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = MockData.Id }, date), loader);
+        app.Logger.LogDebug("Issue");
+        jsonStr = signed.ToString();
+        return Results.Json(JsonDocument.Parse(jsonStr));
+    }
+    catch (Exception e)
+    {
+        app.Logger.LogError("{Error message}", e.Message);
+        return Results.BadRequest(e.Message);
+    }
+})
+.WithName("Issuer")
+.WithOpenApi();
+
+//Verifiers
 app.MapPost("/verifiers/credentials/verify", ([FromBody] object json) =>
 {
     var jsonStr = JsonSerializer.Serialize(json);
@@ -104,6 +135,43 @@ app.MapPost("/verifiers/credentials/verify", ([FromBody] object json) =>
         var response = jsonld.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString();
         app.Logger.LogError("{Exception message}", e.Message);
         app.Logger.LogError("{Response}",response);
+        return Results.Content(response, contentType: "application/json", statusCode: 400);
+    }
+})
+.WithName("Verifier")
+.WithOpenApi();
+
+app.MapPost("/verifiers/sd/credentials/verify", ([FromBody] object json) =>
+{
+    var jsonStr = JsonSerializer.Serialize(json);
+    var jsonObj = JObject.Parse(jsonStr).ParseJson();
+    if (jsonObj is null)
+    {
+        return Results.BadRequest("Invalid JSON");
+    }
+    var keypair = Multikey.From(new MultikeyModel
+    {
+        PublicKeyMultibase = MockData.PublicKeyMultibase,
+        SecretKeyMultibase = MockData.SecretKeyMultibase,
+        Controller = MockData.Controller
+    });
+    var crypto = new ECDsaSd2023VerifyCryptosuite();
+    var suite = new DataIntegrityProof(crypto);
+    var jsonld = new JsonLdSignatureService();
+    var loader = new TestWebDocumentLoader();
+    try
+    {
+        var result = jsonld.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
+        app.Logger.LogDebug("Verify");
+        var response = jsonld.ToJsonResult(result).ToString();
+        app.Logger.LogDebug("{Response}", response);
+        return Results.Content(response, contentType: "application/json", statusCode: 200);
+    }
+    catch (Exception e)
+    {
+        var response = jsonld.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString();
+        app.Logger.LogError("{Exception message}", e.Message);
+        app.Logger.LogError("{Response}", response);
         return Results.Content(response, contentType: "application/json", statusCode: 400);
     }
 })

@@ -12,7 +12,7 @@ using System.Threading.Tasks;
 
 namespace ECDsa_sd_2023_Cryptosuite
 {
-    internal class ECDsaSd2023VerifyCryptosuite : ICryptosuite, ICreateVerifier, ICreateVerifyData
+    public class ECDsaSd2023VerifyCryptosuite : ICryptosuite, ICreateVerifier, ICreateVerifyData
     {
         public string RequiredAlgorithm { get => "P-256"; }
         public string Name { get => "ecdsa-sd-2023"; }
