@@ -55,7 +55,7 @@ namespace ECDsa_sd_2023_Cryptosuite
             var proofHash = hs.HashString(canon);
             var mandatoryHash = hs.HashMandatoryNQuads(mandatory);
 
-            var proofScopedKeyPair = Multikey.Generate(null, null, ECDsaCurve.P256);
+            var proofScopedKeyPair = MultikeyService.Generate(null, null, ECDsaCurve.P256);
             if (proofScopedKeyPair.Signer is null)
             {
                 throw new Exception("Signer is null");

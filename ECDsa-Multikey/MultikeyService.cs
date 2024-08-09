@@ -13,7 +13,7 @@ using System.Threading.Tasks;
 
 namespace ECDsa_Multikey
 {
-    public class Multikey
+    public class MultikeyService
     {
         public static KeyPairInterface Generate(string? id, string? controller, string curveName)
         {
@@ -43,7 +43,7 @@ namespace ECDsa_Multikey
             return kpi;
         }
 
-        public static KeyPairInterface From(MultikeyModel multikey)
+        public static KeyPairInterface From(MultikeyVerificationMethod multikey)
         {
             if (multikey.Type is not null && multikey.Type.ToLower() != "multikey")
             {
@@ -60,7 +60,7 @@ namespace ECDsa_Multikey
             return CreateKeyPairInterface(multikey);
         }
 
-        private static KeyPairInterface CreateKeyPairInterface(MultikeyModel multikey)
+        private static KeyPairInterface CreateKeyPairInterface(MultikeyVerificationMethod multikey)
         {
             var keypair = Serialize.ImportKeyPair(multikey);
             return CreateKeyPairInterface(keypair);
@@ -87,7 +87,7 @@ namespace ECDsa_Multikey
             return kpi;
         }
 
-        private static void AssertMultikey(MultikeyModel key)
+        private static void AssertMultikey(MultikeyVerificationMethod key)
         {
             if (key.Type is not null && key.Type.ToLower() != "multikey")
             {

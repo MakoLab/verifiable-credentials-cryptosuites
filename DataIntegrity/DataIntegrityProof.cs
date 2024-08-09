@@ -1,4 +1,5 @@
 ﻿using Cryptosuite.Core;
+using Cryptosuite.Core.ControllerDocuments;
 using Cryptosuite.Core.Interfaces;
 using Cryptosuite.Core.Util;
 using ECDsa_2019_Cryptosuite;
@@ -25,7 +26,7 @@ namespace DataIntegrity
     public class DataIntegrityProof : LinkedDataSignature
     {
         private const string ProofType = "DataIntegrityProof";
-        private const string DataIntegrityContext = "https://w3id.org/security/data-integrity/v1";
+        private const string DataIntegrityContext = "https://w3id.org/security/data-integrity/v2";
         private const string VC20Context = "https://www.w3.org/ns/credentials/v2";
         private const string MultiBaseBase58BtcHeader = "z";
         private const string MultiBaseBase64UrlHeader = "u";
@@ -168,7 +169,7 @@ namespace DataIntegrity
                 throw new InvalidOperationException("The signer is not defined.");
             }
             var signatureBytes = _signer.Sign(verifyData);
-            proof.ProofValue = MultiBaseBase58BtcHeader + SimpleBase.Base58.Bitcoin.Encode(signatureBytes);
+            proof.ProofValue = $"{MultiBaseBase58BtcHeader}{SimpleBase.Base58.Bitcoin.Encode(signatureBytes)}";
             return proof;
         }
 
@@ -276,7 +277,7 @@ namespace DataIntegrity
                 var doc = result.GetDocument().ToObject<VerificationMethod>();
                 if (doc?.Type?.ToLower() == "multikey")
                 {
-                    doc = result.GetDocument().ToObject<MultikeyModel>();
+                    doc = result.GetDocument().ToObject<MultikeyVerificationMethod>();
                 }
                 if (doc is null)
                 {

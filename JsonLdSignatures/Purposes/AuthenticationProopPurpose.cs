@@ -1,4 +1,5 @@
 ﻿using Cryptosuite.Core;
+using Cryptosuite.Core.ControllerDocuments;
 using FluentResults;
 using JsonLdExtensions;
 using System;

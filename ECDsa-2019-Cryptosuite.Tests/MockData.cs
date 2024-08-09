@@ -1,4 +1,4 @@
-﻿using Cryptosuite.Core;
+﻿using Cryptosuite.Core.ControllerDocuments;
 using ECDsa_Multikey;
 using Newtonsoft.Json.Linq;
 using System;
@@ -39,47 +39,36 @@ namespace ECDsa_2019_Cryptosuite.Tests
             """;
 
         internal const string Controller = "https://example.edu/issuers/565049";
-        public readonly MultikeyModel MockPublicEcdsaMultikey;
-        public readonly MultikeyModel EcdsaMultikeyKeyPair;
-        public readonly MultikeyModel EcdsaSecp256KeyPair;
-        public readonly MultikeyModel ControllerDocEcdsaMultikey;
+        public readonly MultikeyVerificationMethod MockPublicEcdsaMultikey;
+        public readonly MultikeyVerificationMethod EcdsaMultikeyKeyPair;
+        public readonly MultikeyVerificationMethod EcdsaSecp256KeyPair;
+        public readonly ControllerDocument ControllerDocEcdsaMultikey;
         public readonly JObject Credential = JObject.Parse(credString);
 
         public MockData()
         {
-            MockPublicEcdsaMultikey = new MultikeyModel
+            MockPublicEcdsaMultikey = new MultikeyVerificationMethod(id, Controller)
             {
-                Context = new JValue("https://w3id.org/security/multikey/v1"),
-                Type = "Multikey",
-                Controller = Controller,
-                Id = id,
                 PublicKeyMultibase = publicKeyMultibase,
             };
 
-            EcdsaMultikeyKeyPair = new MultikeyModel
+            EcdsaMultikeyKeyPair = new MultikeyVerificationMethod(id, Controller)
             {
-                Context = new JValue("https://w3id.org/security/multikey/v1"),
-                Type = "Multikey",
-                Controller = Controller,
-                Id = id,
                 PublicKeyMultibase = publicKeyMultibase,
                 SecretKeyMultibase = secretKeyMultibase,
             };
 
-            EcdsaSecp256KeyPair = new MultikeyModel
+            EcdsaSecp256KeyPair = new MultikeyVerificationMethod(id, Controller)
             {
-                Type = "EcdsaSecp256r1VerificationKey2019",
-                Controller = Controller,
                 PublicKeyMultibase = publicKeyMultibase,
                 SecretKeyMultibase = secretKeyMultibase,
             };
 
-            ControllerDocEcdsaMultikey = new MultikeyModel
+            ControllerDocEcdsaMultikey = new ControllerDocument("https://example.edu/issuers/565049")
             {
                 Context = new JArray { "https://www.w3.org/ns/did/v1", "https://w3id.org/security/multikey/v1" },
                 Controller = Controller,
-                Id = "https://example.edu/issuers/565049",
-                AssertionMethod = new List<VerificationMethod> { MockPublicEcdsaMultikey },
+                VerificationMethod = [ MockPublicEcdsaMultikey ],
             };
         }
     }

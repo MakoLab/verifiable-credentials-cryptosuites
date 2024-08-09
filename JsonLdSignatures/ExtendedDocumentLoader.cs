@@ -15,8 +15,8 @@ namespace JsonLdSignatures
         private readonly IDocumentLoader _documentLoader;
         private readonly Dictionary<string, JToken> _contexts = new()
         {
-            { SecurityConstants.SecurityContextV1Url, Contexts.SecurityContextV1 },
-            { SecurityConstants.SecurityContextV2Url, Contexts.SecurityContextV2 }
+            { Contexts.SecurityContextV1Url, Contexts.SecurityContextV1 },
+            { Contexts.SecurityContextV2Url, Contexts.SecurityContextV2 }
         };
 
         internal ExtendedDocumentLoader(IDocumentLoader documentLoader)

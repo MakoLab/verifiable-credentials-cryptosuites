@@ -24,11 +24,11 @@ namespace ECDsa_Multikey.Tests
             var pkcs8 = ecdsa.ExportPkcs8PrivateKey();
             var d = ecdsa.ExportParameters(true).D;
             _output.WriteLine(Convert.ToHexString(pub));
-            _output.WriteLine(Convert.ToHexString(x));
-            _output.WriteLine(Convert.ToHexString(y));
+            _output.WriteLine(Convert.ToHexString(x!));
+            _output.WriteLine(Convert.ToHexString(y!));
             _output.WriteLine(Convert.ToHexString(secret));
             _output.WriteLine(Convert.ToHexString(pkcs8));
-            _output.WriteLine(Convert.ToHexString(d));
+            _output.WriteLine(Convert.ToHexString(d!));
             _output.WriteLine(param.Curve.Oid.FriendlyName);
         }
 

@@ -11,6 +11,7 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="8.0.6" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+    <PackageReference Include="ZLogger" Version="2.5.4" />
   </ItemGroup>
 
   <ItemGroup>
@@ -21,6 +22,10 @@
     <ProjectReference Include="..\ECDsa-sd-2023-Cryptosuite\ECDsa-sd-2023-Cryptosuite.csproj" />
     <ProjectReference Include="..\JsonLdSignatures\JsonLdSignatures.csproj" />
     <ProjectReference Include="..\SecurityDocumentLoader\SecurityDocumentLoader.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="logs\" />
   </ItemGroup>
 
 </Project>

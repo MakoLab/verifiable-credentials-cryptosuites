@@ -97,7 +97,7 @@ namespace JsonLdSignatures
                     proofSet.Add(proof);
                 }
             }
-            var context = document["@context"] ?? new JValue(SecurityConstants.SecurityContextUrl);
+            var context = document["@context"] ?? new JValue(Contexts.SecurityContextUrl);
             foreach (var proof in proofSet)
             {
                 proof.Context = context;

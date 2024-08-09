@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using VDS.RDF.JsonLd;
 using Newtonsoft.Json;
 using Cryptosuite.Core.Util;
+using Cryptosuite.Core.ControllerDocuments;
 
 namespace JsonLdSignatures.Purposes
 {
@@ -61,7 +62,7 @@ namespace JsonLdSignatures.Purposes
                 {
                     var framingDocument = new JObject
                     {
-                        { "@context", SecurityConstants.SecurityContextUrl },
+                        { "@context", Contexts.SecurityContextUrl },
                         { "id", controllerId },
                         { _term, new JObject
                             {

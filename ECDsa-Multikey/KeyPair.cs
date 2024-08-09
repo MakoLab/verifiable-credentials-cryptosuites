@@ -11,8 +11,8 @@ namespace ECDsa_Multikey
 {
     internal class KeyPair
     {
-        public string? Id { get; set; }
-        public string? Controller { get; set; }
+        public required string Id { get; set; }
+        public required string Controller { get; set; }
         public AsymmetricCipherKeyPair? Keys { get; set; }
         public X9ECParameters? Curve { get; set; }
         public string? Algorithm { get; set; }

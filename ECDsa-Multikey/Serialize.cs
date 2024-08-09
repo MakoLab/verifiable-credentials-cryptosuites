@@ -88,12 +88,12 @@ namespace ECDsa_Multikey
             }
         };
 
-        internal static KeyPair ImportKeyPair(MultikeyModel multikey)
+        internal static KeyPair ImportKeyPair(MultikeyVerificationMethod multikey)
         {
             return ImportKeyPair(multikey.Id, multikey.Controller, multikey.SecretKeyMultibase, multikey.PublicKeyMultibase);
         }
 
-        internal static KeyPair ImportKeyPair(string? id, string? controller, string? secretKeyMultibase, string? publicKeyMultibase)
+        internal static KeyPair ImportKeyPair(string id, string controller, string? secretKeyMultibase, string? publicKeyMultibase)
         {
             if (publicKeyMultibase is null)
             {
@@ -131,7 +131,7 @@ namespace ECDsa_Multikey
             return keyPair;
         }
 
-        internal static MultikeyModel ExportKeyPair(KeyPair keyPair, bool includePublicKey, bool includeSecretKey, bool includeContext)
+        internal static MultikeyVerificationMethod ExportKeyPair(KeyPair keyPair, bool includePublicKey, bool includeSecretKey, bool includeContext)
         {
             if (!includePublicKey && !includeSecretKey)
             {
@@ -142,12 +142,7 @@ namespace ECDsa_Multikey
                 throw new ArgumentException("Key pair does not contain keys.");
             }
             var secretKeySize = Helpers.GetSecretKeySize(keyPair.Algorithm);
-            var multiKey = new MultikeyModel
-            {
-                Id = keyPair.Id,
-                Controller = keyPair.Controller,
-                Type = "Multikey",
-            };
+            var multiKey = new MultikeyVerificationMethod(keyPair.Id, keyPair.Controller);
             if (includeContext)
             {
                 multiKey.Context = new JValue(Constants.MultikeyContextV1Url);

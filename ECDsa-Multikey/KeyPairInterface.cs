@@ -16,7 +16,7 @@ namespace ECDsa_Multikey
         public required Verifier Verifier { get; set; }
         public Signer? Signer { get; set; }
 
-        public MultikeyModel Export(bool publicKey = true, bool secretKey = false, bool includeContext = true)
+        public MultikeyVerificationMethod Export(bool publicKey = true, bool secretKey = false, bool includeContext = true)
         {
             var keyPair = new KeyPair
             {

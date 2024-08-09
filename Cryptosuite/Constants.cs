@@ -57,19 +57,6 @@ namespace Cryptosuite.Core
         }
     }
 
-    public class SecurityConstants
-    {
-        public const string Ed25519Signature2020ContextUrl = "https://w3id.org/security/suites/ed25519-2020/v1";
-        public const string VeresOneContextV1Url = "https://w3id.org/veres-one/v1";
-        public const string X25519KeyAgreement2020V1ContextUrl = "https://w3id.org/security/suites/x25519-2020/v1";
-        public const string CredentialsContextV1Url = "https://www.w3.org/2018/credentials/v1";
-        public const string DidContextV1Url = "https://www.w3.org/ns/did/v1";
-        public const string DataIntegrityV1Url = "https://w3id.org/security/data-integrity/v1";
-        public const string SecurityContextV1Url = "https://w3id.org/security/v1";
-        public const string SecurityContextV2Url = "https://w3id.org/security/v2";
-        public const string SecurityContextUrl = "https://w3id.org/security/v2";
-    }
-
     public class Constants
     {
         public const char MultibaseBase64Header = 'u';

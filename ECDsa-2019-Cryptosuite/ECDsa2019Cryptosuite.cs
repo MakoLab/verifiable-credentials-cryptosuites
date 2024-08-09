@@ -1,4 +1,5 @@
 ﻿using Cryptosuite.Core;
+using Cryptosuite.Core.ControllerDocuments;
 using Cryptosuite.Core.Interfaces;
 using ECDsa_Multikey;
 using JsonLdExtensions.Canonicalization;
@@ -24,7 +25,7 @@ namespace ECDsa_2019_Cryptosuite
             {
                 throw new Exception("VerificationMethod must be a MultikeyModel");
             }
-            var key = Multikey.From((MultikeyModel)verificationMethod);
+            var key = MultikeyService.From((MultikeyVerificationMethod)verificationMethod);
             return key.Verifier;
         }
 

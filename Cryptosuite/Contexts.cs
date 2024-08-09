@@ -9,6 +9,17 @@ namespace Cryptosuite.Core
 {
     public class Contexts
     {
+        public const string Ed25519Signature2020ContextUrl = "https://w3id.org/security/suites/ed25519-2020/v1";
+        public const string VeresOneContextV1Url = "https://w3id.org/veres-one/v1";
+        public const string X25519KeyAgreement2020V1ContextUrl = "https://w3id.org/security/suites/x25519-2020/v1";
+        public const string CredentialsContextV1Url = "https://www.w3.org/2018/credentials/v1";
+        public const string DidContextV1Url = "https://www.w3.org/ns/did/v1";
+        public const string DataIntegrityV1Url = "https://w3id.org/security/data-integrity/v1";
+        public const string DataIntegrityV2Url = "https://w3id.org/security/data-integrity/v2";
+        public const string SecurityContextV1Url = "https://w3id.org/security/v1";
+        public const string SecurityContextV2Url = "https://w3id.org/security/v2";
+        public const string SecurityContextUrl = "https://w3id.org/security/v2";
+
         const string Ed25519Signature2020ContextString = """
             {
               "@context":
@@ -620,6 +631,89 @@ namespace Cryptosuite.Core
               }
             }
             """;
+        const string DataIntegrityV2String = """
+            {
+              "@context": {
+                "id": "@id",
+                "type": "@type",
+                "@protected": true,
+                "proof": {
+                  "@id": "https://w3id.org/security#proof",
+                  "@type": "@id",
+                  "@container": "@graph"
+                },
+                "DataIntegrityProof": {
+                  "@id": "https://w3id.org/security#DataIntegrityProof",
+                  "@context": {
+                    "@protected": true,
+                    "id": "@id",
+                    "type": "@type",
+                    "challenge": "https://w3id.org/security#challenge",
+                    "created": {
+                      "@id": "http://purl.org/dc/terms/created",
+                      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                    },
+                    "domain": "https://w3id.org/security#domain",
+                    "expires": {
+                      "@id": "https://w3id.org/security#expiration",
+                      "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                    },
+                    "nonce": "https://w3id.org/security#nonce",
+                    "previousProof": {
+                      "@id": "https://w3id.org/security#previousProof",
+                      "@type": "@id"
+                    },
+                    "proofPurpose": {
+                      "@id": "https://w3id.org/security#proofPurpose",
+                      "@type": "@vocab",
+                      "@context": {
+                        "@protected": true,
+                        "id": "@id",
+                        "type": "@type",
+                        "assertionMethod": {
+                          "@id": "https://w3id.org/security#assertionMethod",
+                          "@type": "@id",
+                          "@container": "@set"
+                        },
+                        "authentication": {
+                          "@id": "https://w3id.org/security#authenticationMethod",
+                          "@type": "@id",
+                          "@container": "@set"
+                        },
+                        "capabilityInvocation": {
+                          "@id": "https://w3id.org/security#capabilityInvocationMethod",
+                          "@type": "@id",
+                          "@container": "@set"
+                        },
+                        "capabilityDelegation": {
+                          "@id": "https://w3id.org/security#capabilityDelegationMethod",
+                          "@type": "@id",
+                          "@container": "@set"
+                        },
+                        "keyAgreement": {
+                          "@id": "https://w3id.org/security#keyAgreementMethod",
+                          "@type": "@id",
+                          "@container": "@set"
+                        }
+                      }
+                    },
+                    "cryptosuite": {
+                      "@id": "https://w3id.org/security#cryptosuite",
+                      "@type": "https://w3id.org/security#cryptosuiteString"
+                    },
+                    "proofValue": {
+                      "@id": "https://w3id.org/security#proofValue",
+                      "@type": "https://w3id.org/security#multibase"
+                    },
+                    "verificationMethod": {
+                      "@id": "https://w3id.org/security#verificationMethod",
+                      "@type": "@id"
+                    }
+                  }
+                }
+              }
+            }
+            """;
         const string SecurityContextV1String = """
             {
               "@context": {
@@ -825,13 +919,95 @@ namespace Cryptosuite.Core
             }
             """;
 
-        public static readonly JToken VeresOneContextV1 = JToken.Parse(VeresOneContextV1String);
-        public static readonly JToken Ed25519Signature2020Context = JToken.Parse(Ed25519Signature2020ContextString);
-        public static readonly JToken X25519KeyAgreement2020V1Context = JToken.Parse(X25519KeyAgreement2020V1ContextString);
-        public static readonly JToken CredentialsContextV1 = JToken.Parse(CredentialsContextV1String);
-        public static readonly JToken DidContextV1 = JToken.Parse(DidContextV1String);
-        public static readonly JToken DataIntegrityV1 = JToken.Parse(DataIntegrityV1String);
-        public static readonly JToken SecurityContextV1 = JToken.Parse(SecurityContextV1String);
-        public static readonly JToken SecurityContextV2 = JToken.Parse(SecurityContextV2String);
+        private static JToken? _veresOneContextV1;
+        private static JToken? _ed25519Signature2020Context;
+        private static JToken? _x25519KeyAgreement2020V1Context;
+        private static JToken? _credentialsContextV1;
+        private static JToken? _didContextV1;
+        private static JToken? _dataIntegrityV1;
+        private static JToken? _dataIntegrityV2;
+        private static JToken? _securityContextV1;
+        private static JToken? _securityContextV2;
+
+        public static JToken VeresOneContextV1
+        {
+            get
+            {
+                _veresOneContextV1 ??= JToken.Parse(VeresOneContextV1String);
+                return _veresOneContextV1;
+            }
+        }
+
+        public static JToken Ed25519Signature2020Context
+        {
+            get
+            {
+                _ed25519Signature2020Context ??= JToken.Parse(Ed25519Signature2020ContextString);
+                return _ed25519Signature2020Context;
+            }
+        }
+
+        public static JToken X25519KeyAgreement2020V1Context
+        {
+            get
+            {
+                _x25519KeyAgreement2020V1Context ??= JToken.Parse(X25519KeyAgreement2020V1ContextString);
+                return _x25519KeyAgreement2020V1Context;
+            }
+        }
+
+        public static JToken CredentialsContextV1
+        {
+            get
+            {
+                _credentialsContextV1 ??= JToken.Parse(CredentialsContextV1String);
+                return _credentialsContextV1;
+            }
+        }
+
+        public static JToken DidContextV1
+        {
+            get
+            {
+                _didContextV1 ??= JToken.Parse(DidContextV1String);
+                return _didContextV1;
+            }
+        }
+
+        public static JToken DataIntegrityV1
+        {
+            get
+            {
+                _dataIntegrityV1 ??= JToken.Parse(DataIntegrityV1String);
+                return _dataIntegrityV1;
+            }
+        }
+
+        public static JToken DataIntegrityV2
+        {
+            get
+            {
+                _dataIntegrityV2 ??= JToken.Parse(DataIntegrityV2String);
+                return _dataIntegrityV2;
+            }
+        }
+
+        public static JToken SecurityContextV1
+        {
+            get
+            {
+                _securityContextV1 ??= JToken.Parse(SecurityContextV1String);
+                return _securityContextV1;
+            }
+        }
+
+        public static JToken SecurityContextV2
+        {
+            get
+            {
+                _securityContextV2 ??= JToken.Parse(SecurityContextV2String);
+                return _securityContextV2;
+            }
+        }
     }
 }
