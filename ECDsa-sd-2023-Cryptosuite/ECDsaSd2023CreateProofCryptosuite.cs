@@ -49,8 +49,13 @@ namespace ECDsa_sd_2023_Cryptosuite
                 { "mandatory", MandatoryPointers }
             };
             var cResult = document.CanonicalizeAndGroup(hlmff, groupDefinitions);
-            var mandatory = cResult.Groups["mandatory"].Matching.Values.ToList();
-            var nonMandatory = cResult.Groups["mandatory"].NonMatching.Values.ToList();
+            var mandatory =  new List<string>();
+            var nonMandatory = new List<string>();
+            if (cResult.Groups.TryGetValue("mandatory", out var value) && value.Matching.Count > 0)
+            {
+                mandatory = [.. value.Matching.Values];
+                nonMandatory = [.. value.NonMatching.Values];
+            }
             var canon = Canonize(JObject.FromObject(proof), new JsonLdNormalizerOptions() { DocumentLoader = documentLoader.LoadDocument });
             var proofHash = hs.HashString(canon);
             var mandatoryHash = hs.HashMandatoryNQuads(mandatory);

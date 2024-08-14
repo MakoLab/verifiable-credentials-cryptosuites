@@ -21,6 +21,10 @@ namespace TestWebAPI.Routes
                 .WithName("Issuers")
                 .WithOpenApi();
 
+            erb.MapGet("/issuers/{id}", handler.GetVerificationMethod)
+                .WithName("VerificationMethod")
+                .WithOpenApi();
+
             erb.MapPost("/issuers/credentials/issue", handler.IssueCredential)
                 .WithName("Issuer")
                 .WithOpenApi();
@@ -35,9 +39,16 @@ namespace TestWebAPI.Routes
     {
         public IResult GetIssuers(ILogger<IssuerHandlers> logger)
         {
+            logger.LogDebug("Issuer request: GET Controller Document");
+            logger.LogDebug("Issuer response: {Controller Document}", MockData.GetControllerDocument());
+            return Results.Content(MockData.GetControllerDocument(), contentType: "application/json", statusCode: 200);
+        }
+
+        public IResult GetVerificationMethod(string id, ILogger<IssuerHandlers> logger)
+        {
             logger.LogDebug("Issuer request: GET Verification Method");
-            logger.LogDebug("Issuer response: {Verification Method Document}", MockData.GetVerificationMethodDocument());
-            return Results.Content(MockData.GetVerificationMethodDocument(), contentType: "application/json", statusCode: 200);
+            logger.LogDebug("Issuer response: {Verification Method Document}", MockData.GetVerificationMethodDocument(id));
+            return Results.Content(MockData.GetVerificationMethodDocument(id), contentType: "application/json", statusCode: 200);
         }
 
         public IResult IssueCredential([FromBody] object json, ILogger<IssuerHandlers> logger)

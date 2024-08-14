@@ -158,10 +158,13 @@ namespace DI_Sd_Primitives
         /// <param name="jsonPointers">An array of JSON Pointers.</param>
         /// <param name="labelMap">A blank node label map.</param>
         /// <returns>Tuple containing selectionDocument, deskolemizedNQuads, and nquads</returns>
-        public static SelectCanonicalNQuadsResult SelectCanonicalNQuads(this JObject skolemizedInputDocument, IEnumerable<string> jsonPointers, IDictionary<string, string> labelMap)
+        public static SelectCanonicalNQuadsResult? SelectCanonicalNQuads(this JObject skolemizedInputDocument, IEnumerable<string> jsonPointers, IDictionary<string, string> labelMap)
         {
-            var selectionDocument = skolemizedInputDocument.SelectJsonLd(jsonPointers)
-                ?? throw new ArgumentException("No selection was made.");
+            var selectionDocument = skolemizedInputDocument.SelectJsonLd(jsonPointers);
+            if (selectionDocument is null)
+            {
+                return null;
+            }
             var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(selectionDocument);
             var relabeledNQuads = SkolemizationService.RelabelBlankNodes(deskolemizedNQuads, labelMap);
             return new SelectCanonicalNQuadsResult
@@ -200,7 +203,10 @@ namespace DI_Sd_Primitives
             foreach (var (groupName, jsonPointers) in groupDefinitions)
             {
                 var scnr = skolemizedCompactDocument.SelectCanonicalNQuads(jsonPointers, labelMap);
-                selections.Add(groupName, scnr);
+                if (scnr is not null)
+                {
+                    selections.Add(groupName, scnr);
+                }
             }
             var groups = new Dictionary<string, GroupResult>();
             foreach (var (groupName, selection) in selections)

@@ -13,6 +13,7 @@ namespace Cryptosuite.Core
         public const string VeresOneContextV1Url = "https://w3id.org/veres-one/v1";
         public const string X25519KeyAgreement2020V1ContextUrl = "https://w3id.org/security/suites/x25519-2020/v1";
         public const string CredentialsContextV1Url = "https://www.w3.org/2018/credentials/v1";
+        public const string CredentialsContextV2Url = "https://www.w3.org/ns/credentials/v2";
         public const string DidContextV1Url = "https://www.w3.org/ns/did/v1";
         public const string DataIntegrityV1Url = "https://w3id.org/security/data-integrity/v1";
         public const string DataIntegrityV2Url = "https://w3id.org/security/data-integrity/v2";
@@ -496,6 +497,309 @@ namespace Cryptosuite.Core
               }
             }
             """;
+        const string CredentialsContextV2String = """
+            {
+                "@context": {
+                    "@protected": true,
+                    "id": "@id",
+                    "type": "@type",
+                    "description": "https://schema.org/description",
+                    "digestMultibase": {
+                        "@id": "https://w3id.org/security#digestMultibase",
+                        "@type": "https://w3id.org/security#multibase"
+                    },
+                    "digestSRI": {
+                        "@id": "https://www.w3.org/2018/credentials#digestSRI",
+                        "@type": "https://www.w3.org/2018/credentials#sriString"
+                    },
+                    "mediaType": {
+                        "@id": "https://schema.org/encodingFormat"
+                    },
+                    "name": "https://schema.org/name",
+                    "VerifiableCredential": {
+                        "@id": "https://www.w3.org/2018/credentials#VerifiableCredential",
+                        "@context": {
+                            "@protected": true,
+                            "id": "@id",
+                            "type": "@type",
+                            "confidenceMethod": {
+                                "@id": "https://www.w3.org/2018/credentials#confidenceMethod",
+                                "@type": "@id"
+                            },
+                            "credentialSchema": {
+                                "@id": "https://www.w3.org/2018/credentials#credentialSchema",
+                                "@type": "@id"
+                            },
+                            "credentialStatus": {
+                                "@id": "https://www.w3.org/2018/credentials#credentialStatus",
+                                "@type": "@id"
+                            },
+                            "credentialSubject": {
+                                "@id": "https://www.w3.org/2018/credentials#credentialSubject",
+                                "@type": "@id"
+                            },
+                            "description": "https://schema.org/description",
+                            "evidence": {
+                                "@id": "https://www.w3.org/2018/credentials#evidence",
+                                "@type": "@id"
+                            },
+                            "issuer": {
+                                "@id": "https://www.w3.org/2018/credentials#issuer",
+                                "@type": "@id"
+                            },
+                            "name": "https://schema.org/name",
+                            "proof": {
+                                "@id": "https://w3id.org/security#proof",
+                                "@type": "@id",
+                                "@container": "@graph"
+                            },
+                            "refreshService": {
+                                "@id": "https://www.w3.org/2018/credentials#refreshService",
+                                "@type": "@id"
+                            },
+                            "relatedResource": {
+                                "@id": "https://www.w3.org/2018/credentials#relatedResource",
+                                "@type": "@id"
+                            },
+                            "renderMethod": {
+                                "@id": "https://www.w3.org/2018/credentials#renderMethod",
+                                "@type": "@id"
+                            },
+                            "termsOfUse": {
+                                "@id": "https://www.w3.org/2018/credentials#termsOfUse",
+                                "@type": "@id"
+                            },
+                            "validFrom": {
+                                "@id": "https://www.w3.org/2018/credentials#validFrom",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            },
+                            "validUntil": {
+                                "@id": "https://www.w3.org/2018/credentials#validUntil",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            }
+                        }
+                    },
+                    "EnvelopedVerifiableCredential": "https://www.w3.org/2018/credentials#EnvelopedVerifiableCredential",
+                    "VerifiablePresentation": {
+                        "@id": "https://www.w3.org/2018/credentials#VerifiablePresentation",
+                        "@context": {
+                            "@protected": true,
+                            "id": "@id",
+                            "type": "@type",
+                            "holder": {
+                                "@id": "https://www.w3.org/2018/credentials#holder",
+                                "@type": "@id"
+                            },
+                            "proof": {
+                                "@id": "https://w3id.org/security#proof",
+                                "@type": "@id",
+                                "@container": "@graph"
+                            },
+                            "termsOfUse": {
+                                "@id": "https://www.w3.org/2018/credentials#termsOfUse",
+                                "@type": "@id"
+                            },
+                            "verifiableCredential": {
+                                "@id": "https://www.w3.org/2018/credentials#verifiableCredential",
+                                "@type": "@id",
+                                "@container": "@graph",
+                                "@context": null
+                            }
+                        }
+                    },
+                    "EnvelopedVerifiablePresentation": "https://www.w3.org/2018/credentials#EnvelopedVerifiablePresentation",
+                    "JsonSchemaCredential": "https://www.w3.org/2018/credentials#JsonSchemaCredential",
+                    "JsonSchema": {
+                        "@id": "https://www.w3.org/2018/credentials#JsonSchema",
+                        "@context": {
+                            "@protected": true,
+                            "id": "@id",
+                            "type": "@type",
+                            "jsonSchema": {
+                                "@id": "https://www.w3.org/2018/credentials#jsonSchema",
+                                "@type": "@json"
+                            }
+                        }
+                    },
+                    "BitstringStatusListCredential": "https://www.w3.org/ns/credentials/status#BitstringStatusListCredential",
+                    "BitstringStatusList": {
+                        "@id": "https://www.w3.org/ns/credentials/status#BitstringStatusList",
+                        "@context": {
+                            "@protected": true,
+                            "id": "@id",
+                            "type": "@type",
+                            "encodedList": {
+                                "@id": "https://www.w3.org/ns/credentials/status#encodedList",
+                                "@type": "https://w3id.org/security#multibase"
+                            },
+                            "statusMessage": {
+                                "@id": "https://www.w3.org/ns/credentials/status#statusMessage",
+                                "@context": {
+                                    "@protected": true,
+                                    "id": "@id",
+                                    "type": "@type",
+                                    "message": "https://www.w3.org/ns/credentials/status#message",
+                                    "status": "https://www.w3.org/ns/credentials/status#status"
+                                }
+                            },
+                            "statusPurpose": "https://www.w3.org/ns/credentials/status#statusPurpose",
+                            "statusReference": {
+                                "@id": "https://www.w3.org/ns/credentials/status#statusReference",
+                                "@type": "@id"
+                            },
+                            "statusSize": {
+                                "@id": "https://www.w3.org/ns/credentials/status#statusSize",
+                                "@type": "https://www.w3.org/2001/XMLSchema#positiveInteger"
+                            },
+                            "ttl": "https://www.w3.org/ns/credentials/status#ttl"
+                        }
+                    },
+                    "BitstringStatusListEntry": {
+                        "@id": "https://www.w3.org/ns/credentials/status#BitstringStatusListEntry",
+                        "@context": {
+                            "@protected": true,
+                            "id": "@id",
+                            "type": "@type",
+                            "statusListCredential": {
+                                "@id": "https://www.w3.org/ns/credentials/status#statusListCredential",
+                                "@type": "@id"
+                            },
+                            "statusListIndex": "https://www.w3.org/ns/credentials/status#statusListIndex",
+                            "statusPurpose": "https://www.w3.org/ns/credentials/status#statusPurpose"
+                        }
+                    },
+                    "DataIntegrityProof": {
+                        "@id": "https://w3id.org/security#DataIntegrityProof",
+                        "@context": {
+                            "@protected": true,
+                            "id": "@id",
+                            "type": "@type",
+                            "challenge": "https://w3id.org/security#challenge",
+                            "created": {
+                                "@id": "http://purl.org/dc/terms/created",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            },
+                            "cryptosuite": {
+                                "@id": "https://w3id.org/security#cryptosuite",
+                                "@type": "https://w3id.org/security#cryptosuiteString"
+                            },
+                            "domain": "https://w3id.org/security#domain",
+                            "expires": {
+                                "@id": "https://w3id.org/security#expiration",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            },
+                            "nonce": "https://w3id.org/security#nonce",
+                            "previousProof": {
+                                "@id": "https://w3id.org/security#previousProof",
+                                "@type": "@id"
+                            },
+                            "proofPurpose": {
+                                "@id": "https://w3id.org/security#proofPurpose",
+                                "@type": "@vocab",
+                                "@context": {
+                                    "@protected": true,
+                                    "id": "@id",
+                                    "type": "@type",
+                                    "assertionMethod": {
+                                        "@id": "https://w3id.org/security#assertionMethod",
+                                        "@type": "@id",
+                                        "@container": "@set"
+                                    },
+                                    "authentication": {
+                                        "@id": "https://w3id.org/security#authenticationMethod",
+                                        "@type": "@id",
+                                        "@container": "@set"
+                                    },
+                                    "capabilityDelegation": {
+                                        "@id": "https://w3id.org/security#capabilityDelegationMethod",
+                                        "@type": "@id",
+                                        "@container": "@set"
+                                    },
+                                    "capabilityInvocation": {
+                                        "@id": "https://w3id.org/security#capabilityInvocationMethod",
+                                        "@type": "@id",
+                                        "@container": "@set"
+                                    },
+                                    "keyAgreement": {
+                                        "@id": "https://w3id.org/security#keyAgreementMethod",
+                                        "@type": "@id",
+                                        "@container": "@set"
+                                    }
+                                }
+                            },
+                            "proofValue": {
+                                "@id": "https://w3id.org/security#proofValue",
+                                "@type": "https://w3id.org/security#multibase"
+                            },
+                            "verificationMethod": {
+                                "@id": "https://w3id.org/security#verificationMethod",
+                                "@type": "@id"
+                            }
+                        }
+                    },
+                    "...": {
+                        "@id": "https://www.iana.org/assignments/jwt#..."
+                    },
+                    "_sd": {
+                        "@id": "https://www.iana.org/assignments/jwt#_sd",
+                        "@type": "@json"
+                    },
+                    "_sd_alg": {
+                        "@id": "https://www.iana.org/assignments/jwt#_sd_alg"
+                    },
+                    "aud": {
+                        "@id": "https://www.iana.org/assignments/jwt#aud",
+                        "@type": "@id"
+                    },
+                    "cnf": {
+                        "@id": "https://www.iana.org/assignments/jwt#cnf",
+                        "@context": {
+                            "@protected": true,
+                            "kid": {
+                                "@id": "https://www.iana.org/assignments/jwt#kid",
+                                "@type": "@id"
+                            },
+                            "jwk": {
+                                "@id": "https://www.iana.org/assignments/jwt#jwk",
+                                "@type": "@json"
+                            }
+                        }
+                    },
+                    "exp": {
+                        "@id": "https://www.iana.org/assignments/jwt#exp",
+                        "@type": "https://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+                    },
+                    "iat": {
+                        "@id": "https://www.iana.org/assignments/jwt#iat",
+                        "@type": "https://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+                    },
+                    "iss": {
+                        "@id": "https://www.iana.org/assignments/jose#iss",
+                        "@type": "@id"
+                    },
+                    "jku": {
+                        "@id": "https://www.iana.org/assignments/jose#jku",
+                        "@type": "@id"
+                    },
+                    "kid": {
+                        "@id": "https://www.iana.org/assignments/jose#kid",
+                        "@type": "@id"
+                    },
+                    "nbf": {
+                        "@id": "https://www.iana.org/assignments/jwt#nbf",
+                        "@type": "https://www.w3.org/2001/XMLSchema#nonNegativeInteger"
+                    },
+                    "sub": {
+                        "@id": "https://www.iana.org/assignments/jose#sub",
+                        "@type": "@id"
+                    },
+                    "x5u": {
+                        "@id": "https://www.iana.org/assignments/jose#x5u",
+                        "@type": "@id"
+                    }
+                }
+            }
+            """;
         const string DidContextV1String = """
             {
               "@context": {
@@ -923,6 +1227,7 @@ namespace Cryptosuite.Core
         private static JToken? _ed25519Signature2020Context;
         private static JToken? _x25519KeyAgreement2020V1Context;
         private static JToken? _credentialsContextV1;
+        private static JToken? _credentialsContextV2;
         private static JToken? _didContextV1;
         private static JToken? _dataIntegrityV1;
         private static JToken? _dataIntegrityV2;
@@ -962,6 +1267,15 @@ namespace Cryptosuite.Core
             {
                 _credentialsContextV1 ??= JToken.Parse(CredentialsContextV1String);
                 return _credentialsContextV1;
+            }
+        }
+
+        public static JToken CredentialsContextV2
+        {
+            get
+            {
+                _credentialsContextV2 ??= JToken.Parse(CredentialsContextV2String);
+                return _credentialsContextV2;
             }
         }
 
