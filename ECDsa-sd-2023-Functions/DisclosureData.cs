@@ -4,6 +4,7 @@ using Cryptosuite.Core.Util;
 using ECDsa_sd_2023_Functions.Util;
 using Newtonsoft.Json.Linq;
 using PeterO.Cbor;
+using ECDsa_Multikey;
 
 namespace ECDsa_sd_2023_Functions
 {

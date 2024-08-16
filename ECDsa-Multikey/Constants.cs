@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ECDsa_Multikey
 {
-    internal static class Constants
+    public static class Constants
     {
         internal const string Algorithm = "ECDSA";
         internal const string MultikeyString = "Multikey";
@@ -20,7 +20,8 @@ namespace ECDsa_Multikey
         internal const string ECDsa2019SuiteContextV1Url = "https://w3id.org/security/suites/ecdsa-2019/v1";
         internal const string MultikeyContextV1Url = "https://w3id.org/security/multikey/v1";
 
-        internal const char MultibaseBase58Header = 'z';
+        public const char MultibaseBase58Header = 'z';
+        public const char MultibaseBase64Header = 'u';
 
         internal static readonly byte[] MulticodecP256PublicKeyHeader = new byte[] { 0x80, 0x24 };
         internal static readonly byte[] MulticodecP384PublicKeyHeader = new byte[] { 0x81, 0x24 };

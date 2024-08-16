@@ -10,13 +10,11 @@ namespace ECDsa_Multikey
         public string? Id { get; set; }
         public string? Controller { get; set; }
         public AsymmetricCipherKeyPair? Keys { get; set; }
-        public string? Algorithm { get; set; }
-        public string? PublicKeyMultibase { get; set; }
-        public string? SecretKeyMultibase { get; set; }
+        public required string Algorithm { get; set; }
         public required Verifier Verifier { get; set; }
         public Signer? Signer { get; set; }
 
-        public MultikeyVerificationMethod Export(bool publicKey = true, bool secretKey = false, bool includeContext = true)
+        public MultikeyVerificationMethod Export(bool includePublicKey = true, bool includeSecretKey = false, bool includeContext = true)
         {
             var keyPair = new KeyPair
             {
@@ -25,17 +23,7 @@ namespace ECDsa_Multikey
                 Keys = Keys,
                 Algorithm = Algorithm,
             };
-            return Serialize.ExportKeyPair(keyPair, publicKey, secretKey, includeContext);
-        }
-
-        public byte[] GetPublicKey()
-        {
-            return Base58.Bitcoin.Decode(PublicKeyMultibase.AsSpan()[1..]);
-        }
-
-        public byte[] GetSecretKey()
-        {
-            return Base58.Bitcoin.Decode(SecretKeyMultibase.AsSpan()[1..]);
+            return Serialize.ExportKeyPair(keyPair, includePublicKey, includeSecretKey, includeContext);
         }
     }
 }

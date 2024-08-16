@@ -4,6 +4,7 @@ using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using SimpleBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,7 +33,7 @@ namespace ECDsa_Multikey
                 Keys = keys,
             };
             var kpi = CreateKeyPairInterface(keyPair);
-            var exported = kpi.Export(publicKey: true);
+            var exported = kpi.Export(includePublicKey: true);
             var publicKeyMultibase = exported.PublicKeyMultibase;
             if (controller is not null && id is null)
             {
@@ -72,19 +73,26 @@ namespace ECDsa_Multikey
             {
                 throw new ArgumentException("Key pair does not contain keys.");
             }
-            var multi = Serialize.ExportKeyPair(keyPair, true, true, true);
             var kpi = new KeyPairInterface
             {
                 Id = keyPair.Id,
                 Controller = keyPair.Controller,
                 Keys = keyPair.Keys,
                 Algorithm = keyPair.Algorithm,
-                PublicKeyMultibase = multi.PublicKeyMultibase,
-                SecretKeyMultibase = multi.SecretKeyMultibase,
                 Verifier = new Verifier(keyPair.Id, keyPair.Keys, keyPair.Algorithm),
                 Signer = new Signer(keyPair.Id, keyPair.Keys, keyPair.Algorithm),
             };
             return kpi;
+        }
+
+        public static byte[] ToByteArray(string multibase)
+        {
+            return Base58.Bitcoin.Decode(multibase.AsSpan()[1..]);
+        }
+
+        public static string ToMultibaseString(byte[] bytes)
+        {
+            return $"{Constants.MultibaseBase58Header}{Base58.Bitcoin.Encode(bytes)}";
         }
 
         private static void AssertMultikey(MultikeyVerificationMethod key)

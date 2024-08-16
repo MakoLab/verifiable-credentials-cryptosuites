@@ -1,5 +1,6 @@
 ﻿using Cryptosuite.Core;
 using Cryptosuite.Core.Util;
+using ECDsa_Multikey;
 using System;
 using System.Collections.Generic;
 using System.Linq;

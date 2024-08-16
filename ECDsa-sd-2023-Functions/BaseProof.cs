@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Formats.Cbor;
 using Cryptosuite.Core.Util;
+using ECDsa_Multikey;
 using Cryptosuite.Core;
 
 namespace ECDsa_sd_2023_Functions

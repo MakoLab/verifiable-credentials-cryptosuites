@@ -77,7 +77,7 @@ namespace ECDsa_sd_2023_Cryptosuite
 
         private VerificationMethod GetVerificationMethod(string uri, ControllerDocument cd)
         {
-            var vm = cd.VerificationMethod.FirstOrDefault(vm => vm.Id == uri);
+            var vm = cd.VerificationMethod?.FirstOrDefault(vm => vm.Id == uri);
             return vm is not null ? vm : throw new Exception("Could not retrieve a verification method from controller document.");
         }
     }

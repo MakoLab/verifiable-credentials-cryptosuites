@@ -56,9 +56,4 @@ namespace Cryptosuite.Core
             throw new NotSupportedException($"Curve {id.Id} is not supported.");
         }
     }
-
-    public class Constants
-    {
-        public const char MultibaseBase64Header = 'u';
-    }
 }

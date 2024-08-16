@@ -141,6 +141,10 @@ namespace ECDsa_Multikey
             {
                 throw new ArgumentException("Key pair does not contain keys.");
             }
+            if (keyPair.Id is null || keyPair.Controller is null)
+            {
+                throw new ArgumentException("Key pair does not contain an identifier or controller.");
+            }
             var secretKeySize = Helpers.GetSecretKeySize(keyPair.Algorithm);
             var multiKey = new MultikeyVerificationMethod(keyPair.Id, keyPair.Controller);
             if (includeContext)
