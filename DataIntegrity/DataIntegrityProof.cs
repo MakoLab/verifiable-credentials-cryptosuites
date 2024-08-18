@@ -47,7 +47,7 @@ namespace DataIntegrity
 
         public override Proof CreateProof(JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
         {
-            var proof = _proof is null ? new Proof() { Type = "DataIntegrityProof" } : new Proof(_proof) { Type = "DataIntegrityProof" };
+            var proof = _proof is null ? new Proof() { Type = "DataIntegrityProof" } : new Proof(_proof);
             proof.Type = Type;
             var date = _date;
             if (proof.Created is null && date is null)
@@ -243,7 +243,6 @@ namespace DataIntegrity
             proof = new Proof(proof)
             {
                 Context = document["@context"],
-                Type = "DataIntegrityProof",
             };
             EnsureSuiteContext(JObject.FromObject(proof), true);
             proof.ProofValue = null;

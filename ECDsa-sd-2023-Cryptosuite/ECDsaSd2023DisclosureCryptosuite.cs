@@ -30,7 +30,7 @@ namespace ECDsa_sd_2023_Cryptosuite
             {
                 throw new Exception("No selective disclosure data found.");
             }
-            var newProof = new Proof(proof) { Type = "DataIntegrityProof" };
+            var newProof = new Proof(proof);
             var pv = dd.SerializeDerivedProofValue();
             newProof.ProofValue = pv;
             dd.RevealDocument.Add("proof", JObject.FromObject(newProof));

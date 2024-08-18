@@ -1,5 +1,6 @@
 ﻿using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics.CodeAnalysis;
 
 namespace Cryptosuite.Core
 {
@@ -41,6 +42,7 @@ namespace Cryptosuite.Core
         /// Shallow copy constructor
         /// </summary>
         /// <param name="proof">Proof to copy</param>
+        [SetsRequiredMembers]
         public Proof(Proof proof)
         {
             Id = proof.Id;
