@@ -1,5 +1,4 @@
-﻿using ECDsa_2019_Cryptosuite.Tests;
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace TestWebAPI
 {

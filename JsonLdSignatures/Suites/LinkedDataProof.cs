@@ -1,15 +1,9 @@
 ﻿using Cryptosuite.Core;
 using Cryptosuite.Core.ControllerDocuments;
-using Cryptosuite.Core.Interfaces;
 using FluentResults;
 using JsonLdExtensions;
 using JsonLdSignatures.Purposes;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace JsonLdSignatures.Suites
 {

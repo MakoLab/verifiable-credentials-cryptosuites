@@ -1,20 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using VDS.RDF;
-using System.Text.RegularExpressions;
-using JsonLdExtensions.Canonicalization;
-using JsonLdExtensions;
-using VDS.RDF.Writing.Formatting;
-using Newtonsoft.Json;
+﻿using JsonLdExtensions.Canonicalization;
 using Newtonsoft.Json.Linq;
+using System.Text.RegularExpressions;
+using VDS.RDF;
 using VDS.RDF.JsonLd;
-using VDS.RDF.Writing;
-using Microsoft.Json.Pointer;
-using OneOf;
 using VDS.RDF.Parsing;
+using VDS.RDF.Writing;
 
 namespace DI_Sd_Primitives
 {

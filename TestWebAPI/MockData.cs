@@ -1,9 +1,7 @@
 ﻿using Cryptosuite.Core;
 using Cryptosuite.Core.ControllerDocuments;
 using ECDsa_Multikey;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Newtonsoft.Json.Serialization;
 
 namespace TestWebAPI
 {

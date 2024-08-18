@@ -1,10 +1,4 @@
-﻿using DI_Sd_Primitives.Interfaces;
-using JsonLdExtensions.Canonicalization;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using JsonLdExtensions.Canonicalization;
 using VDS.RDF;
 using VDS.RDF.Writing;
 

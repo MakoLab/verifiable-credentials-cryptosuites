@@ -1,15 +1,9 @@
 ﻿using Org.BouncyCastle.Asn1.Sec;
-using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Math;
-using Org.BouncyCastle.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Cryptosuite.Core.Tests
 {

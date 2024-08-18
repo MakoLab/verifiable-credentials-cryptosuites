@@ -1,16 +1,11 @@
-﻿using FluentResults;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cryptosuite.Core;
+﻿using Cryptosuite.Core;
+using Cryptosuite.Core.ControllerDocuments;
+using Cryptosuite.Core.Util;
+using FluentResults;
 using JsonLdExtensions;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using VDS.RDF.JsonLd;
-using Newtonsoft.Json;
-using Cryptosuite.Core.Util;
-using Cryptosuite.Core.ControllerDocuments;
 
 namespace JsonLdSignatures.Purposes
 {

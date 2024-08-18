@@ -1,18 +1,9 @@
 ﻿using Cryptosuite.Core;
-using ECDsa_Multikey;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
-using Org.BouncyCastle.Crypto.Generators;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Numerics;
-using System.Text;
-using System.Threading.Tasks;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ECDsa_Multikey.Tests")]
 namespace ECDsa_Multikey

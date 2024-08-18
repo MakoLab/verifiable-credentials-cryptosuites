@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Org.BouncyCastle.Asn1.X9;
+﻿using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 
 

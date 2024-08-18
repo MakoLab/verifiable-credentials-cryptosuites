@@ -1,13 +1,7 @@
 ﻿using DI_Sd_Primitives.Interfaces;
 using JsonLdExtensions.Canonicalization;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VDS.RDF;
-using VDS.RDF.Parsing;
 
 namespace DI_Sd_Primitives
 {

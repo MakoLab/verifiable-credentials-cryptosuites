@@ -1,12 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Formats.Cbor;
-using Cryptosuite.Core.Util;
+﻿using Cryptosuite.Core.Util;
 using ECDsa_Multikey;
-using Cryptosuite.Core;
+using System.Formats.Cbor;
 
 namespace ECDsa_sd_2023_Functions
 {
@@ -86,7 +80,7 @@ namespace ECDsa_sd_2023_Functions
         /// <returns>A single sign data value, represented as series of bytes.</returns>
         public static byte[] SerializeSignData(byte[] proofHash, byte[] publicKey, byte[] mandatoryHash)
         {
-            return [..proofHash, ..publicKey, ..mandatoryHash];
+            return [.. proofHash, .. publicKey, .. mandatoryHash];
         }
 
         private byte[] CborEncode()

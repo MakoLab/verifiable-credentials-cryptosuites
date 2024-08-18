@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECDsa_Multikey
+﻿namespace ECDsa_Multikey
 {
     public static class Constants
     {

@@ -1,11 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Cryptosuite.Core.Util;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using Cryptosuite.Core.Util;
 
 namespace Cryptosuite.Core.Tests
 {

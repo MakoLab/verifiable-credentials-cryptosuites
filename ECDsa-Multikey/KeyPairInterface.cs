@@ -1,7 +1,5 @@
 ﻿using Cryptosuite.Core;
 using Org.BouncyCastle.Crypto;
-using SimpleBase;
-using System.Security.Cryptography;
 
 namespace ECDsa_Multikey
 {

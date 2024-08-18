@@ -2,23 +2,16 @@
 using Cryptosuite.Core.ControllerDocuments;
 using Cryptosuite.Core.Interfaces;
 using Cryptosuite.Core.Util;
-using ECDsa_2019_Cryptosuite;
 using ECDsa_Multikey;
 using FluentResults;
 using JsonLdExtensions;
 using JsonLdExtensions.Canonicalization;
-using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
 using JsonLdSignatures.Suites;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
 using System.Security.Cryptography;
 using System.Text;
-using System.Threading.Tasks;
 using VDS.RDF.JsonLd;
 
 namespace DataIntegrity
@@ -233,7 +226,7 @@ namespace DataIntegrity
                 }
             }
             var proofHash = Sha256Digest(CanonizeProof(proof, document, documentLoader));
-            return [..cachedDocHash, ..proofHash];
+            return [.. cachedDocHash, .. proofHash];
         }
 
         private static bool IncludesContext(JObject document, string context)

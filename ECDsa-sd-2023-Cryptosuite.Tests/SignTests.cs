@@ -3,12 +3,6 @@ using ECDsa_Multikey;
 using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
 using Newtonsoft.Json.Linq;
-using SecurityDocumentLoader;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECDsa_sd_2023_Cryptosuite.Tests
 {

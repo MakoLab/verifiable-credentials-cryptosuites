@@ -1,16 +1,10 @@
 ﻿using Cryptosuite.Core;
 using DI_Sd_Primitives;
 using JsonLdExtensions.Canonicalization;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Macs;
 using Org.BouncyCastle.Crypto.Parameters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using VDS.RDF;
 
 namespace ECDsa_sd_2023_Functions

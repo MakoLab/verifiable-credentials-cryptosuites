@@ -6,15 +6,7 @@ using ECDsa_sd_2023_Functions;
 using JsonLdExtensions;
 using JsonLdExtensions.Canonicalization;
 using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Crypto.Digests;
-using Org.BouncyCastle.Crypto.Macs;
-using Org.BouncyCastle.Crypto.Parameters;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Text.Unicode;
-using System.Threading.Tasks;
 
 namespace ECDsa_sd_2023_Cryptosuite
 {
@@ -49,7 +41,7 @@ namespace ECDsa_sd_2023_Cryptosuite
                 { "mandatory", MandatoryPointers }
             };
             var cResult = document.CanonicalizeAndGroup(hlmff, groupDefinitions);
-            var mandatory =  new List<string>();
+            var mandatory = new List<string>();
             var nonMandatory = new List<string>();
             if (cResult.Groups.TryGetValue("mandatory", out var value) && value.Matching.Count > 0)
             {

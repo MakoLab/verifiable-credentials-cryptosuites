@@ -5,7 +5,6 @@ using ECDsa_sd_2023_Cryptosuite;
 using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
 using System.Text.Json;
 

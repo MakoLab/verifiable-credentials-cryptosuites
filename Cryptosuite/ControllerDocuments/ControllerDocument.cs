@@ -3,11 +3,6 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Newtonsoft.Json.Serialization;
 using OneOf;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Cryptosuite.Core.ControllerDocuments
 {
@@ -22,7 +17,7 @@ namespace Cryptosuite.Core.ControllerDocuments
         public IEnumerable<OneOf<string, VerificationMethod>>? Authentication { get; set; }
         [JsonProperty(ItemConverterType = typeof(OneOfConverter<string, VerificationMethod>))]
         public IEnumerable<OneOf<string, VerificationMethod>>? AssertionMethod { get; set; }
-        
+
         public ControllerDocument(string id)
         {
             Id = id;

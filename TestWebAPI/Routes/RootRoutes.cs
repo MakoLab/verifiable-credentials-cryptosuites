@@ -4,17 +4,17 @@
     {
         public static RouteHandlerBuilder RegisterHomeRoute(this IEndpointRouteBuilder erb)
         {
-           var handler = new RootHandlers();
-           var builder = erb.MapGet("/", handler.GetHome)
-            .WithName("Root")
-            .WithOpenApi();
+            var handler = new RootHandlers();
+            var builder = erb.MapGet("/", handler.GetHome)
+             .WithName("Root")
+             .WithOpenApi();
             return builder;
         }
     }
 
     public class RootHandlers
     {
-       public string GetHome()
+        public string GetHome()
         {
             return "Hello World!";
         }

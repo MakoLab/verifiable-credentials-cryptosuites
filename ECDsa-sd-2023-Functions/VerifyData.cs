@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ECDsa_sd_2023_Functions
+﻿namespace ECDsa_sd_2023_Functions
 {
     public class VerifyData
     {

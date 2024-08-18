@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DI_Sd_Primitives.Tests.InlineTestData
+﻿namespace DI_Sd_Primitives.Tests.InlineTestData
 {
     public class SelectPaths_ReturnsSelectedPaths_TestData : TheoryData<string, string, string>
     {

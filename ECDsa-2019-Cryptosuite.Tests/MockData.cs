@@ -1,11 +1,6 @@
 ﻿using Cryptosuite.Core.ControllerDocuments;
 using ECDsa_Multikey;
 using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace ECDsa_2019_Cryptosuite.Tests
 {
@@ -68,7 +63,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
             {
                 Context = new JArray { "https://www.w3.org/ns/did/v1", "https://w3id.org/security/multikey/v1" },
                 Controller = Controller,
-                VerificationMethod = [ MockPublicEcdsaMultikey ],
+                VerificationMethod = [MockPublicEcdsaMultikey],
             };
         }
     }
