@@ -100,7 +100,7 @@ namespace JsonLdSignatures
             return proofSet;
         }
 
-        private IEnumerable<Result<VerificationResult>> Verify(JObject document, LinkedDataSignature[] suites, IEnumerable<Proof> proofSet, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
+        private List<Result<VerificationResult>> Verify(JObject document, LinkedDataSignature[] suites, IEnumerable<Proof> proofSet, IList<ProofPurpose> purposes, IDocumentLoader documentLoader)
         {
             var purposeToProofs = new Dictionary<ProofPurpose, List<Proof>>();
             var proofToSuite = new Dictionary<Proof, LinkedDataSignature>();
@@ -110,7 +110,7 @@ namespace JsonLdSignatures
             }
             if (purposeToProofs.Count < purposes.Count)
             {
-                return new List<Result<VerificationResult>>() { Result.Fail("Insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
+                return [Result.Fail("Insufficient proofs matched the acceptable suite(s) and required purpose(s).")];
             }
             var results = new List<Result<VerificationResult>>();
             foreach (var (proof, suite) in proofToSuite)
@@ -138,6 +138,10 @@ namespace JsonLdSignatures
                         continue;
                     }
                     var vm = result.Value.VerificationMethod;
+                    if (vm is null)
+                    {
+                        throw new Exception("Verification method is required.");
+                    }
                     var suite = proofToSuite[proof];
                     var purposeResult = ((ControllerProofPurpose)purpose).Validate(proof, vm, documentLoader);
                     result.Value.PurposeValidation.Add(purposeResult);

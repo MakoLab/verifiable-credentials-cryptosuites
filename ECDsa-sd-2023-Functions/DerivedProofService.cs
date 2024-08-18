@@ -96,6 +96,7 @@ namespace ECDsa_sd_2023_Functions
             }
             var proofCopy = new Proof(proof)
             {
+                Type = "DataIntegrityProof",
                 ProofValue = null
             };
             var proofDocument = JObject.FromObject(proofCopy);
