@@ -1,6 +1,7 @@
 ﻿using Cryptosuite.Core;
 using DI_Sd_Primitives;
 using JsonLdExtensions.Canonicalization;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Crypto.Macs;
@@ -95,8 +96,17 @@ namespace ECDsa_sd_2023_Functions
         /// <returns>A single verify data object value.</returns>
         public static VerifyData CreateVerifyData(JObject document, Proof proof)
         {
-            //TODO: Implement proofHash
-            throw new NotImplementedException();
+            if (proof.ProofValue == null)
+            {
+                throw new ArgumentException("Proof value is required to create verify data.");
+            }
+            var proofCopy = new Proof(proof)
+            {
+                ProofValue = null
+            };
+            var proofDocument = JObject.FromObject(proofCopy);
+            var canonicalized = JsonLdNormalizer.Normalize(proofDocument, new JsonLdNormalizerOptions()).SerializedNQuads.Replace("\r", String.Empty);
+            var proofHash = new HashingService().HashString(canonicalized);
             var derivedProof = DisclosureData.ParseDerivedProofValue(proof.ProofValue);
             var labelMapFunction = new CustomLabelMapFactoryFunction(derivedProof.LabelMap);
             var cs = new CanonicalizationService();
@@ -119,7 +129,7 @@ namespace ECDsa_sd_2023_Functions
             return new VerifyData
             {
                 BaseSignature = derivedProof.BaseSignature,
-                ProofHash = [], //TODO: Implement proofHash
+                ProofHash = proofHash,
                 PublicKey = derivedProof.PublicKey,
                 Signatures = derivedProof.Signatures,
                 NonMandatory = nonMandatory,
