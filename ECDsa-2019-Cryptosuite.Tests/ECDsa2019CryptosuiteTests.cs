@@ -1,5 +1,10 @@
-﻿using JsonLdExtensions;
+﻿using DataIntegrity;
+using ECDsa_Multikey;
+using JsonLdExtensions;
 using JsonLdExtensions.Canonicalization;
+using JsonLdSignatures;
+using JsonLdSignatures.Purposes;
+using Newtonsoft.Json.Linq;
 
 namespace ECDsa_2019_Cryptosuite.Tests
 {
@@ -24,6 +29,21 @@ namespace ECDsa_2019_Cryptosuite.Tests
             var cryptosuite = new ECDsa2019Cryptosuite();
             var canonized = cryptosuite.Canonize(credential, new JsonLdNormalizerOptions() { DocumentLoader = documentLoader.LoadDocument });
             Assert.Equal(expected, canonized);
+        }
+
+        [Fact]
+        public void ShouldSignDocument()
+        {
+            var credential = mockData.Credential;
+            var cryptosuite = new ECDsa2019Cryptosuite();
+            var keypair = MultikeyService.From(mockData.EcdsaMultikeyKeyPair);
+            var suite = new DataIntegrityProof(cryptosuite, keypair.Signer);
+            var jss = new JsonLdSignatureService(new ProofSetService());
+            var proofPurpose = new AssertionMethodPurpose();
+            documentLoader.AddStatic(mockData.MockPublicEcdsaMultikey.Id, JObject.FromObject(mockData.ControllerDocEcdsaMultikey));
+            var signed = jss.Sign(credential, suite, proofPurpose, documentLoader);
+
+            Assert.NotNull(signed);
         }
     }
 }

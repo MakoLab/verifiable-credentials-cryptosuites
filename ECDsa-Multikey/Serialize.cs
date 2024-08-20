@@ -136,7 +136,6 @@ namespace ECDsa_Multikey
             {
                 throw new ArgumentException("Key pair does not contain an identifier or controller.");
             }
-            var secretKeySize = Helpers.GetSecretKeySize(keyPair.Algorithm);
             var multiKey = new MultikeyVerificationMethod(keyPair.Id, keyPair.Controller);
             if (includeContext)
             {
@@ -144,35 +143,58 @@ namespace ECDsa_Multikey
             }
             if (includePublicKey)
             {
-                var publicKeySize = secretKeySize + 1;
-                var publicMultikey = new byte[2 + publicKeySize];
-                var publicKey = (ECPublicKeyParameters)keyPair.Keys.Public;
-                Helpers.SetPublicKeyHeader(keyPair.Algorithm, publicMultikey);
-                var x = publicKey.Q.XCoord.GetEncoded();
-                var y = publicKey.Q.YCoord.GetEncoded();
-                if (x is null || y is null)
-                {
-                    throw new Exception("Public key is missing.");
-                }
-                var even = y[^1] % 2 == 0;
-                publicMultikey[2] = (byte)(even ? 0x02 : 0x03);
-                x.CopyTo(publicMultikey.AsSpan()[^x.Length..]);
-                multiKey.PublicKeyMultibase = Constants.MultibaseBase58Header + SimpleBase.Base58.Bitcoin.Encode(publicMultikey);
+                multiKey.PublicKeyMultibase = ExtractPublicKeyMultibase(keyPair.Keys, keyPair.Algorithm);
             }
             if (includeSecretKey)
             {
-                var secretMultikey = new byte[2 + secretKeySize];
-                Helpers.SetSecretKeyHeader(keyPair.Algorithm, secretMultikey);
-                var privateKey = (ECPrivateKeyParameters)keyPair.Keys.Private;
-                var d = privateKey.D.ToByteArrayUnsigned();
-                if (d is null)
-                {
-                    throw new Exception("Secret key is missing.");
-                }
-                d.CopyTo(secretMultikey.AsSpan()[^d.Length..]);
-                multiKey.SecretKeyMultibase = Constants.MultibaseBase58Header + SimpleBase.Base58.Bitcoin.Encode(secretMultikey);
+                multiKey.SecretKeyMultibase = ExtractPrivateKeyMultibase(keyPair.Keys, keyPair.Algorithm);
             }
             return multiKey;
+        }
+
+        /// <summary>
+        /// Extracts the private key from the key pair.
+        /// </summary>
+        /// <param name="keyPair"></param>
+        /// <param name="algorithm"></param>
+        /// <returns>Private key in multibase format.</returns>
+        /// <exception cref="Exception"></exception>
+        internal static string ExtractPrivateKeyMultibase(AsymmetricCipherKeyPair keyPair, string algorithm)
+        {
+            var secretKeySize = Helpers.GetSecretKeySize(algorithm);
+            var secretMultikey = new byte[2 + secretKeySize];
+            Helpers.SetSecretKeyHeader(algorithm, secretMultikey);
+
+            var privateKey = (ECPrivateKeyParameters)keyPair.Private;
+            var d = privateKey.D.ToByteArrayUnsigned() ?? throw new Exception("Secret key is missing.");
+            d.CopyTo(secretMultikey.AsSpan()[^d.Length..]);
+            return Constants.MultibaseBase58Header + SimpleBase.Base58.Bitcoin.Encode(secretMultikey);
+        }
+
+        /// <summary>
+        /// Extracts the public key from the key pair.
+        /// </summary>
+        /// <param name="keyPair"></param>
+        /// <param name="algorithm"></param>
+        /// <returns>Public key in multibase format.</returns>
+        /// <exception cref="Exception"></exception>
+        internal static string ExtractPublicKeyMultibase(AsymmetricCipherKeyPair keyPair, string algorithm)
+        {
+            var secretKeySize = Helpers.GetSecretKeySize(algorithm);
+            var publicKeySize = secretKeySize + 1;
+            var publicMultikey = new byte[2 + publicKeySize];
+            var publicKey = (ECPublicKeyParameters)keyPair.Public;
+            Helpers.SetPublicKeyHeader(algorithm, publicMultikey);
+            var x = publicKey.Q.XCoord.GetEncoded();
+            var y = publicKey.Q.YCoord.GetEncoded();
+            if (x is null || y is null)
+            {
+                throw new Exception("Public key is missing.");
+            }
+            var even = y[^1] % 2 == 0;
+            publicMultikey[2] = (byte)(even ? 0x02 : 0x03);
+            x.CopyTo(publicMultikey.AsSpan()[^x.Length..]);
+            return Constants.MultibaseBase58Header + SimpleBase.Base58.Bitcoin.Encode(publicMultikey);
         }
 
         private static byte[] ToSpki(byte[] publicMultikey)
@@ -200,29 +222,6 @@ namespace ECDsa_Multikey
             publicMultikey.AsSpan()[2..].CopyTo(pkcs8.AsSpan()[offset..]);
             return pkcs8;
         }
-
-        //private static byte[] DecompressKey(Span<byte> key, ECCurve curve)
-        //{
-        //    if (curve.Prime is null || curve.A is null || curve.B is null)
-        //    {
-        //        throw new Exception("Curve parameters are missing.");
-        //    }
-        //    var p = new BigInteger(curve.Prime);
-        //    var x = new BigInteger(key[1..]);
-        //    var a = new BigInteger(curve.A);
-        //    var b = new BigInteger(curve.B);
-        //    var ysq = (BigInteger.ModPow(x, 3, p) + a * x + b) % p;
-        //    var y = BigInteger.ModPow(ysq, (p + 1) / 4, p);
-        //    if (y % 2 != key[0] % 2)
-        //    {
-        //        y = p - y;
-        //    }
-        //    var result = new byte[key.Length * 2 - 1];
-        //    result[0] = 0x04;
-        //    x.ToByteArray(isBigEndian: false, isUnsigned: true).CopyTo(result.AsSpan()[1..]);
-        //    y.ToByteArray(isBigEndian: false, isUnsigned: true).CopyTo(result.AsSpan()[(1 + x.ToByteArray().Length)..]);
-        //    return result;
-        //}
 
         private static void EnsureMultikeyHeadersMatch(byte[] publicMultikey, byte[] secretMultikey)
         {

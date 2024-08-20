@@ -23,5 +23,14 @@ namespace ECDsa_Multikey
             };
             return Serialize.ExportKeyPair(keyPair, includePublicKey, includeSecretKey, includeContext);
         }
+
+        public string GetPublicKeyMultibase()
+        {
+            if (Keys is null)
+            {
+                throw new ArgumentException("Key pair does not contain keys.");
+            }
+            return Serialize.ExtractPublicKeyMultibase(Keys, Algorithm);
+        }
     }
 }

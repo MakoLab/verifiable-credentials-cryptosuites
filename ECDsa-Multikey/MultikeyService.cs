@@ -27,8 +27,7 @@ namespace ECDsa_Multikey
                 Keys = keys,
             };
             var kpi = CreateKeyPairInterface(keyPair);
-            var exported = kpi.Export(includePublicKey: true);
-            var publicKeyMultibase = exported.PublicKeyMultibase;
+            var publicKeyMultibase = kpi.GetPublicKeyMultibase();
             if (controller is not null && id is null)
             {
                 id = $"{controller}#{publicKeyMultibase}";
@@ -40,7 +39,7 @@ namespace ECDsa_Multikey
 
         public static KeyPairInterface From(MultikeyVerificationMethod multikey)
         {
-            if (multikey.Type is not null && multikey.Type.ToLower() != "multikey")
+            if (multikey.Type is not null && !multikey.Type.Equals("multikey", StringComparison.InvariantCultureIgnoreCase))
             {
                 multikey = Translators.ToMultikey(multikey);
                 return CreateKeyPairInterface(multikey);
