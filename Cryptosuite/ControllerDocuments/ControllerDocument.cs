@@ -13,10 +13,10 @@ namespace Cryptosuite.Core.ControllerDocuments
         public JToken? Context { get; set; }
         public string Id { get; set; }
         public string? Controller { get; set; }
-        public IEnumerable<VerificationMethod>? VerificationMethod { get; set; }
-        public IEnumerable<OneOf<string, VerificationMethod>>? Authentication { get; set; }
+        public IList<VerificationMethod>? VerificationMethod { get; set; }
+        public IList<OneOf<string, VerificationMethod>>? Authentication { get; set; }
         [JsonProperty(ItemConverterType = typeof(OneOfConverter<string, VerificationMethod>))]
-        public IEnumerable<OneOf<string, VerificationMethod>>? AssertionMethod { get; set; }
+        public IList<OneOf<string, VerificationMethod>>? AssertionMethod { get; set; }
 
         public ControllerDocument(string id)
         {

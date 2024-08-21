@@ -13,12 +13,11 @@ namespace ECDsa_2019_Cryptosuite.Tests
         private const string credString = """
             {
               "@context": [
-                "https://www.w3.org/2018/credentials/v1",
+                "https://www.w3.org/ns/credentials/v2",
                 {
                   "AlumniCredential": "https://schema.org#AlumniCredential",
                   "alumniOf": "https://schema.org#alumniOf"
                 },
-                "https://w3id.org/security/data-integrity/v1"
               ],
               "id": "http://example.edu/credentials/1872",
               "type": [
@@ -36,8 +35,6 @@ namespace ECDsa_2019_Cryptosuite.Tests
 
         internal const string Controller = "https://example.edu/issuers/565049";
         public readonly MultikeyVerificationMethod MockPublicEcdsaMultikey;
-        public readonly MultikeyVerificationMethod EcdsaMultikeyKeyPair;
-        public readonly MultikeyVerificationMethod EcdsaSecp256KeyPair;
         public readonly ControllerDocument ControllerDocEcdsaMultikey;
         public readonly JObject Credential = JObject.Parse(credString);
 
@@ -46,18 +43,6 @@ namespace ECDsa_2019_Cryptosuite.Tests
             MockPublicEcdsaMultikey = new MultikeyVerificationMethod(id, Controller)
             {
                 PublicKeyMultibase = publicKeyMultibase,
-            };
-
-            EcdsaMultikeyKeyPair = new MultikeyVerificationMethod(id, Controller)
-            {
-                PublicKeyMultibase = publicKeyMultibase,
-                SecretKeyMultibase = secretKeyMultibase,
-            };
-
-            EcdsaSecp256KeyPair = new MultikeyVerificationMethod(id, Controller)
-            {
-                PublicKeyMultibase = publicKeyMultibase,
-                SecretKeyMultibase = secretKeyMultibase,
             };
 
             ControllerDocEcdsaMultikey = new ControllerDocument("https://example.edu/issuers/565049")

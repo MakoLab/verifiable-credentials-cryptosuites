@@ -13,7 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Cryptosuite\Cryptosuite.Core.csproj" />
-    <ProjectReference Include="..\JsonLdExtensions\JsonLdExtensions.csproj" />
+    <ProjectReference Include="..\DataIntegrity\DataIntegrity.csproj" />
   </ItemGroup>
 
 </Project>

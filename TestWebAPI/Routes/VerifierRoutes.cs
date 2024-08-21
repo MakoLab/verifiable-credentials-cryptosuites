@@ -39,19 +39,19 @@ namespace TestWebAPI.Routes
             });
             var crypto = new ECDsa2019Cryptosuite();
             var suite = new DataIntegrityProof(crypto, keypair.Signer);
-            var jsonld = new JsonLdSignatureService();
-            var loader = new TestWebDocumentLoader();
+            var jss = new JsonLdSignatureService();
+            var loader = new VCDIDocumentLoader();
             try
             {
-                var result = jsonld.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
-                var response = jsonld.ToJsonResult(result).ToString();
+                var result = jss.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
+                var response = jss.ToJsonResult(result).ToString();
                 logger.LogDebug("Verifier response:\n==================");
                 logger.LogDebug("{Response}", response);
                 return Results.Content(response, contentType: "application/json", statusCode: 200);
             }
             catch (Exception e)
             {
-                var response = jsonld.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString();
+                var response = jss.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString();
                 logger.LogError("Error:\n======\n{Exception message}", e.Message);
                 logger.LogDebug("Verifier response:\n==================");
                 logger.LogError("{Response}", response);
