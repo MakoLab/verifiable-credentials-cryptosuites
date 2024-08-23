@@ -48,7 +48,6 @@ namespace ECDsa_2019_Cryptosuite.Tests
             var suite = new DataIntegrityProof(cryptosuite, keypair.Signer);
             var jss = new JsonLdSignatureService();
             var proofPurpose = new AssertionMethodPurpose();
-            documentLoader.AddStatic(mockData.MockPublicEcdsaMultikey.Id, JObject.FromObject(mockData.ControllerDocEcdsaMultikey));
 
             // Act
             var signed = jss.Sign(credential, suite, proofPurpose, documentLoader);

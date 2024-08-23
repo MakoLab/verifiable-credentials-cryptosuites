@@ -5,7 +5,7 @@ using Newtonsoft.Json.Serialization;
 namespace Cryptosuite.Core.ControllerDocuments
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
-    public abstract class VerificationMethod
+    public class VerificationMethod
     {
         [JsonProperty("@context")]
         public JToken? Context { get; set; }

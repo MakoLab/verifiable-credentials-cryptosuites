@@ -31,7 +31,7 @@ namespace JsonLdSignatures.Purposes
                         return Result.Fail("The proof's created timestamp is out of range.");
                     }
                 }
-                return Result.Ok();
+                return Result.Ok(new ValidationResult());
             }
             catch (Exception ex)
             {

@@ -43,6 +43,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
             MockPublicEcdsaMultikey = new MultikeyVerificationMethod(id, Controller)
             {
                 PublicKeyMultibase = publicKeyMultibase,
+                SecretKeyMultibase = secretKeyMultibase,
             };
 
             ControllerDocEcdsaMultikey = new ControllerDocument("https://example.edu/issuers/565049")

@@ -11,16 +11,15 @@ namespace JsonLdSignatures.Purposes
 {
     public class ControllerProofPurpose : ProofPurpose
     {
-        const string DidContextV1 = "https://www.w3.org/ns/did/v1";
-        private readonly string[] DidVrTerms = new string[]
-        {
+        private readonly string[] DidVrTerms =
+        [
             "assertionMethod",
             "authentication",
             "capabilityInvocation",
             "capabilityDelegation",
             "keyAgreement",
             "verificationMethod"
-        };
+        ];
         private readonly Controller? _controller;
         private readonly bool _termDefinedByDIDContext;
         private readonly string _term;
@@ -52,7 +51,7 @@ namespace JsonLdSignatures.Purposes
                 var document = (JToken)documentLoader.LoadDocument(controllerId!).Document;
                 var context = document["@context"] is JArray contextArray ? contextArray[0] : document["@context"];
                 var contextString = context?.ToString();
-                var mustFrame = !(_termDefinedByDIDContext && contextString == DidContextV1);
+                var mustFrame = !(_termDefinedByDIDContext && contextString == Contexts.DidContextV1Url);
                 if (mustFrame)
                 {
                     var framingDocument = new JObject
