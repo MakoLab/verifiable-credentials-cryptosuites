@@ -13,7 +13,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
         private const string credString = """
             {
               "@context": [
-                "https://www.w3.org/ns/credentials/v2",
+                "https://www.w3.org/2018/credentials/v1",
                 {
                   "AlumniCredential": "https://schema.org#AlumniCredential",
                   "alumniOf": "https://schema.org#alumniOf"
