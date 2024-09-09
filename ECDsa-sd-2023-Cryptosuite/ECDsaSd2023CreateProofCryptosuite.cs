@@ -62,7 +62,7 @@ namespace ECDsa_sd_2023_Cryptosuite
             {
                 signatures.Add(proofScopedKeyPair.Signer.Sign(Encoding.UTF8.GetBytes(item)));
             }
-            var publicKey = MultikeyService.ToByteArray(proofScopedKeyPair.GetPublicKeyMultibase() ?? throw new Exception("No public key in Verification Method"));
+            var publicKey = MultikeyService.ToByteArray(proofScopedKeyPair.KeyPair.GetPublicKeyMultibase() ?? throw new Exception("No public key in Verification Method"));
             var toSign = BaseProof.SerializeSignData(proofHash, publicKey, mandatoryHash);
             var baseSignature = signer.Sign(toSign);
             var baseProof = new BaseProof()

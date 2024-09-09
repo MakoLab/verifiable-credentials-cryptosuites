@@ -12,8 +12,10 @@ namespace ECDsa_sd_2023_Cryptosuite.Tests
 
         public static string GetVerificationMethodDocument()
         {
-            var vm = new MultikeyVerificationMethod(VerificationMethodId, ControllerId)
+            var vm = new MultikeyVerificationMethod()
             {
+                Id = VerificationMethodId,
+                Controller = ControllerId,
                 PublicKeyMultibase = PublicKeyMultibase,
             };
             return JObject.FromObject(vm).ToString();

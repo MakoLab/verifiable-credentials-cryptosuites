@@ -11,15 +11,15 @@ namespace Cryptosuite.Core
         private readonly ECDsaSigner _verifier;
         public string? Id { get; set; }
         public DerObjectIdentifier Algorithm { get; private set; }
-        public AsymmetricCipherKeyPair Key { get; set; }
+        public AsymmetricKeyParameter PublicKey { get; set; }
 
-        public Verifier(string? id, AsymmetricCipherKeyPair key, string algorithm)
+        public Verifier(string? id, AsymmetricKeyParameter key, string algorithm)
         {
             Id = id;
-            Key = key;
+            PublicKey = key;
             Algorithm = ECDsaCurve.ToDerObjectIdentifier(algorithm);
             _verifier = new ECDsaSigner(new HMacDsaKCalculator(new Sha256Digest()));
-            _verifier.Init(false, Key.Public);
+            _verifier.Init(false, PublicKey);
         }
 
         public virtual bool Verify(byte[] verifyData, byte[] signature)

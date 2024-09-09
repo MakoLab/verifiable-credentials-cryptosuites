@@ -61,8 +61,10 @@ namespace TestWebAPI.Routes
                 return Results.BadRequest("Invalid request: 'credential' property is required");
             }
             var document = (jsonObj["credential"] as JObject)!;
-            var keypair = MultikeyService.From(new MultikeyVerificationMethod(MockData.VerificationMethodId, MockData.ControllerId)
+            var keypair = MultikeyService.From(new MultikeyVerificationMethod()
             {
+                Id = MockData.VerificationMethodId,
+                Controller = MockData.ControllerId,
                 PublicKeyMultibase = MockData.PublicKeyMultibase,
                 SecretKeyMultibase = MockData.SecretKeyMultibase,
             });
@@ -97,8 +99,10 @@ namespace TestWebAPI.Routes
                 return Results.BadRequest("Invalid request: 'credential' property is required");
             }
             var document = (jsonObj["credential"] as JObject)!;
-            var keypair = MultikeyService.From(new MultikeyVerificationMethod(MockData.VerificationMethodId, MockData.ControllerId)
+            var keypair = MultikeyService.From(new MultikeyVerificationMethod()
             {
+                Id = MockData.VerificationMethodId,
+                Controller = MockData.ControllerId,
                 PublicKeyMultibase = MockData.PublicKeyMultibase,
                 SecretKeyMultibase = MockData.SecretKeyMultibase,
             });

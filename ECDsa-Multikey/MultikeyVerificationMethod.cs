@@ -9,11 +9,9 @@ namespace ECDsa_Multikey
         public string? SecretKeyMultibase { get; set; }
 
         [SetsRequiredMembers]
-        public MultikeyVerificationMethod(string id, string controller)
+        public MultikeyVerificationMethod()
         {
             Type = "Multikey";
-            Id = id;
-            Controller = controller;
         }
     }
 }

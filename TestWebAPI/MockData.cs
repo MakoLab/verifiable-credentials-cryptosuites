@@ -19,8 +19,10 @@ namespace TestWebAPI
                 Context = new JArray(
                     Contexts.CredentialsContextV2Url
                     ),
-                VerificationMethod = [new MultikeyVerificationMethod(VerificationMethodId, ControllerId)
+                VerificationMethod = [new MultikeyVerificationMethod()
                 {
+                    Id = VerificationMethodId,
+                    Controller = ControllerId,
                     PublicKeyMultibase = PublicKeyMultibase,
                 }],
                 AssertionMethod = [VerificationMethodId],
@@ -34,11 +36,13 @@ namespace TestWebAPI
             {
                 return "{}";
             }
-            var vm = new MultikeyVerificationMethod(VerificationMethodId, ControllerId)
+            var vm = new MultikeyVerificationMethod()
             {
                 Context = new JArray(
                     Contexts.CredentialsContextV2Url
                     ),
+                Id = VerificationMethodId,
+                Controller = ControllerId,
                 PublicKeyMultibase = PublicKeyMultibase,
             };
             return JObject.FromObject(vm).ToString();

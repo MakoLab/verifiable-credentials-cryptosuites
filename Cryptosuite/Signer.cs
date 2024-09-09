@@ -1,6 +1,7 @@
 ﻿using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Crypto.Signers;
 
 namespace Cryptosuite.Core
@@ -10,15 +11,15 @@ namespace Cryptosuite.Core
         private readonly ECDsaSigner _signer;
         public string? Id { get; set; }
         public DerObjectIdentifier Algorithm { get; private set; }
-        public AsymmetricCipherKeyPair Key { get; set; }
+        public AsymmetricKeyParameter PrivateKey { get; set; }
 
-        public Signer(string? id, AsymmetricCipherKeyPair key, string algorithm)
+        public Signer(string? id, AsymmetricKeyParameter privateKey, string algorithm)
         {
             Id = id;
-            Key = key;
+            PrivateKey = privateKey;
             Algorithm = ECDsaCurve.ToDerObjectIdentifier(algorithm);
             _signer = new ECDsaSigner(new HMacDsaKCalculator(new Sha256Digest()));
-            _signer.Init(true, Key.Private);
+            _signer.Init(true, PrivateKey);
         }
 
         public byte[] Sign(byte[] data)

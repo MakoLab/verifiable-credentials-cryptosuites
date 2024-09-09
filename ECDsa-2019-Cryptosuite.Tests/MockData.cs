@@ -40,8 +40,10 @@ namespace ECDsa_2019_Cryptosuite.Tests
 
         public MockData()
         {
-            MockPublicEcdsaMultikey = new MultikeyVerificationMethod(id, Controller)
+            MockPublicEcdsaMultikey = new MultikeyVerificationMethod()
             {
+                Id = id,
+                Controller = Controller,
                 PublicKeyMultibase = publicKeyMultibase,
                 SecretKeyMultibase = secretKeyMultibase,
             };

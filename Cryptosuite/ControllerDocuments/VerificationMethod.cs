@@ -9,9 +9,9 @@ namespace Cryptosuite.Core.ControllerDocuments
     {
         [JsonProperty("@context")]
         public JToken? Context { get; set; }
-        public required string Id { get; set; }
+        public string? Id { get; set; }
         public required string Type { get; set; }
-        public required string Controller { get; set; }
+        public string? Controller { get; set; }
         public DateTime? Revoked { get; set; }
     }
 }

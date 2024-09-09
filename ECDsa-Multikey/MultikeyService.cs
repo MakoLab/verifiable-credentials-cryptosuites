@@ -24,16 +24,17 @@ namespace ECDsa_Multikey
                 Id = id,
                 Controller = controller,
                 Algorithm = curveName,
-                Keys = keys,
+                PublicKey = keys.Public as ECPublicKeyParameters ?? throw new InvalidOperationException("Failed to create public key."),
+                SecretKey = keys.Private as ECPrivateKeyParameters
             };
             var kpi = CreateKeyPairInterface(keyPair);
-            var publicKeyMultibase = kpi.GetPublicKeyMultibase();
+            var publicKeyMultibase = kpi.KeyPair.GetPublicKeyMultibase();
             if (controller is not null && id is null)
             {
                 id = $"{controller}#{publicKeyMultibase}";
             }
-            kpi.Id = id;
-            kpi.Controller = controller;
+            kpi.KeyPair.Id = id;
+            kpi.KeyPair.Controller = controller;
             return kpi;
         }
 
@@ -62,19 +63,19 @@ namespace ECDsa_Multikey
 
         private static KeyPairInterface CreateKeyPairInterface(KeyPair keyPair)
         {
-            if (keyPair.Keys is null)
+            if (keyPair.PublicKey is null)
             {
-                throw new ArgumentException("Key pair does not contain keys.");
+                throw new ArgumentException("Key pair does not contain public key.");
             }
             var kpi = new KeyPairInterface
             {
-                Id = keyPair.Id,
-                Controller = keyPair.Controller,
-                Keys = keyPair.Keys,
-                Algorithm = keyPair.Algorithm,
-                Verifier = new Verifier(keyPair.Id, keyPair.Keys, keyPair.Algorithm),
-                Signer = new Signer(keyPair.Id, keyPair.Keys, keyPair.Algorithm),
+                KeyPair = new KeyPair(keyPair),
+                Verifier = new Verifier(keyPair.Id, keyPair.PublicKey, keyPair.Algorithm),
             };
+            if (keyPair.SecretKey is not null)
+            {
+                kpi.Signer = new Signer(keyPair.Id, keyPair.SecretKey, keyPair.Algorithm);
+            }
             return kpi;
         }
 

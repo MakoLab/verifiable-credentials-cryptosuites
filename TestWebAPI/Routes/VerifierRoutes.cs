@@ -32,8 +32,10 @@ namespace TestWebAPI.Routes
             {
                 return Results.BadRequest("Invalid JSON");
             }
-            var keypair = MultikeyService.From(new MultikeyVerificationMethod(MockData.VerificationMethodId, MockData.ControllerId)
-            {
+            var keypair = MultikeyService.From(new MultikeyVerificationMethod
+            {   
+                Id = MockData.VerificationMethodId,
+                Controller = MockData.ControllerId,
                 PublicKeyMultibase = MockData.PublicKeyMultibase,
                 SecretKeyMultibase = MockData.SecretKeyMultibase,
             });
@@ -47,7 +49,8 @@ namespace TestWebAPI.Routes
                 var response = jss.ToJsonResult(result).ToString();
                 logger.LogDebug("Verifier response:\n==================");
                 logger.LogDebug("{Response}", response);
-                return Results.Content(response, contentType: "application/json", statusCode: 200);
+                var statusCode = result.Any(r => r.IsSuccess) ? 200 : 400;
+                return Results.Content(response, contentType: "application/json", statusCode: statusCode);
             }
             catch (Exception e)
             {
@@ -55,7 +58,7 @@ namespace TestWebAPI.Routes
                 logger.LogError("Error:\n======\n{Exception message}", e.Message);
                 logger.LogDebug("Verifier response:\n==================");
                 logger.LogError("{Response}", response);
-                return Results.Content(response, contentType: "application/json", statusCode: 400);
+                return Results.BadRequest(response);
             }
         }
     }

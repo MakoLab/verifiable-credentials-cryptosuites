@@ -84,7 +84,7 @@ namespace ECDsa_Multikey
             return ImportKeyPair(multikey.Id, multikey.Controller, multikey.SecretKeyMultibase, multikey.PublicKeyMultibase);
         }
 
-        internal static KeyPair ImportKeyPair(string id, string controller, string? secretKeyMultibase, string? publicKeyMultibase)
+        internal static KeyPair ImportKeyPair(string? id, string? controller, string? secretKeyMultibase, string? publicKeyMultibase)
         {
             if (publicKeyMultibase is null)
             {
@@ -103,9 +103,9 @@ namespace ECDsa_Multikey
                 Controller = controller,
                 Curve = curve,
                 Algorithm = algorithm,
+                PublicKey = PublicKeyFactory.CreateKey(ToSpki(publicMultikey)) as ECPublicKeyParameters ?? throw new InvalidOperationException("Failed to create public key."),
             };
-            var publicKey = PublicKeyFactory.CreateKey(ToSpki(publicMultikey));
-            AsymmetricKeyParameter? privateKey = null;
+            
 
             if (secretKeyMultibase is not null)
             {
@@ -116,9 +116,8 @@ namespace ECDsa_Multikey
                 var secretMultikey = SimpleBase.Base58.Bitcoin.Decode(secretKeyMultibase.AsSpan()[1..]);
                 EnsureMultikeyHeadersMatch(publicMultikey, secretMultikey);
                 var pkcs8 = ToPkcs8(secretMultikey, publicMultikey);
-                privateKey = PrivateKeyFactory.CreateKey(pkcs8);
+                keyPair.SecretKey = PrivateKeyFactory.CreateKey(pkcs8) as ECPrivateKeyParameters;
             }
-            keyPair.Keys = new AsymmetricCipherKeyPair(publicKey, privateKey);
             return keyPair;
         }
 
@@ -128,26 +127,30 @@ namespace ECDsa_Multikey
             {
                 throw new ArgumentException("Export requires specifying either 'publicKey' or 'secretKey'.");
             }
-            if (keyPair.Keys is null)
-            {
-                throw new ArgumentException("Key pair does not contain keys.");
-            }
             if (keyPair.Id is null || keyPair.Controller is null)
             {
                 throw new ArgumentException("Key pair does not contain an identifier or controller.");
             }
-            var multiKey = new MultikeyVerificationMethod(keyPair.Id, keyPair.Controller);
+            var multiKey = new MultikeyVerificationMethod { Id = keyPair.Id, Controller = keyPair.Controller };
             if (includeContext)
             {
                 multiKey.Context = new JValue(Constants.MultikeyContextV1Url);
             }
             if (includePublicKey)
             {
-                multiKey.PublicKeyMultibase = ExtractPublicKeyMultibase(keyPair.Keys, keyPair.Algorithm);
+                if (keyPair.PublicKey is null)
+                {
+                    throw new ArgumentException("Key pair does not contain a public key.");
+                }
+                multiKey.PublicKeyMultibase = ExtractPublicKeyMultibase(keyPair.PublicKey, keyPair.Algorithm);
             }
             if (includeSecretKey)
             {
-                multiKey.SecretKeyMultibase = ExtractPrivateKeyMultibase(keyPair.Keys, keyPair.Algorithm);
+                if (keyPair.SecretKey is null)
+                {
+                    throw new ArgumentException("Key pair does not contain a secret key.");
+                }
+                multiKey.SecretKeyMultibase = ExtractPrivateKeyMultibase(keyPair.SecretKey, keyPair.Algorithm);
             }
             return multiKey;
         }
@@ -159,14 +162,13 @@ namespace ECDsa_Multikey
         /// <param name="algorithm"></param>
         /// <returns>Private key in multibase format.</returns>
         /// <exception cref="Exception"></exception>
-        internal static string ExtractPrivateKeyMultibase(AsymmetricCipherKeyPair keyPair, string algorithm)
+        internal static string ExtractPrivateKeyMultibase(ECPrivateKeyParameters secretKey, string algorithm)
         {
             var secretKeySize = Helpers.GetSecretKeySize(algorithm);
             var secretMultikey = new byte[2 + secretKeySize];
             Helpers.SetSecretKeyHeader(algorithm, secretMultikey);
 
-            var privateKey = (ECPrivateKeyParameters)keyPair.Private;
-            var d = privateKey.D.ToByteArrayUnsigned() ?? throw new Exception("Secret key is missing.");
+            var d = secretKey.D.ToByteArrayUnsigned() ?? throw new Exception("Secret key is missing.");
             d.CopyTo(secretMultikey.AsSpan()[^d.Length..]);
             return Constants.MultibaseBase58Header + SimpleBase.Base58.Bitcoin.Encode(secretMultikey);
         }
@@ -178,12 +180,11 @@ namespace ECDsa_Multikey
         /// <param name="algorithm"></param>
         /// <returns>Public key in multibase format.</returns>
         /// <exception cref="Exception"></exception>
-        internal static string ExtractPublicKeyMultibase(AsymmetricCipherKeyPair keyPair, string algorithm)
+        internal static string ExtractPublicKeyMultibase(ECPublicKeyParameters publicKey, string algorithm)
         {
             var secretKeySize = Helpers.GetSecretKeySize(algorithm);
             var publicKeySize = secretKeySize + 1;
             var publicMultikey = new byte[2 + publicKeySize];
-            var publicKey = (ECPublicKeyParameters)keyPair.Public;
             Helpers.SetPublicKeyHeader(algorithm, publicMultikey);
             var x = publicKey.Q.XCoord.GetEncoded();
             var y = publicKey.Q.YCoord.GetEncoded();

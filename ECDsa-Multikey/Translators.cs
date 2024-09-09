@@ -16,8 +16,10 @@ namespace ECDsa_Multikey
             {
                 throw new Exception($"Context not supported {keyPair.Context}");
             }
-            return new MultikeyVerificationMethod(keyPair.Id, keyPair.Controller)
+            return new MultikeyVerificationMethod()
             {
+                Id = keyPair.Id,
+                Controller = keyPair.Controller,
                 Context = new JValue(Constants.MultikeyContextV1Url),
                 PublicKeyMultibase = keyPair.PublicKeyMultibase,
                 SecretKeyMultibase = keyPair.SecretKeyMultibase

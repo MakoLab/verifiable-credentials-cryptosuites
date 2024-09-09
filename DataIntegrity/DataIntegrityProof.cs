@@ -179,7 +179,7 @@ namespace DataIntegrity
             }
             if (_cryptoSuite.RequiredAlgorithm != verifier.Algorithm.ToAlgorithmName())
             {
-                throw new ArgumentException($"The verifier's algorithm {verifier.Key} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
+                throw new ArgumentException($"The verifier's algorithm {verifier.Algorithm.ToAlgorithmName()} does not match the required algorithm for the cryptosuite {_cryptoSuite.RequiredAlgorithm}.");
             }
             var proofValue = proof.ProofValue ?? throw new ArgumentException($"The proof does not include a valid {nameof(proof.ProofValue)} property.");
             var multibaseHeader = proofValue[..1];

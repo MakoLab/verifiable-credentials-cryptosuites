@@ -24,8 +24,10 @@ namespace ECDsa_sd_2023_Cryptosuite.Tests
                 { "issuanceDate", "2010-01-01T19:23:24Z" },
                 { "issuer", "https://example.edu/issuers/565049" }
             };
-            var keypair = MultikeyService.From(new MultikeyVerificationMethod(MockData.VerificationMethodId, MockData.ControllerId)
+            var keypair = MultikeyService.From(new MultikeyVerificationMethod()
             {
+                Id = MockData.VerificationMethodId,
+                Controller = MockData.ControllerId,
                 PublicKeyMultibase = MockData.PublicKeyMultibase,
                 SecretKeyMultibase = MockData.SecretKeyMultibase,
             });
