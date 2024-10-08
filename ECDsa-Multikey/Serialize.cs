@@ -19,10 +19,10 @@ namespace ECDsa_Multikey
     }
     internal class Serialize
     {
-        private static readonly Dictionary<string, byte[]> SpkiPrefixes = new()
+        private static readonly Dictionary<ECDsaCurveType, byte[]> SpkiPrefixes = new()
         {
             {
-                ECDsaCurve.P256,
+                ECDsaCurveType.P256,
                 new byte[]
                 {
                     48, 57, 48, 19, 6, 7, 42, 134, 72, 206,
@@ -31,7 +31,7 @@ namespace ECDsa_Multikey
                 }
             },
             {
-                ECDsaCurve.P384,
+                ECDsaCurveType.P384,
                 new byte[]
                 {
                     48, 70, 48, 16, 6, 7, 42, 134, 72, 206, 61, 2,
@@ -39,7 +39,7 @@ namespace ECDsa_Multikey
                 }
             },
             {
-            ECDsaCurve.P521,
+            ECDsaCurveType.P521,
                 new byte[]
                 {
                     48, 88, 48, 16, 6, 7, 42, 134, 72, 206, 61, 2,
@@ -48,10 +48,10 @@ namespace ECDsa_Multikey
             }
         };
 
-        private static readonly Dictionary<string, (byte[] secret, byte[] pub)> Pkcs8Prefixes = new()
+        private static readonly Dictionary<ECDsaCurveType, (byte[] secret, byte[] pub)> Pkcs8Prefixes = new()
         {
             {
-                ECDsaCurve.P256,
+                ECDsaCurveType.P256,
                 (
                     new byte[]
                     {
@@ -63,7 +63,7 @@ namespace ECDsa_Multikey
                 )
             },
             {
-                ECDsaCurve.P384,
+                ECDsaCurveType.P384,
                 (
                     new byte[]
                     {
@@ -75,7 +75,7 @@ namespace ECDsa_Multikey
                 )
             },
             {
-                ECDsaCurve.P521,
+                ECDsaCurveType.P521,
                 (
                     new byte[]
                     {
@@ -104,14 +104,14 @@ namespace ECDsa_Multikey
                 throw new ArgumentException($"{nameof(publicKeyMultibase)} must be a multibase, base58-encoded string.");
             }
             var publicMultikey = Base58.Bitcoin.Decode(publicKeyMultibase.AsSpan()[1..]);
-            var algorithm = Helpers.GetNamedCurveFromPublicMultikey(publicMultikey);
-            var curve = FromString(algorithm);
+            var curveType = Helpers.GetNamedCurveFromPublicMultikey(publicMultikey);
+            var curve = FromCurveType(curveType);
             var keyPair = new KeyPair
             {
                 Id = id,
                 Controller = controller,
                 Curve = curve,
-                Algorithm = algorithm,
+                Algorithm = curveType,
                 PublicKey = PublicKeyFactory.CreateKey(ToSpki(publicMultikey)) as ECPublicKeyParameters ?? throw new InvalidOperationException("Failed to create public key."),
             };
             
@@ -167,14 +167,14 @@ namespace ECDsa_Multikey
         /// Extracts the private key from the key parameter.
         /// </summary>
         /// <param name="secretKey"></param>
-        /// <param name="algorithm"></param>
+        /// <param name="curveType"></param>
         /// <returns>Private key in multibase format.</returns>
         /// <exception cref="Exception"></exception>
-        internal static string ExtractPrivateKeyMultibase(ECPrivateKeyParameters secretKey, string algorithm)
+        internal static string ExtractPrivateKeyMultibase(ECPrivateKeyParameters secretKey, ECDsaCurveType curveType)
         {
-            var secretKeySize = Helpers.GetSecretKeySize(algorithm);
+            var secretKeySize = Helpers.GetSecretKeySize(curveType);
             var secretMultikey = new byte[2 + secretKeySize];
-            Helpers.SetSecretKeyHeader(algorithm, secretMultikey);
+            Helpers.SetSecretKeyHeader(curveType, secretMultikey);
 
             var d = secretKey.D.ToByteArrayUnsigned() ?? throw new Exception("Secret key is missing.");
             d.CopyTo(secretMultikey.AsSpan()[^d.Length..]);
@@ -188,7 +188,7 @@ namespace ECDsa_Multikey
         /// <param name="algorithm"></param>
         /// <returns>Public key in multibase format.</returns>
         /// <exception cref="Exception"></exception>
-        internal static string ExtractPublicKeyMultibase(ECPublicKeyParameters publicKey, string algorithm)
+        internal static string ExtractPublicKeyMultibase(ECPublicKeyParameters publicKey, ECDsaCurveType algorithm)
         {
             var secretKeySize = Helpers.GetSecretKeySize(algorithm);
             var publicKeySize = secretKeySize + 1;
@@ -232,13 +232,13 @@ namespace ECDsa_Multikey
             }
         }
 
-        private static X9ECParameters FromString(string curveName)
+        private static X9ECParameters FromCurveType(ECDsaCurveType curve)
         {
-            return curveName switch
+            return curve switch
             {
-                ECDsaCurve.P256 => ECNamedCurveTable.GetByName("P-256"),
-                ECDsaCurve.P384 => ECNamedCurveTable.GetByName("P-384"),
-                ECDsaCurve.P521 => ECNamedCurveTable.GetByName("P-521"),
+                ECDsaCurveType.P256 => ECNamedCurveTable.GetByName("P-256"),
+                ECDsaCurveType.P384 => ECNamedCurveTable.GetByName("P-384"),
+                ECDsaCurveType.P521 => ECNamedCurveTable.GetByName("P-521"),
                 _ => throw new Exception("Unsupported curve name.")
             };
         }

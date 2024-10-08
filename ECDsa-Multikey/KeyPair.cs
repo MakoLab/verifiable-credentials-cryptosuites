@@ -1,4 +1,5 @@
-﻿using Org.BouncyCastle.Asn1.X9;
+﻿using Cryptosuite.Core;
+using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using System.Diagnostics.CodeAnalysis;
@@ -13,7 +14,7 @@ namespace ECDsa_Multikey
         public required ECPublicKeyParameters PublicKey { get; set; }
         public ECPrivateKeyParameters? SecretKey { get; set; }
         public X9ECParameters? Curve { get; set; }
-        public required string Algorithm { get; set; }
+        public required ECDsaCurveType Algorithm { get; set; }
 
         public KeyPair()
         {

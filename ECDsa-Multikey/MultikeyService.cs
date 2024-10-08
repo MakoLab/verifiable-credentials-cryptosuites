@@ -10,10 +10,10 @@ namespace ECDsa_Multikey
 {
     public class MultikeyService
     {
-        public static KeyPairInterface Generate(string? id, string? controller, string curveName)
+        public static KeyPairInterface Generate(string? id, string? controller, ECDsaCurveType curveType)
         {
             // generate bouncy castle ecdsa key pair
-            var curve = ECNamedCurveTable.GetByName(curveName);
+            var curve = ECNamedCurveTable.GetByName(curveType.ToString());
             var domainParams = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H, curve.GetSeed());
             var keyParams = new ECKeyGenerationParameters(domainParams, new SecureRandom());
             var generator = new ECKeyPairGenerator("ECDSA");
@@ -23,7 +23,7 @@ namespace ECDsa_Multikey
             {
                 Id = id,
                 Controller = controller,
-                Algorithm = curveName,
+                Algorithm = curveType,
                 PublicKey = keys.Public as ECPublicKeyParameters ?? throw new InvalidOperationException("Failed to create public key."),
                 SecretKey = keys.Private as ECPrivateKeyParameters
             };
@@ -67,15 +67,14 @@ namespace ECDsa_Multikey
             {
                 throw new ArgumentException("Key pair does not contain public key.");
             }
-            var curveType = ECDsaCurve.ToECDsaCurveType(keyPair.Algorithm);
             var kpi = new KeyPairInterface
             {
                 KeyPair = new KeyPair(keyPair),
-                Verifier = new Verifier(keyPair.Id, keyPair.PublicKey, curveType),
+                Verifier = new Verifier(keyPair.Id, keyPair.PublicKey, keyPair.Algorithm),
             };
             if (keyPair.SecretKey is not null)
             {
-                kpi.Signer = new Signer(keyPair.Id, keyPair.SecretKey, curveType);
+                kpi.Signer = new Signer(keyPair.Id, keyPair.SecretKey, keyPair.Algorithm);
             }
             return kpi;
         }

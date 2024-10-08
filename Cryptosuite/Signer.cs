@@ -1,12 +1,13 @@
 ﻿using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Signers;
+using Org.BouncyCastle.Security;
 
 namespace Cryptosuite.Core
 {
     public class Signer
     {
-        private readonly ECDsaSigner _signer;
+        private readonly ISigner _signer;
         private readonly ECDsaCurveType _curve;
         public string? Id { get; set; }
         public DerObjectIdentifier Algorithm { get; private set; }
@@ -19,7 +20,7 @@ namespace Cryptosuite.Core
             Algorithm = ECDsaCurve.ToDerObjectIdentifier(curve);
             _curve = curve;
             var digest = ECDsaCurve.GetDigest(curve);
-            _signer = new ECDsaSigner(new HMacDsaKCalculator(digest));
+            _signer = SignerUtilities.GetSigner(curve.ToDerObjectIdentifier());
             _signer.Init(true, PrivateKey);
         }
 
@@ -29,11 +30,8 @@ namespace Cryptosuite.Core
             digest.BlockUpdate(data, 0, data.Length);
             var dataHash = new byte[digest.GetDigestSize()];
             digest.DoFinal(dataHash, 0);
-            var signature = _signer.GenerateSignature(dataHash);
-            var r = signature[0].ToByteArrayUnsigned();
-            var s = signature[1].ToByteArrayUnsigned();
-            byte[] sigArray = [.. r, .. s];
-            return sigArray;
+            _signer.BlockUpdate(data);
+            return _signer.GenerateSignature();
         }
     }
 }
