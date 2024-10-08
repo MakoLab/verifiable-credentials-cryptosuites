@@ -4,10 +4,19 @@ using Org.BouncyCastle.Asn1.X9;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Security;
+using SimpleBase;
 
 [assembly: System.Runtime.CompilerServices.InternalsVisibleTo("ECDsa_Multikey.Tests")]
 namespace ECDsa_Multikey
 {
+    [Flags]
+    public enum ExportKeyPairOptions
+    {
+        None = 0,
+        IncludePublicKey = 1,
+        IncludeSecretKey = 2,
+        IncludeContext = 4
+    }
     internal class Serialize
     {
         private static readonly Dictionary<string, byte[]> SpkiPrefixes = new()
@@ -94,7 +103,7 @@ namespace ECDsa_Multikey
             {
                 throw new ArgumentException($"{nameof(publicKeyMultibase)} must be a multibase, base58-encoded string.");
             }
-            var publicMultikey = SimpleBase.Base58.Bitcoin.Decode(publicKeyMultibase.AsSpan()[1..]);
+            var publicMultikey = Base58.Bitcoin.Decode(publicKeyMultibase.AsSpan()[1..]);
             var algorithm = Helpers.GetNamedCurveFromPublicMultikey(publicMultikey);
             var curve = FromString(algorithm);
             var keyPair = new KeyPair
@@ -106,14 +115,13 @@ namespace ECDsa_Multikey
                 PublicKey = PublicKeyFactory.CreateKey(ToSpki(publicMultikey)) as ECPublicKeyParameters ?? throw new InvalidOperationException("Failed to create public key."),
             };
             
-
             if (secretKeyMultibase is not null)
             {
                 if (secretKeyMultibase[0] != Constants.MultibaseBase58Header)
                 {
                     throw new ArgumentException($"{nameof(secretKeyMultibase)} must be a multibase, base58-encoded string.");
                 }
-                var secretMultikey = SimpleBase.Base58.Bitcoin.Decode(secretKeyMultibase.AsSpan()[1..]);
+                var secretMultikey = Base58.Bitcoin.Decode(secretKeyMultibase.AsSpan()[1..]);
                 EnsureMultikeyHeadersMatch(publicMultikey, secretMultikey);
                 var pkcs8 = ToPkcs8(secretMultikey, publicMultikey);
                 keyPair.SecretKey = PrivateKeyFactory.CreateKey(pkcs8) as ECPrivateKeyParameters;
@@ -121,9 +129,9 @@ namespace ECDsa_Multikey
             return keyPair;
         }
 
-        internal static MultikeyVerificationMethod ExportKeyPair(KeyPair keyPair, bool includePublicKey, bool includeSecretKey, bool includeContext)
+        internal static MultikeyVerificationMethod ExportKeyPair(KeyPair keyPair, ExportKeyPairOptions exportOptions)
         {
-            if (!includePublicKey && !includeSecretKey)
+            if (exportOptions == ExportKeyPairOptions.None)
             {
                 throw new ArgumentException("Export requires specifying either 'publicKey' or 'secretKey'.");
             }
@@ -132,11 +140,11 @@ namespace ECDsa_Multikey
                 throw new ArgumentException("Key pair does not contain an identifier or controller.");
             }
             var multiKey = new MultikeyVerificationMethod { Id = keyPair.Id, Controller = keyPair.Controller };
-            if (includeContext)
+            if (exportOptions.HasFlag(ExportKeyPairOptions.IncludeContext))
             {
                 multiKey.Context = new JValue(Constants.MultikeyContextV1Url);
             }
-            if (includePublicKey)
+            if (exportOptions.HasFlag(ExportKeyPairOptions.IncludePublicKey))
             {
                 if (keyPair.PublicKey is null)
                 {
@@ -144,7 +152,7 @@ namespace ECDsa_Multikey
                 }
                 multiKey.PublicKeyMultibase = ExtractPublicKeyMultibase(keyPair.PublicKey, keyPair.Algorithm);
             }
-            if (includeSecretKey)
+            if (exportOptions.HasFlag(ExportKeyPairOptions.IncludeSecretKey))
             {
                 if (keyPair.SecretKey is null)
                 {
@@ -156,9 +164,9 @@ namespace ECDsa_Multikey
         }
 
         /// <summary>
-        /// Extracts the private key from the key pair.
+        /// Extracts the private key from the key parameter.
         /// </summary>
-        /// <param name="keyPair"></param>
+        /// <param name="secretKey"></param>
         /// <param name="algorithm"></param>
         /// <returns>Private key in multibase format.</returns>
         /// <exception cref="Exception"></exception>
@@ -170,7 +178,7 @@ namespace ECDsa_Multikey
 
             var d = secretKey.D.ToByteArrayUnsigned() ?? throw new Exception("Secret key is missing.");
             d.CopyTo(secretMultikey.AsSpan()[^d.Length..]);
-            return Constants.MultibaseBase58Header + SimpleBase.Base58.Bitcoin.Encode(secretMultikey);
+            return Constants.MultibaseBase58Header + Base58.Bitcoin.Encode(secretMultikey);
         }
 
         /// <summary>
@@ -184,7 +192,7 @@ namespace ECDsa_Multikey
         {
             var secretKeySize = Helpers.GetSecretKeySize(algorithm);
             var publicKeySize = secretKeySize + 1;
-            var publicMultikey = new byte[2 + publicKeySize];
+            var publicMultikey = new byte[2 + publicKeySize].AsSpan();
             Helpers.SetPublicKeyHeader(algorithm, publicMultikey);
             var x = publicKey.Q.XCoord.GetEncoded();
             var y = publicKey.Q.YCoord.GetEncoded();
@@ -194,33 +202,23 @@ namespace ECDsa_Multikey
             }
             var even = y[^1] % 2 == 0;
             publicMultikey[2] = (byte)(even ? 0x02 : 0x03);
-            x.CopyTo(publicMultikey.AsSpan()[^x.Length..]);
-            return Constants.MultibaseBase58Header + SimpleBase.Base58.Bitcoin.Encode(publicMultikey);
+            x.CopyTo(publicMultikey[^x.Length..]);
+            return Constants.MultibaseBase58Header + Base58.Bitcoin.Encode(publicMultikey);
         }
 
-        private static byte[] ToSpki(byte[] publicMultikey)
+        private static byte[] ToSpki(ReadOnlySpan<byte> publicMultikey)
         {
-            var header = SpkiPrefixes[Helpers.GetNamedCurveFromPublicMultikey(publicMultikey)];
-            var spki = new byte[header.Length + publicMultikey.AsSpan()[2..].Length]; // do not include multikey 2-byte header
-            var offset = 0;
-            header.CopyTo(spki, offset);
-            offset += header.Length;
-            publicMultikey.AsSpan()[2..].CopyTo(spki.AsSpan()[offset..]);
+            var header = SpkiPrefixes[Helpers.GetNamedCurveFromPublicMultikey(publicMultikey)].AsSpan();
+            byte[] spki = [.. header, .. publicMultikey[2..]];
             return spki;
         }
 
-        private static byte[] ToPkcs8(byte[] secretMultikey, byte[] publicMultikey)
+        private static byte[] ToPkcs8(ReadOnlySpan<byte> secretMultikey, ReadOnlySpan<byte> publicMultikey)
         {
             var (secret, pub) = Pkcs8Prefixes[Helpers.GetNamedCurveFromPublicMultikey(publicMultikey)];
-            var pkcs8 = new byte[secret.Length + secretMultikey.Length - 2 + pub.Length + publicMultikey.Length - 2]; // do not include multikey 2-byte headers
-            var offset = 0;
-            secret.CopyTo(pkcs8, offset);
-            offset += secret.Length;
-            secretMultikey.AsSpan()[2..].CopyTo(pkcs8.AsSpan()[offset..]);
-            offset += secretMultikey.Length - 2;
-            pub.CopyTo(pkcs8.AsSpan()[offset..]);
-            offset += pub.Length;
-            publicMultikey.AsSpan()[2..].CopyTo(pkcs8.AsSpan()[offset..]);
+            var secretSpan = secret.AsSpan();
+            var pubSpan = pub.AsSpan();
+            byte[] pkcs8 = [.. secretSpan, .. secretMultikey[2..], .. pubSpan, .. publicMultikey[2..]];
             return pkcs8;
         }
 

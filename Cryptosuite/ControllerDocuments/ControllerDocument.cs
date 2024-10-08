@@ -7,13 +7,11 @@ using OneOf;
 namespace Cryptosuite.Core.ControllerDocuments
 {
     [JsonObject(ItemNullValueHandling = NullValueHandling.Ignore, NamingStrategyType = typeof(CamelCaseNamingStrategy))]
-    public class ControllerDocument
+    public class ControllerDocument : BaseDocument
     {
-        [JsonProperty("@context")]
-        public JToken? Context { get; set; }
-        public string Id { get; set; }
         public string? Controller { get; set; }
         public IList<VerificationMethod>? VerificationMethod { get; set; }
+        [JsonProperty(ItemConverterType = typeof(OneOfConverter<string, VerificationMethod>))]
         public IList<OneOf<string, VerificationMethod>>? Authentication { get; set; }
         [JsonProperty(ItemConverterType = typeof(OneOfConverter<string, VerificationMethod>))]
         public IList<OneOf<string, VerificationMethod>>? AssertionMethod { get; set; }

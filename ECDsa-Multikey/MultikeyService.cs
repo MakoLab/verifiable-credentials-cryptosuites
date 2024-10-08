@@ -67,14 +67,15 @@ namespace ECDsa_Multikey
             {
                 throw new ArgumentException("Key pair does not contain public key.");
             }
+            var curveType = ECDsaCurve.ToECDsaCurveType(keyPair.Algorithm);
             var kpi = new KeyPairInterface
             {
                 KeyPair = new KeyPair(keyPair),
-                Verifier = new Verifier(keyPair.Id, keyPair.PublicKey, keyPair.Algorithm),
+                Verifier = new Verifier(keyPair.Id, keyPair.PublicKey, curveType),
             };
             if (keyPair.SecretKey is not null)
             {
-                kpi.Signer = new Signer(keyPair.Id, keyPair.SecretKey, keyPair.Algorithm);
+                kpi.Signer = new Signer(keyPair.Id, keyPair.SecretKey, curveType);
             }
             return kpi;
         }

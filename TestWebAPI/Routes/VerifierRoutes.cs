@@ -46,7 +46,7 @@ namespace TestWebAPI.Routes
             try
             {
                 var result = jss.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
-                var response = jss.ToJsonResult(result).ToString();
+                var response = JsonLdSignatureService.ToJsonResult(result).ToString();
                 logger.LogDebug("Verifier response:\n==================");
                 logger.LogDebug("{Response}", response);
                 var statusCode = result.Any(r => r.IsSuccess) ? 200 : 400;
@@ -54,7 +54,7 @@ namespace TestWebAPI.Routes
             }
             catch (Exception e)
             {
-                var response = jss.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString();
+                var response = JsonLdSignatureService.ToJsonResult(e.Message, System.Net.HttpStatusCode.BadRequest).ToString();
                 logger.LogError("Error:\n======\n{Exception message}", e.Message);
                 logger.LogDebug("Verifier response:\n==================");
                 logger.LogError("{Response}", response);

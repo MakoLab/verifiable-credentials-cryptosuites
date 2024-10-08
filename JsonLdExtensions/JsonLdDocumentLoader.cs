@@ -27,7 +27,7 @@ namespace JsonLdExtensions
                     Document = document,
                 };
             }
-            return DefaultDocumentLoader.LoadJson(url, new JsonLdLoaderOptions());
+            return DefaultDocumentLoader.LoadJson(url, options);
         }
     }
 }

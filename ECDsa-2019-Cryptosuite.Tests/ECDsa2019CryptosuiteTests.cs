@@ -37,10 +37,10 @@ namespace ECDsa_2019_Cryptosuite.Tests
         }
 
         [Fact]
-        public void ShouldSignDocument()
+        public void ShouldSignAndVerifyDocument()
         {
             // Arrange
-            documentLoader.AddStatic(mockData.ControllerDocEcdsaMultikey.Id, JObject.FromObject(mockData.ControllerDocEcdsaMultikey));
+            documentLoader.AddStatic(mockData.ControllerDocEcdsaMultikey.Id!, JObject.FromObject(mockData.ControllerDocEcdsaMultikey));
             documentLoader.AddStatic(mockData.ControllerDocEcdsaMultikey.AssertionMethod![0].AsT0, JObject.FromObject(mockData.ControllerDocEcdsaMultikey.VerificationMethod![0]));
             var credential = mockData.Credential;
             var cryptosuite = new ECDsa2019Cryptosuite();
@@ -55,6 +55,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
 
             // Assert
             Assert.NotNull(signed);
+            Assert.NotNull(signed["proof"]);
             var v = Assert.Single(verified);
             Assert.True(v.IsSuccess);
         }

@@ -11,7 +11,7 @@
         internal const string ECDsa2019Secp521KeyType = "EcdsaSecp521r1VerificationKey2019";
 
         internal const string ECDsa2019SuiteContextV1Url = "https://w3id.org/security/suites/ecdsa-2019/v1";
-        internal const string MultikeyContextV1Url = "https://w3id.org/security/multikey/v1";
+        public const string MultikeyContextV1Url = "https://w3id.org/security/multikey/v1";
 
         public const char MultibaseBase58Header = 'z';
         public const char MultibaseBase64Header = 'u';

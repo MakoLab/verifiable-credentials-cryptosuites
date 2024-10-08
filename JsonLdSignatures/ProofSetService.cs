@@ -65,7 +65,7 @@ namespace JsonLdSignatures
             }
             doc.Remove("proof");
             var results = Verify(document, suites, proofSet, purposes, loader);
-            if (!results.Any())
+            if (results.Count == 0)
             {
                 return new List<Result<VerificationResult>>() { Result.Fail("Did not verify any proofs; insufficient proofs matched the acceptable suite(s) and required purpose(s).") };
             }

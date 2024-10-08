@@ -9,7 +9,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
     {
         private const string publicKeyMultibase = "zDnaekGZTbQBerwcehBSXLqAg6s55hVEBms1zFy89VHXtJSa9";
         private const string secretKeyMultibase = "z42tqZ5smVag3DtDhjY9YfVwTMyVHW6SCHJi2ZMrD23DGYS3";
-        private readonly string id = $"{Controller}#{publicKeyMultibase}";
+        private readonly string keyId = $"{Controller}#{publicKeyMultibase}";
         private const string credString = """
             {
               "@context": [
@@ -42,7 +42,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
         {
             MockPublicEcdsaMultikey = new MultikeyVerificationMethod()
             {
-                Id = id,
+                Id = keyId,
                 Controller = Controller,
                 PublicKeyMultibase = publicKeyMultibase,
                 SecretKeyMultibase = secretKeyMultibase,
@@ -52,7 +52,7 @@ namespace ECDsa_2019_Cryptosuite.Tests
             {
                 Context = new JArray { Contexts.DidContextV1Url, "https://w3id.org/security/multikey/v1", Contexts.CredentialsContextV2Url },
                 VerificationMethod = [MockPublicEcdsaMultikey],
-                AssertionMethod = [id],
+                AssertionMethod = [keyId],
             };
         }
     }

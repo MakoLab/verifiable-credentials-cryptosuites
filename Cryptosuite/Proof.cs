@@ -1,4 +1,5 @@
-﻿using Newtonsoft.Json;
+﻿using Cryptosuite.Core.Util;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System.Diagnostics.CodeAnalysis;
 
@@ -24,6 +25,7 @@ namespace Cryptosuite.Core
         [JsonProperty("verificationMethod")]
         public string? VerificationMethod { get; set; }
         [JsonProperty("domain")]
+        [JsonConverter(typeof(SingleArrayConverter<string>))]
         public IEnumerable<string>? Domain { get; set; }
         [JsonProperty("challenge")]
         public string? Challenge { get; set; }

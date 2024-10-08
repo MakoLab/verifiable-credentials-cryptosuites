@@ -35,10 +35,10 @@ namespace JsonLdSignatures
 
         public IEnumerable<Result<VerificationResult>> Verify(JObject document, LinkedDataSignature suite, ProofPurpose purpose, IDocumentLoader documentLoader)
         {
-            return _proofSetService.Verify(document, new[] { suite }, new List<ProofPurpose>() { purpose }, documentLoader);
+            return _proofSetService.Verify(document, [suite], [purpose], documentLoader);
         }
 
-        public JObject ToJsonResult(IEnumerable<Result<VerificationResult>> results)
+        public static JObject ToJsonResult(IEnumerable<Result<VerificationResult>> results)
         {
             var json = new JObject();
             var goods = new JArray();
@@ -82,7 +82,7 @@ namespace JsonLdSignatures
             return json;
         }
 
-        public JObject ToJsonResult(string message, HttpStatusCode status)
+        public static JObject ToJsonResult(string message, HttpStatusCode status)
         {
             var json = new JObject();
             if (status == HttpStatusCode.OK)

@@ -4,7 +4,7 @@ namespace ECDsa_Multikey
 {
     internal class Helpers
     {
-        internal static string GetNamedCurveFromPublicMultikey(byte[] publicMultikey)
+        internal static string GetNamedCurveFromPublicMultikey(ReadOnlySpan<byte> publicMultikey)
         {
             if (publicMultikey[0] == Constants.MulticodecP256PublicKeyHeader[0] &&
                 publicMultikey[1] == Constants.MulticodecP256PublicKeyHeader[1])
@@ -24,7 +24,7 @@ namespace ECDsa_Multikey
             throw new Exception("Unsupported public multikey header.");
         }
 
-        internal static string GetNamedCurveFromSecretMultikey(byte[] secretMultikey)
+        internal static string GetNamedCurveFromSecretMultikey(ReadOnlySpan<byte> secretMultikey)
         {
             if (secretMultikey[0] == Constants.MulticodecP256SecretKeyHeader[0] &&
                 secretMultikey[1] == Constants.MulticodecP256SecretKeyHeader[1])
@@ -55,36 +55,36 @@ namespace ECDsa_Multikey
             };
         }
 
-        internal static void SetSecretKeyHeader(string? algorithm, byte[] buffer)
+        internal static void SetSecretKeyHeader(string? algorithm, Span<byte> buffer)
         {
             switch (algorithm)
             {
                 case ECDsaCurve.P256:
-                    Constants.MulticodecP256SecretKeyHeader.CopyTo(buffer.AsSpan());
+                    Constants.MulticodecP256SecretKeyHeader.CopyTo(buffer);
                     break;
                 case ECDsaCurve.P384:
-                    Constants.MulticodecP384SecretKeyHeader.CopyTo(buffer.AsSpan());
+                    Constants.MulticodecP384SecretKeyHeader.CopyTo(buffer);
                     break;
                 case ECDsaCurve.P521:
-                    Constants.MulticodecP521SecretKeyHeader.CopyTo(buffer.AsSpan());
+                    Constants.MulticodecP521SecretKeyHeader.CopyTo(buffer);
                     break;
                 default:
                     throw new Exception("Unsupported curve.");
             }
         }
 
-        internal static void SetPublicKeyHeader(string? algorithm, byte[] buffer)
+        internal static void SetPublicKeyHeader(string? algorithm, Span<byte> buffer)
         {
             switch (algorithm)
             {
                 case ECDsaCurve.P256:
-                    Constants.MulticodecP256PublicKeyHeader.CopyTo(buffer.AsSpan());
+                    Constants.MulticodecP256PublicKeyHeader.CopyTo(buffer);
                     break;
                 case ECDsaCurve.P384:
-                    Constants.MulticodecP384PublicKeyHeader.CopyTo(buffer.AsSpan());
+                    Constants.MulticodecP384PublicKeyHeader.CopyTo(buffer);
                     break;
                 case ECDsaCurve.P521:
-                    Constants.MulticodecP521PublicKeyHeader.CopyTo(buffer.AsSpan());
+                    Constants.MulticodecP521PublicKeyHeader.CopyTo(buffer);
                     break;
                 default:
                     throw new Exception("Unsupported curve.");

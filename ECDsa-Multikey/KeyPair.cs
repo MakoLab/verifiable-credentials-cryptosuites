@@ -31,10 +31,11 @@ namespace ECDsa_Multikey
             Algorithm = keyPair.Algorithm;
         }
 
-        public MultikeyVerificationMethod Export(bool includePublicKey = true, bool includeSecretKey = false, bool includeContext = true)
+        public MultikeyVerificationMethod Export(ExportKeyPairOptions exportOptions = ExportKeyPairOptions.IncludePublicKey | ExportKeyPairOptions.IncludeContext)
         {
-            return Serialize.ExportKeyPair(this, includePublicKey, includeSecretKey, includeContext);
+            return Serialize.ExportKeyPair(this, exportOptions);
         }
+
         public string GetPublicKeyMultibase()
         {
             if (PublicKey is null)
