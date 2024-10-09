@@ -20,4 +20,4 @@ app.RegisterHomeRoute();
 app.RegisterIssuerRoutes();
 app.RegisterVerifierRoutes();
 
-app.Run("https://localhost:40443");
+app.Run();
