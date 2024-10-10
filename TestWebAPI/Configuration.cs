@@ -9,8 +9,9 @@ namespace TestWebAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Logging.ClearProviders()
-                .AddZLoggerConsole()
-                .AddZLoggerFile($"logs/{DateTime.Now:yy-MM-dd}.log");
+                .AddConsole();
+                //.AddZLoggerConsole()
+                //.AddZLoggerFile($"logs/{DateTime.Now:yy-MM-dd}.log");
             return builder;
         }
     }
