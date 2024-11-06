@@ -29,12 +29,12 @@ namespace Cryptosuite.Core
             _ => throw new NotSupportedException($"Curve {curve} is not supported."),
         };
 
-        public static string ToAlgorithmName(this DerObjectIdentifier id) => id switch
+        public static string ToAlgorithmName(this DerObjectIdentifier derId) => derId switch
         {
-            { Id: var der } when der == BsiObjectIdentifiers.ecdsa_plain_SHA256.Id => P256,
-            { Id: var der } when der == BsiObjectIdentifiers.ecdsa_plain_SHA384.Id => P384,
-            { Id: var der } when der == BsiObjectIdentifiers.ecdsa_plain_SHA512.Id => P521,
-            _ => throw new NotSupportedException($"Curve {id.Id} is not supported."),
+            { Id: var id } when id == BsiObjectIdentifiers.ecdsa_plain_SHA256.Id => P256,
+            { Id: var id } when id == BsiObjectIdentifiers.ecdsa_plain_SHA384.Id => P384,
+            { Id: var id } when id == BsiObjectIdentifiers.ecdsa_plain_SHA512.Id => P521,
+            _ => throw new NotSupportedException($"Curve {derId.Id} is not supported."),
         };
 
         public static ECDsaCurveType ToECDsaCurveType(string curve) => curve switch
