@@ -91,5 +91,18 @@ namespace ECDsa_Multikey.Tests
             var verification = verifier.VerifySignature(message, signature[0], signature[1]);
             Assert.True(verification);
         }
+
+        [Fact]
+        public void GenerateNewKeyPair()
+        {
+            var keypair = MultikeyService.Generate(null, null, Cryptosuite.Core.ECDsaCurveType.P256);
+            Assert.NotNull(keypair);
+            Assert.NotNull(keypair.KeyPair);
+            var vm = keypair.KeyPair.Export(ExportKeyPairOptions.IncludePublicKey | ExportKeyPairOptions.IncludeSecretKey | ExportKeyPairOptions.IncludeContext);
+            Assert.NotNull(vm);
+            Assert.NotNull(vm.Context);
+            Assert.NotNull(vm.PublicKeyMultibase);
+            Assert.NotNull(vm.SecretKeyMultibase);
+        }
     }
 }

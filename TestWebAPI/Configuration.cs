@@ -8,10 +8,12 @@ namespace TestWebAPI
         {
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
+            builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
             builder.Logging.ClearProviders()
                 .AddConsole();
-                //.AddZLoggerConsole()
-                //.AddZLoggerFile($"logs/{DateTime.Now:yy-MM-dd}.log");
+            //.AddZLoggerConsole()
+            //.AddZLoggerFile($"logs/{DateTime.Now:yy-MM-dd}.log");
+            builder.Services.AddSingleton<MockDataProvider>();
             return builder;
         }
     }

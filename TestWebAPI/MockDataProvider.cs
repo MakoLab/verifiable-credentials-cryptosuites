@@ -5,14 +5,24 @@ using Newtonsoft.Json.Linq;
 
 namespace TestWebAPI
 {
-    public class MockData
+    public class MockDataProvider
     {
-        public static string ControllerId { get; set; } = "https://db.makolab.pro/issuers";
-        public static string PublicKeyMultibase { get; set; } = "zDnaekGZTbQBerwcehBSXLqAg6s55hVEBms1zFy89VHXtJSa1";
-        public static string SecretKeyMultibase { get; set; } = "z42tqZ5smVag3DtDhjY9YfVwTMyVHW6SCHJi2ZMrD23DGYS3";
-        public static string VerificationMethodId { get; set; } = $"{ControllerId}/{PublicKeyMultibase}";
+        private readonly IConfiguration _config;
 
-        public static string GetControllerDocument()
+        public MockDataProvider(IConfiguration config)
+        {
+            _config = config;
+            var baseUrl = _config["BaseUrl"] ?? throw new ArgumentNullException("BaseUrl is not set in appsettings.json");
+            ControllerId = $"{baseUrl}/issuers/{PublicKeyMultibase}";
+            VerificationMethodId = $"{ControllerId}/{PublicKeyMultibase}";
+        }
+
+        public string ControllerId { get; private set; }
+        public string VerificationMethodId { get; private set; }
+        public string PublicKeyMultibase { get; set; } = "zDnaeipTBN8tgRmkjZWaQSBFj4Ub3ywWP6vAsgGET922nkvZz";
+        public string SecretKeyMultibase { get; set; } = "z42tnbVkUeRLg26SD6j5oAG4XHNgQpVeJbA7p4zfhH75JyxC";
+
+        public string GetControllerDocument()
         {
             var cd = new ControllerDocument(ControllerId)
             {
@@ -30,7 +40,7 @@ namespace TestWebAPI
             return JObject.FromObject(cd).ToString();
         }
 
-        public static string GetVerificationMethodDocument(string id)
+        public string GetVerificationMethodDocument(string id)
         {
             if (id != PublicKeyMultibase)
             {

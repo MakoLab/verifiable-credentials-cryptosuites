@@ -36,21 +36,21 @@ namespace TestWebAPI.Routes
 
     public class IssuerHandlers
     {
-        public IResult GetIssuers(ILogger<IssuerHandlers> logger)
+        public IResult GetIssuers(ILogger<IssuerHandlers> logger, MockDataProvider mdp)
         {
             logger.LogDebug("Issuer request: GET Controller Document");
-            logger.LogDebug("Issuer response: {Controller Document}", MockData.GetControllerDocument());
-            return Results.Content(MockData.GetControllerDocument(), contentType: "application/json", statusCode: 200);
+            logger.LogDebug("Issuer response: {Controller Document}", mdp.GetControllerDocument());
+            return Results.Content(mdp.GetControllerDocument(), contentType: "application/json", statusCode: 200);
         }
 
-        public IResult GetVerificationMethod(string id, ILogger<IssuerHandlers> logger)
+        public IResult GetVerificationMethod(string id, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
         {
             logger.LogDebug("Issuer request: GET Verification Method");
-            logger.LogDebug("Issuer response: {Verification Method Document}", MockData.GetVerificationMethodDocument(id));
-            return Results.Content(MockData.GetVerificationMethodDocument(id), contentType: "application/json", statusCode: 200);
+            logger.LogDebug("Issuer response: {Verification Method Document}", mdp.GetVerificationMethodDocument(id));
+            return Results.Content(mdp.GetVerificationMethodDocument(id), contentType: "application/json", statusCode: 200);
         }
 
-        public IResult IssueCredential([FromBody] object json, ILogger<IssuerHandlers> logger)
+        public IResult IssueCredential([FromBody] object json, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
         {
             var jsonStr = JsonSerializer.Serialize(json);
             logger.LogDebug("Issuer request:\n===============");
@@ -63,10 +63,10 @@ namespace TestWebAPI.Routes
             var document = (jsonObj["credential"] as JObject)!;
             var keypair = MultikeyService.From(new MultikeyVerificationMethod()
             {
-                Id = MockData.VerificationMethodId,
-                Controller = MockData.ControllerId,
-                PublicKeyMultibase = MockData.PublicKeyMultibase,
-                SecretKeyMultibase = MockData.SecretKeyMultibase,
+                Id = mdp.VerificationMethodId,
+                Controller = mdp.ControllerId,
+                PublicKeyMultibase = mdp.PublicKeyMultibase,
+                SecretKeyMultibase = mdp.SecretKeyMultibase,
             });
             var date = DateTime.Parse("2023-03-01T21:29:24Z");
             var crypto = new ECDsa2019Cryptosuite();
@@ -75,7 +75,7 @@ namespace TestWebAPI.Routes
             var loader = new SecurityDocumentLoader.SecurityDocumentLoader();
             try
             {
-                var signed = jsonLd.Sign(document, suite, new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = MockData.VerificationMethodId }, date), loader);
+                var signed = jsonLd.Sign(document, suite, new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = mdp.VerificationMethodId }, date), loader);
                 jsonStr = signed.ToString();
                 logger.LogDebug("Issuer response:\n================");
                 logger.LogDebug("{Response}", jsonStr);
@@ -88,7 +88,7 @@ namespace TestWebAPI.Routes
             }
         }
 
-        public IResult IssueSdCredential([FromBody] object json, ILogger<IssuerHandlers> logger)
+        public IResult IssueSdCredential([FromBody] object json, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
         {
             var jsonStr = JsonSerializer.Serialize(json);
             logger.LogDebug("Sd Issuer request:\n==================");
@@ -101,10 +101,10 @@ namespace TestWebAPI.Routes
             var document = (jsonObj["credential"] as JObject)!;
             var keypair = MultikeyService.From(new MultikeyVerificationMethod()
             {
-                Id = MockData.VerificationMethodId,
-                Controller = MockData.ControllerId,
-                PublicKeyMultibase = MockData.PublicKeyMultibase,
-                SecretKeyMultibase = MockData.SecretKeyMultibase,
+                Id = mdp.VerificationMethodId,
+                Controller = mdp.ControllerId,
+                PublicKeyMultibase = mdp.PublicKeyMultibase,
+                SecretKeyMultibase = mdp.SecretKeyMultibase,
             });
             var date = DateTime.Parse("2023-03-01T21:29:24Z");
             var crypto = new ECDsaSd2023CreateProofCryptosuite();
@@ -113,7 +113,7 @@ namespace TestWebAPI.Routes
             var loader = new SecurityDocumentLoader.SecurityDocumentLoader();
             try
             {
-                var signed = jsonLd.Sign(document, suite, new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = MockData.VerificationMethodId }, date), loader);
+                var signed = jsonLd.Sign(document, suite, new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = mdp.VerificationMethodId }, date), loader);
                 logger.LogDebug("Sd Issuer response:\n===================");
                 logger.LogDebug("{Response}", jsonStr);
                 jsonStr = signed.ToString();

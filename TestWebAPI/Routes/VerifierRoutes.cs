@@ -23,7 +23,7 @@ namespace TestWebAPI.Routes
 
     public class VerifierHandlers
     {
-        public IResult VerifyCredential([FromBody] object json, ILogger<VerifierHandlers> logger)
+        public IResult VerifyCredential([FromBody] object json, ILogger<VerifierHandlers> logger, MockDataProvider mdp)
         {
             var jsonStr = JsonSerializer.Serialize(json);
             logger.LogDebug("Verifier Request:\n=================");
@@ -34,10 +34,10 @@ namespace TestWebAPI.Routes
             }
             var keypair = MultikeyService.From(new MultikeyVerificationMethod
             {   
-                Id = MockData.VerificationMethodId,
-                Controller = MockData.ControllerId,
-                PublicKeyMultibase = MockData.PublicKeyMultibase,
-                SecretKeyMultibase = MockData.SecretKeyMultibase,
+                Id = mdp.VerificationMethodId,
+                Controller = mdp.ControllerId,
+                PublicKeyMultibase = mdp.PublicKeyMultibase,
+                SecretKeyMultibase = mdp.SecretKeyMultibase,
             });
             var crypto = new ECDsa2019Cryptosuite();
             var suite = new DataIntegrityProof(crypto, keypair.Signer);

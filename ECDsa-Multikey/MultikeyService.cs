@@ -13,7 +13,7 @@ namespace ECDsa_Multikey
         public static KeyPairInterface Generate(string? id, string? controller, ECDsaCurveType curveType)
         {
             // generate bouncy castle ecdsa key pair
-            var curve = ECNamedCurveTable.GetByName(curveType.ToString());
+            var curve = ECNamedCurveTable.GetByName(ECDsaCurve.ToString(curveType));
             var domainParams = new ECDomainParameters(curve.Curve, curve.G, curve.N, curve.H, curve.GetSeed());
             var keyParams = new ECKeyGenerationParameters(domainParams, new SecureRandom());
             var generator = new ECKeyPairGenerator("ECDSA");
@@ -31,6 +31,11 @@ namespace ECDsa_Multikey
             var publicKeyMultibase = kpi.KeyPair.GetPublicKeyMultibase();
             if (controller is not null && id is null)
             {
+                id = $"{controller}#{publicKeyMultibase}";
+            }
+            if (controller is null)
+            {
+                controller = $"did:key:{publicKeyMultibase}";
                 id = $"{controller}#{publicKeyMultibase}";
             }
             kpi.KeyPair.Id = id;
