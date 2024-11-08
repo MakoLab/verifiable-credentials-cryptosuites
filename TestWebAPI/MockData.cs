@@ -7,8 +7,8 @@ namespace TestWebAPI
 {
     public class MockData
     {
-        public static string ControllerId { get; set; } = "https://localhost:40443/issuers";
-        public static string PublicKeyMultibase { get; set; } = "zDnaekGZTbQBerwcehBSXLqAg6s55hVEBms1zFy89VHXtJSa9";
+        public static string ControllerId { get; set; } = "https://db.makolab.pro/issuers";
+        public static string PublicKeyMultibase { get; set; } = "zDnaekGZTbQBerwcehBSXLqAg6s55hVEBms1zFy89VHXtJSa1";
         public static string SecretKeyMultibase { get; set; } = "z42tqZ5smVag3DtDhjY9YfVwTMyVHW6SCHJi2ZMrD23DGYS3";
         public static string VerificationMethodId { get; set; } = $"{ControllerId}/{PublicKeyMultibase}";
 
