@@ -20,7 +20,11 @@ namespace TestWebAPI.Routes
                 .WithName("Issuers")
                 .WithOpenApi();
 
-            erb.MapGet("/issuers/{id}", handler.GetVerificationMethod)
+            erb.MapGet("/issuers/{id}", handler.GetController)
+                .WithName("Controller")
+                .WithOpenApi();
+
+            erb.MapGet("/issuers/{cId}/{vId}", handler.GetVerificationMethod)
                 .WithName("VerificationMethod")
                 .WithOpenApi();
 
@@ -43,11 +47,18 @@ namespace TestWebAPI.Routes
             return Results.Content(mdp.GetControllerDocument(), contentType: "application/json", statusCode: 200);
         }
 
-        public IResult GetVerificationMethod(string id, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
+        public IResult GetController(string id, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
+        {
+            logger.LogDebug("Issuer request: GET Controller Document");
+            logger.LogDebug("Issuer response: {Controller Document}", mdp.GetControllerDocument());
+            return Results.Content(mdp.GetControllerDocument(), contentType: "application/json", statusCode: 200);
+        }
+
+        public IResult GetVerificationMethod(string cId, string vId, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
         {
             logger.LogDebug("Issuer request: GET Verification Method");
-            logger.LogDebug("Issuer response: {Verification Method Document}", mdp.GetVerificationMethodDocument(id));
-            return Results.Content(mdp.GetVerificationMethodDocument(id), contentType: "application/json", statusCode: 200);
+            logger.LogDebug("Issuer response: {Verification Method Document}", mdp.GetVerificationMethodDocument(cId));
+            return Results.Content(mdp.GetVerificationMethodDocument(cId), contentType: "application/json", statusCode: 200);
         }
 
         public IResult IssueCredential([FromBody] object json, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
