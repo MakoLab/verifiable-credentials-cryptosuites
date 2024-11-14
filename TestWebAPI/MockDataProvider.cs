@@ -7,14 +7,10 @@ namespace TestWebAPI
 {
     public class MockDataProvider
     {
-        private readonly IConfiguration _config;
-
-        public MockDataProvider(IConfiguration config)
+        public MockDataProvider()
         {
-            _config = config;
-            var baseUrl = _config["BaseUrl"] ?? throw new ArgumentNullException("BaseUrl is not set in appsettings.json");
-            ControllerId = $"{baseUrl}/issuers/{PublicKeyMultibase}";
-            VerificationMethodId = $"{ControllerId}/{PublicKeyMultibase}";
+            ControllerId = $"did:key:{PublicKeyMultibase}";
+            VerificationMethodId = $"{ControllerId}#{PublicKeyMultibase}";
         }
 
         public string ControllerId { get; private set; }

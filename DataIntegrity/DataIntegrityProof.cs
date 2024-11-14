@@ -19,11 +19,11 @@ namespace DataIntegrity
     public class DataIntegrityProof : LinkedDataSignature
     {
         private const string ProofType = "DataIntegrityProof";
-        private const string DataIntegrityContext = "https://w3id.org/security/data-integrity/v2";
-        private const string VC20Context = "https://www.w3.org/ns/credentials/v2";
-        private const string MultiBaseBase58BtcHeader = "z";
-        private const string MultiBaseBase64UrlHeader = "u";
+        private const string DataIntegrityContext = Contexts.DataIntegrityV2Url;
+        private const string VC20Context = Contexts.CredentialsContextV2Url;
 
+        private readonly string MultiBaseBase58BtcHeader = Constants.MultibaseBase58Header.ToString();
+        private readonly string MultiBaseBase64UrlHeader = Constants.MultibaseBase64Header.ToString();
         private readonly ICryptosuite _cryptoSuite;
         private readonly Signer? _signer;
         private readonly DateTime? _date;
@@ -98,7 +98,9 @@ namespace DataIntegrity
             }
         }
 
-        public override Result<VerificationMethod> VerifyProof(Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
+        public override Result<VerificationMethod> VerifyProof(
+            Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet,
+            IDocumentLoader documentLoader)
         {
             Verifier verifier;
             if (_cryptoSuite is ICreateVerifier cv)
