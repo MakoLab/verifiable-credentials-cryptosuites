@@ -6,6 +6,9 @@ using VDS.RDF.JsonLd;
 
 namespace DataIntegrity
 {
+    /// <summary>
+    /// A document loader that supports loading documents from HTTP(S) URLs and DID URLs.
+    /// </summary>
     public class VCDIDocumentLoader : JsonLdDocumentLoader
     {
         public VCDIDocumentLoader()

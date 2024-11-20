@@ -10,6 +10,7 @@ using JsonLdSignatures.Purposes;
 using JsonLdSignatures.Suites;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using VDS.RDF.JsonLd;
@@ -218,7 +219,11 @@ namespace DataIntegrity
                 if (_cryptoSuite is ICanonize cs)
                 {
                     _hashDocument = document;
-                    var canon = cs.Canonize(JObject.FromObject(proof), new JsonLdNormalizerOptions { DocumentLoader = documentLoader.LoadDocument });
+                    Debug.WriteLine("Document:");
+                    Debug.WriteLine(document);
+                    var canon = cs.Canonize(document, new JsonLdNormalizerOptions { DocumentLoader = documentLoader.LoadDocument });
+                    Debug.WriteLine("Canonized document:");
+                    Debug.WriteLine(canon);
                     _hashCache = Sha256Digest(canon);
                     cachedDocHash = _hashCache;
                 }
@@ -227,7 +232,14 @@ namespace DataIntegrity
                     throw new InvalidOperationException($"The cryptosuite {_cryptoSuite.Name} does not support canonization.");
                 }
             }
-            var proofHash = Sha256Digest(CanonizeProof(proof, document, documentLoader));
+            var canonizedProof = CanonizeProof(proof, document, documentLoader);
+            var proofHash = Sha256Digest(canonizedProof);
+            Debug.WriteLine("Canonized proof:");
+            Debug.WriteLine(canonizedProof);
+            Debug.WriteLine("Document hash:");
+            Debug.WriteLine(Convert.ToHexString(cachedDocHash));
+            Debug.WriteLine("Proof hash:");
+            Debug.WriteLine(Convert.ToHexString(proofHash));
             return [.. cachedDocHash, .. proofHash];
         }
 
