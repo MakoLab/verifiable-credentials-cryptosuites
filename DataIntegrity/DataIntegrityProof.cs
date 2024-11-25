@@ -238,7 +238,7 @@ namespace DataIntegrity
             Debug.WriteLine($"Canonized proof:\n{canonizedProof}");
             Debug.WriteLine($"Document hash:\n{Convert.ToHexString(cachedDocHash).ToLower()}");
             Debug.WriteLine($"Proof hash:\n{Convert.ToHexString(proofHash).ToLower()}");
-            return [.. cachedDocHash, .. proofHash];
+            return [.. proofHash, .. cachedDocHash];
         }
 
         private static bool IncludesContext(JObject document, string context)
