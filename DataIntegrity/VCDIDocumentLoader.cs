@@ -11,8 +11,11 @@ namespace DataIntegrity
     /// </summary>
     public class VCDIDocumentLoader : JsonLdDocumentLoader
     {
-        public VCDIDocumentLoader()
+        private readonly IDidDocumentCreator _didDocumentCreator;
+
+        public VCDIDocumentLoader(IDidDocumentCreator didDocumentCreator)
         {
+            _didDocumentCreator = didDocumentCreator;
             AddStatic(Contexts.Ed25519Signature2020ContextUrl, Contexts.Ed25519Signature2020Context);
             AddStatic(Contexts.X25519KeyAgreement2020V1ContextUrl, Contexts.X25519KeyAgreement2020V1Context);
             AddStatic(Contexts.CredentialsContextV1Url, Contexts.CredentialsContextV1);
@@ -39,8 +42,7 @@ namespace DataIntegrity
             {
                 if (url.LocalPath.StartsWith("key:"))
                 {
-                    var documentCreator = new DidDocumentCreator();
-                    var controllerDocument = documentCreator.CreateControllerDocument(url);
+                    var controllerDocument = _didDocumentCreator.CreateControllerDocument(url);
                     return new RemoteDocument()
                     {
                         ContextUrl = null,

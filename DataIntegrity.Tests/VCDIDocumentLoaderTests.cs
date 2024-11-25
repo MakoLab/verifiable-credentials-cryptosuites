@@ -13,7 +13,7 @@ namespace DataIntegrity.Tests
         public void LoadDocumentWithStaticHttpScheme()
         {
             // Arrange
-            var documentLoader = new VCDIDocumentLoader();
+            var documentLoader = new VCDIDocumentLoader(new DidDocumentCreator());
             var url = new Uri(Contexts.DataIntegrityV1Url);
 
             // Act
@@ -29,7 +29,7 @@ namespace DataIntegrity.Tests
         public void LoadDocumentWithDidKeyScheme()
         {
             // Arrange
-            var documentLoader = new VCDIDocumentLoader();
+            var documentLoader = new VCDIDocumentLoader(new DidDocumentCreator());
             var url = new Uri("did:key:zDnaepBuvsQ8cpsWrVKw8fbpGpvPeNSjVPTWoq6cRqaYzBKVP");
 
             // Act

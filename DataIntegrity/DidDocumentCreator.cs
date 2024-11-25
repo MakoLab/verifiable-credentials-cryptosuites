@@ -10,8 +10,15 @@ using System.Threading.Tasks;
 
 namespace DataIntegrity
 {
-    public class DidDocumentCreator
+    public class DidDocumentCreator : IDidDocumentCreator
     {
+        /// <summary>
+        /// Create a DID Document from a DID URI.
+        /// </summary>
+        /// <param name="uri">Document Uri</param>
+        /// <returns>Controller document or Verification method document.</returns>
+        /// <exception cref="ArgumentException"></exception>
+        /// <remarks>Supports "key" method only.</remarks>
         public BaseDocument CreateControllerDocument(Uri uri)
         {
             if (uri.Scheme != "did")

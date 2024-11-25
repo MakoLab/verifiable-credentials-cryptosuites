@@ -23,7 +23,7 @@ namespace TestWebAPI.Routes
 
     public class VerifierHandlers
     {
-        public IResult VerifyCredential([FromBody] object json, ILogger<VerifierHandlers> logger, MockDataProvider mdp)
+        public IResult VerifyCredential([FromBody] object json, ILogger<VerifierHandlers> logger, MockDataProvider mdp, IDidDocumentCreator didDocumentCreator)
         {
             var jsonStr = JsonSerializer.Serialize(json);
             logger.LogDebug("Verifier Request:\n=================");
@@ -42,7 +42,7 @@ namespace TestWebAPI.Routes
             var crypto = new ECDsa2019Cryptosuite();
             var suite = new DataIntegrityProof(crypto, keypair.Signer);
             var jss = new JsonLdSignatureService();
-            var loader = new VCDIDocumentLoader();
+            var loader = new SecurityDocumentLoader.SecurityDocumentLoader(didDocumentCreator);
             try
             {
                 var result = jss.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);

@@ -1,4 +1,5 @@
-﻿using ZLogger;
+﻿using DataIntegrity;
+using ZLogger;
 
 namespace TestWebAPI
 {
@@ -14,6 +15,7 @@ namespace TestWebAPI
             //.AddZLoggerConsole()
             //.AddZLoggerFile($"logs/{DateTime.Now:yy-MM-dd}.log");
             builder.Services.AddSingleton<MockDataProvider>();
+            builder.Services.AddSingleton<IDidDocumentCreator, DidDocumentCreator>();
             return builder;
         }
     }

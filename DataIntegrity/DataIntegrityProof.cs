@@ -72,6 +72,7 @@ namespace DataIntegrity
             {
                 verifyData = CreateVerifyData(document, proof, documentLoader);
             }
+            Debug.WriteLine($"Verify data: {Convert.ToHexString(verifyData).ToLower()}");
             if (_signer is null)
             {
                 throw new InvalidOperationException("The signer is not defined.");
@@ -165,7 +166,9 @@ namespace DataIntegrity
                 throw new InvalidOperationException("The signer is not defined.");
             }
             var signatureBytes = _signer.Sign(verifyData);
+            Debug.WriteLine($"Signature: {Convert.ToHexString(signatureBytes).ToLower()}");
             proof.ProofValue = $"{MultiBaseBase58BtcHeader}{SimpleBase.Base58.Bitcoin.Encode(signatureBytes)}";
+            Debug.WriteLine($"Proof value: {proof.ProofValue}");
             return proof;
         }
 
@@ -219,11 +222,9 @@ namespace DataIntegrity
                 if (_cryptoSuite is ICanonize cs)
                 {
                     _hashDocument = document;
-                    Debug.WriteLine("Document:");
-                    Debug.WriteLine(document);
+                    Debug.WriteLine($"Document:\n{document}");
                     var canon = cs.Canonize(document, new JsonLdNormalizerOptions { DocumentLoader = documentLoader.LoadDocument });
-                    Debug.WriteLine("Canonized document:");
-                    Debug.WriteLine(canon);
+                    Debug.WriteLine($"Canonized document:\n{canon}");
                     _hashCache = Sha256Digest(canon);
                     cachedDocHash = _hashCache;
                 }
@@ -234,12 +235,9 @@ namespace DataIntegrity
             }
             var canonizedProof = CanonizeProof(proof, document, documentLoader);
             var proofHash = Sha256Digest(canonizedProof);
-            Debug.WriteLine("Canonized proof:");
-            Debug.WriteLine(canonizedProof);
-            Debug.WriteLine("Document hash:");
-            Debug.WriteLine(Convert.ToHexString(cachedDocHash));
-            Debug.WriteLine("Proof hash:");
-            Debug.WriteLine(Convert.ToHexString(proofHash));
+            Debug.WriteLine($"Canonized proof:\n{canonizedProof}");
+            Debug.WriteLine($"Document hash:\n{Convert.ToHexString(cachedDocHash).ToLower()}");
+            Debug.WriteLine($"Proof hash:\n{Convert.ToHexString(proofHash).ToLower()}");
             return [.. cachedDocHash, .. proofHash];
         }
 

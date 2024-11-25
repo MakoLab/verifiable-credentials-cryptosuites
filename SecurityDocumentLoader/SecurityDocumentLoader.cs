@@ -5,7 +5,7 @@ namespace SecurityDocumentLoader
 {
     public class SecurityDocumentLoader : VCDIDocumentLoader
     {
-        public SecurityDocumentLoader()
+        public SecurityDocumentLoader(IDidDocumentCreator didDocumentCreator) : base(didDocumentCreator)
         {
         }
 

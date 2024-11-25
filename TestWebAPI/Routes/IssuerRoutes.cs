@@ -14,25 +14,25 @@ namespace TestWebAPI.Routes
     {
         public static void RegisterIssuerRoutes(this IEndpointRouteBuilder erb)
         {
-            var handler = new IssuerHandlers();
+            var handlers = new IssuerHandlers();
 
-            erb.MapGet("/issuers", handler.GetIssuers)
+            erb.MapGet("/issuers", handlers.GetIssuers)
                 .WithName("Issuers")
                 .WithOpenApi();
 
-            erb.MapGet("/issuers/{id}", handler.GetController)
+            erb.MapGet("/issuers/{id}", handlers.GetController)
                 .WithName("Controller")
                 .WithOpenApi();
 
-            erb.MapGet("/issuers/{cId}/{vId}", handler.GetVerificationMethod)
+            erb.MapGet("/issuers/{cId}/{vId}", handlers.GetVerificationMethod)
                 .WithName("VerificationMethod")
                 .WithOpenApi();
 
-            erb.MapPost("/issuers/credentials/issue", handler.IssueCredential)
+            erb.MapPost("/issuers/credentials/issue", handlers.IssueCredential)
                 .WithName("Issuer")
                 .WithOpenApi();
 
-            erb.MapPost("/issuers/sd/credentials/issue", handler.IssueSdCredential)
+            erb.MapPost("/issuers/sd/credentials/issue", handlers.IssueSdCredential)
                 .WithName("IssuerSd")
                 .WithOpenApi();
         }
@@ -61,7 +61,7 @@ namespace TestWebAPI.Routes
             return Results.Content(mdp.GetVerificationMethodDocument(cId), contentType: "application/json", statusCode: 200);
         }
 
-        public IResult IssueCredential([FromBody] object json, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
+        public IResult IssueCredential([FromBody] object json, ILogger<IssuerHandlers> logger, MockDataProvider mdp, IDidDocumentCreator didDocumentCreator)
         {
             var jsonStr = JsonSerializer.Serialize(json);
             logger.LogDebug("Issuer request:\n===============");
@@ -83,7 +83,7 @@ namespace TestWebAPI.Routes
             var crypto = new ECDsa2019Cryptosuite();
             var suite = new DataIntegrityProof(crypto, keypair.Signer, date);
             var jsonLd = new JsonLdSignatureService();
-            var loader = new SecurityDocumentLoader.SecurityDocumentLoader();
+            var loader = new SecurityDocumentLoader.SecurityDocumentLoader(didDocumentCreator);
             try
             {
                 var signed = jsonLd.Sign(document, suite, new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = mdp.VerificationMethodId }, date), loader);
@@ -99,7 +99,7 @@ namespace TestWebAPI.Routes
             }
         }
 
-        public IResult IssueSdCredential([FromBody] object json, ILogger<IssuerHandlers> logger, MockDataProvider mdp)
+        public IResult IssueSdCredential([FromBody] object json, ILogger<IssuerHandlers> logger, MockDataProvider mdp, IDidDocumentCreator didDocumentCreator)
         {
             var jsonStr = JsonSerializer.Serialize(json);
             logger.LogDebug("Sd Issuer request:\n==================");
@@ -121,7 +121,7 @@ namespace TestWebAPI.Routes
             var crypto = new ECDsaSd2023CreateProofCryptosuite();
             var suite = new DataIntegrityProof(crypto, keypair.Signer, date);
             var jsonLd = new JsonLdSignatureService();
-            var loader = new SecurityDocumentLoader.SecurityDocumentLoader();
+            var loader = new SecurityDocumentLoader.SecurityDocumentLoader(didDocumentCreator);
             try
             {
                 var signed = jsonLd.Sign(document, suite, new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = mdp.VerificationMethodId }, date), loader);
