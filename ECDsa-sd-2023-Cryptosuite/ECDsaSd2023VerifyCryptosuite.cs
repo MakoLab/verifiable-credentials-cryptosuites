@@ -13,6 +13,7 @@ namespace ECDsa_sd_2023_Cryptosuite
     {
         public string RequiredAlgorithm { get => "P-256"; }
         public string Name { get => "ecdsa-sd-2023"; }
+        public static string TypeName { get => "ecdsa-sd-2023-verify"; }
 
         public Verifier CreateVerifier(VerificationMethod verificationMethod)
         {

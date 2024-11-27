@@ -1,4 +1,5 @@
 ﻿using DataIntegrity;
+using JsonLdExtensions;
 using VDS.RDF.JsonLd;
 
 namespace SecurityDocumentLoader
@@ -19,7 +20,12 @@ namespace SecurityDocumentLoader
                     Document = document,
                 };
             }
-            throw new ArgumentException($"{nameof(SecurityDocumentLoader)} supports static documents only.");
+
+            if (((IDocumentLoader)this).GetUriType(url) == UriType.Did)
+            {
+                return base.LoadDocument(url, options);
+            }
+            throw new ArgumentException($"{nameof(SecurityDocumentLoader)} supports static http documents only.");
         }
     }
 }

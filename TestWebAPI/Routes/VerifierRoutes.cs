@@ -23,7 +23,7 @@ namespace TestWebAPI.Routes
 
     public class VerifierHandlers
     {
-        public IResult VerifyCredential([FromBody] object json, ILogger<VerifierHandlers> logger, MockDataProvider mdp, IDidDocumentCreator didDocumentCreator)
+        public IResult VerifyCredential([FromBody] object json, ILogger<VerifierHandlers> logger, MockDataProvider mdp, ICryptosuiteResolver resolver)
         {
             var jsonStr = JsonSerializer.Serialize(json);
             logger.LogDebug("Verifier Request:\n=================");
@@ -32,20 +32,47 @@ namespace TestWebAPI.Routes
             {
                 return Results.BadRequest("Invalid JSON");
             }
-            var keypair = MultikeyService.From(new MultikeyVerificationMethod
-            {   
-                Id = mdp.VerificationMethodId,
-                Controller = mdp.ControllerId,
-                PublicKeyMultibase = mdp.PublicKeyMultibase,
-                SecretKeyMultibase = mdp.SecretKeyMultibase,
-            });
-            var crypto = new ECDsa2019Cryptosuite();
-            var suite = new DataIntegrityProof(crypto, keypair.Signer);
-            var jss = new JsonLdSignatureService();
-            var loader = new SecurityDocumentLoader.SecurityDocumentLoader(didDocumentCreator);
+            var cryptosuiteName = GetCryptosuiteName(jsonObj);
+            if (cryptosuiteName is null)
+            {
+                return Results.BadRequest("Cryptosuite not found in request document.");
+            }
+            cryptosuiteName = $"{cryptosuiteName}-verify";
+            var cryptosuite = resolver.GetCryptosuite(cryptosuiteName);
+            if (cryptosuite is null)
+            {
+                return Results.BadRequest("Cryptosuite not recognized.");
+            }
+            var verificationMethodId = GetVerificationMethodId(jsonObj);
+            if (verificationMethodId is null)
+            {
+                return Results.BadRequest("Verification method not found in request document.");
+            }
+            Uri vmUri;
             try
             {
-                var result = jss.Verify(jsonObj, suite, new AssertionMethodPurpose(), loader);
+                vmUri = new Uri(verificationMethodId);
+            }
+            catch (Exception)
+            {
+                return Results.BadRequest("Verification method is not a valid URI.");
+            }
+            var documentLoader = new VCDIDocumentLoader();
+            if (documentLoader.LoadDocument(vmUri)?.Document is not JObject verificationMethodObject)
+            {
+                return Results.BadRequest("Unable to load Verification Method document.");
+            }
+            var mvm = verificationMethodObject.ToObject<MultikeyVerificationMethod>();
+            if (mvm is null)
+            {
+                return Results.BadRequest("Verification Method document is not a valid MultikeyVerificationMethod.");
+            }
+            var keypair = MultikeyService.From(mvm);
+            var suite = new DataIntegrityProof(cryptosuite, keypair.Signer);
+            var jss = new JsonLdSignatureService();
+            try
+            {
+                var result = jss.Verify(jsonObj, suite, new AssertionMethodPurpose(), documentLoader);
                 var response = JsonLdSignatureService.ToJsonResult(result).ToString();
                 logger.LogDebug("Verifier response:\n==================");
                 logger.LogDebug("{Response}", response);
@@ -60,6 +87,16 @@ namespace TestWebAPI.Routes
                 logger.LogError("{Response}", response);
                 return Results.BadRequest(response);
             }
+        }
+
+        private static string? GetCryptosuiteName(JObject jObject)
+        {
+            return jObject["proof"]?["cryptosuite"]?.ToString();
+        }
+
+        private static string? GetVerificationMethodId(JObject jObject)
+        {
+            return jObject["proof"]?["verificationMethod"]?.ToString();
         }
     }
 }

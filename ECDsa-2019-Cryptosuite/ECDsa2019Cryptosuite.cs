@@ -9,9 +9,9 @@ namespace ECDsa_2019_Cryptosuite
 {
     public class ECDsa2019Cryptosuite : ICryptosuite, ICanonize, ICreateVerifier
     {
-        public string RequiredAlgorithm { get { return "P-256"; } }
-
-        public string Name { get { return "ecdsa-rdfc-2019"; } }
+        public string RequiredAlgorithm { get => "P-256"; }
+        public string Name { get => "ecdsa-rdfc-2019"; }
+        public static string TypeName { get => "ecdsa-rdfc-2019"; }
 
         public Verifier CreateVerifier(VerificationMethod verificationMethod)
         {
