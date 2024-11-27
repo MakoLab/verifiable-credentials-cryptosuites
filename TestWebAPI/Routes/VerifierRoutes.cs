@@ -2,6 +2,7 @@
 using DataIntegrity;
 using ECDsa_2019_Cryptosuite;
 using ECDsa_Multikey;
+using JsonLdExtensions;
 using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
 using Microsoft.AspNetCore.Mvc;
@@ -24,21 +25,17 @@ namespace TestWebAPI.Routes
 
     public class VerifierHandlers
     {
-        public IResult VerifyCredential([FromBody] object json,
-                                        ILogger<VerifierHandlers> logger,
-                                        ICryptosuiteResolver resolver,
-                                        IDidDocumentCreator didDocumentCreator)
+        public IResult VerifyCredential([FromBody] object json, ILogger<VerifierHandlers> logger, ICryptosuiteResolver resolver, IDocumentLoader documentLoader)
         {
             var jsonStr = JsonSerializer.Serialize(json);
             logger.LogDebug("Verifier Request:\n=================");
             logger.LogDebug("{Request}", jsonStr);
             try
             {
-                var (document, cryptosuiteName, keypair) = ProcessVerificationRequest(didDocumentCreator, jsonStr);
+                var (document, cryptosuiteName, keypair) = ProcessVerificationRequest(documentLoader, jsonStr);
                 var cryptosuite = resolver.GetCryptosuite(cryptosuiteName) ?? throw new ArgumentException("Cryptosuite not found.");
                 var suite = new DataIntegrityProof(cryptosuite, keypair.Signer);
                 var jss = new JsonLdSignatureService();
-                var documentLoader = new VCDIDocumentLoader(didDocumentCreator);
                 var result = jss.Verify(document, suite, new AssertionMethodPurpose(), documentLoader);
                 var response = JsonLdSignatureService.ToJsonResult(result).ToString();
                 logger.LogDebug("Verifier response:\n==================");
@@ -56,7 +53,7 @@ namespace TestWebAPI.Routes
             }
         }
 
-        private static (JObject, string, KeyPairInterface) ProcessVerificationRequest(IDidDocumentCreator didDocumentCreator, string jsonStr)
+        private static (JObject, string, KeyPairInterface) ProcessVerificationRequest(IDocumentLoader documentLoader, string jsonStr)
         {
             if (JObject.Parse(jsonStr)["verifiableCredential"] is not JObject jsonObj)
             {
@@ -67,7 +64,6 @@ namespace TestWebAPI.Routes
             var verificationMethodId = GetVerificationMethodId(jsonObj) ?? throw new ArgumentException("Verification method not found in request document.");
             Uri vmUri;
             vmUri = new Uri(verificationMethodId);
-            var documentLoader = new VCDIDocumentLoader(didDocumentCreator);
             if (documentLoader.LoadDocument(vmUri)?.Document is not JObject verificationMethodObject)
             {
                 throw new ArgumentException("Unable to load Verification Method document.");

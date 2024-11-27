@@ -2,6 +2,8 @@
 using ECDsa_sd_2023_Cryptosuite;
 using DataIntegrity;
 using ZLogger;
+using JsonLdExtensions;
+using SecurityTestDocumentLoader;
 
 namespace TestWebAPI
 {
@@ -9,6 +11,8 @@ namespace TestWebAPI
     {
         public static WebApplicationBuilder ConfigureBuilder(this WebApplicationBuilder builder)
         {
+            // Add services to the container.
+            // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             builder.Configuration.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
@@ -26,6 +30,7 @@ namespace TestWebAPI
 
             });
             builder.Services.AddSingleton<IDidDocumentCreator, DidDocumentCreator>();
+            builder.Services.AddSingleton<IDocumentLoader, SecurityDocumentLoader>();
             return builder;
         }
     }

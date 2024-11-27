@@ -3,6 +3,7 @@ using ECDsa_Multikey;
 using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
 using Newtonsoft.Json.Linq;
+using SecurityTestDocumentLoader;
 
 namespace ECDsa_sd_2023_Cryptosuite.Tests
 {
@@ -35,7 +36,7 @@ namespace ECDsa_sd_2023_Cryptosuite.Tests
             var crypto = new ECDsaSd2023CreateProofCryptosuite();
             var suite = new DataIntegrityProof(crypto, keypair.Signer, date);
             var jsonLd = new JsonLdSignatureService();
-            var loader = new SecurityDocumentLoader.SecurityDocumentLoader(new DidDocumentCreator());
+            var loader = new SecurityDocumentLoader(new DidDocumentCreator());
             var purpose = new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = MockData.VerificationMethodId }, date);
             var signed = suite.CreateProof(document, purpose, [], loader);
             Assert.NotNull(signed);

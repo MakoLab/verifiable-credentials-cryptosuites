@@ -21,7 +21,7 @@
     <ProjectReference Include="..\ECDsa-Multikey\ECDsa-Multikey.csproj" />
     <ProjectReference Include="..\ECDsa-sd-2023-Cryptosuite\ECDsa-sd-2023-Cryptosuite.csproj" />
     <ProjectReference Include="..\JsonLdSignatures\JsonLdSignatures.csproj" />
-    <ProjectReference Include="..\SecurityDocumentLoader\SecurityDocumentLoader.csproj" />
+    <ProjectReference Include="..\SecurityDocumentLoader\SecurityTestDocumentLoader.csproj" />
   </ItemGroup>
 
   <ItemGroup>

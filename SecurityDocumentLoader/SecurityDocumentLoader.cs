@@ -2,7 +2,7 @@
 using JsonLdExtensions;
 using VDS.RDF.JsonLd;
 
-namespace SecurityDocumentLoader
+namespace SecurityTestDocumentLoader
 {
     public class SecurityDocumentLoader : VCDIDocumentLoader
     {

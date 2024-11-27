@@ -5,12 +5,13 @@ using JsonLdExtensions.Canonicalization;
 using JsonLdSignatures;
 using JsonLdSignatures.Purposes;
 using Newtonsoft.Json.Linq;
+using SecurityTestDocumentLoader;
 
 namespace ECDsa_2019_Cryptosuite.Tests
 {
     public class ECDsa2019CryptosuiteTests
     {
-        readonly JsonLdDocumentLoader documentLoader = new SecurityDocumentLoader.SecurityDocumentLoader(new DidDocumentCreator());
+        readonly JsonLdDocumentLoader documentLoader = new SecurityDocumentLoader(new DidDocumentCreator());
         readonly MockData mockData = new();
 
         [Fact]
