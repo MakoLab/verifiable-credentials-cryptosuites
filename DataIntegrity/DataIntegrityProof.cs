@@ -104,11 +104,6 @@ namespace DataIntegrity
             Proof proof, JObject document, ProofPurpose purpose, IEnumerable<Proof> proofSet,
             IDocumentLoader documentLoader)
         {
-            Verifier verifier;
-            if (_cryptoSuite is ICreateVerifier cv)
-            {
-                verifier = cv.CreateVerifier(GetVerificationMethod(proof, documentLoader));
-            }
             byte[] verifyData;
             if (_cryptoSuite is ICreateVerifyData csv)
             {
@@ -196,7 +191,7 @@ namespace DataIntegrity
             }
             else if (multibaseHeader == MultiBaseBase64UrlHeader)
             {
-                signature = Convert.FromBase64String(proofValue[1..]);
+                signature = BaseConvert.FromBase64UrlNoPadding(proofValue[1..]);
             }
             else
             {

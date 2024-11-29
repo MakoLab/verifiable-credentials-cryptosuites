@@ -6,7 +6,7 @@ using Newtonsoft.Json.Linq;
 
 namespace ECDsa_sd_2023_Cryptosuite
 {
-    public class ECDsaSd2023DisclosureCryptosuite : IDerive
+    public class ECDsaSd2023DisclosureCryptosuite : ICryptosuite, IDerive
     {
         public string RequiredAlgorithm { get => "P-256"; }
         public string Name { get => "ecdsa-sd-2023"; }

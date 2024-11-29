@@ -7,12 +7,14 @@ namespace TestWebAPI
     {
         public static IServiceCollection AddCryptosuiteResolver(this IServiceCollection services, Action<CryptosuiteResolver> configure)
         {
-            services.AddSingleton<ICryptosuiteResolver, CryptosuiteResolver>();
-            var serviceProvider = services.BuildServiceProvider();
-            var resolver = serviceProvider.GetRequiredService<ICryptosuiteResolver>() as CryptosuiteResolver
-                ?? throw new InvalidOperationException("CryptosuiteResolver not registered");
-            configure(resolver);
+            services.AddSingleton<ICryptosuiteResolver, CryptosuiteResolver>(sp =>
+            {
+                var resolver = new CryptosuiteResolver(sp.GetRequiredService<ILogger<CryptosuiteResolver>>());
+                configure(resolver);
+                return resolver;
+            });
             return services;
         }
     }
+
 }

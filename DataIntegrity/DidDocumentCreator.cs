@@ -39,7 +39,7 @@ namespace DataIntegrity
             var verificationPublicKey = keypair.KeyPair.Export(ExportKeyPairOptions.IncludePublicKey | ExportKeyPairOptions.IncludeContext);
             var didDocument = new ControllerDocument(did)
             {
-                Context = AddContexts(verificationPublicKey.Context, Contexts.DidContextV1),
+                Context = AddContexts(Contexts.DidContextV1Url, verificationPublicKey.Context),
                 VerificationMethod = [verificationPublicKey],
                 Authentication = [verificationPublicKey.Id!],
                 AssertionMethod = [verificationPublicKey.Id!],
@@ -52,8 +52,10 @@ namespace DataIntegrity
             return didDocument;
         }
 
-        private static JToken AddContexts(JToken? context, JToken added)
+        private static JToken? AddContexts(JToken? context, JToken? added)
         {
+            if (added is null)
+                return context;
             if (context is null)
                 return added;
             if (context is JArray array)

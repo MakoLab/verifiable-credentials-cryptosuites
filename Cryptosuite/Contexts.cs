@@ -15,6 +15,7 @@ namespace Cryptosuite.Core
         public const string SecurityContextV1Url = "https://w3id.org/security/v1";
         public const string SecurityContextV2Url = "https://w3id.org/security/v2";
         public const string SecurityContextUrl = "https://w3id.org/security/v2";
+        public const string MultikeyContextV1Url = "https://w3id.org/security/multikey/v1";
 
         const string Ed25519Signature2020ContextString = """
             {
@@ -1217,6 +1218,43 @@ namespace Cryptosuite.Core
               ]
             }
             """;
+        const string MultikeyContextV1String = """
+            {
+                "@context": {
+                    "id": "@id",
+                    "type": "@type",
+                    "@protected": true,
+                    "Multikey": {
+                        "@id": "https://w3id.org/security#Multikey",
+                        "@context": {
+                            "@protected": true,
+                            "id": "@id",
+                            "type": "@type",
+                            "controller": {
+                                "@id": "https://w3id.org/security#controller",
+                                "@type": "@id"
+                            },
+                            "revoked": {
+                                "@id": "https://w3id.org/security#revoked",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            },
+                            "expires": {
+                                "@id": "https://w3id.org/security#expiration",
+                                "@type": "http://www.w3.org/2001/XMLSchema#dateTime"
+                            },
+                            "publicKeyMultibase": {
+                                "@id": "https://w3id.org/security#publicKeyMultibase",
+                                "@type": "https://w3id.org/security#multibase"
+                            },
+                            "secretKeyMultibase": {
+                                "@id": "https://w3id.org/security#secretKeyMultibase",
+                                "@type": "https://w3id.org/security#multibase"
+                            }
+                        }
+                    }
+                }
+            }
+            """;
 
         private static JToken? _veresOneContextV1;
         private static JToken? _ed25519Signature2020Context;
@@ -1228,6 +1266,7 @@ namespace Cryptosuite.Core
         private static JToken? _dataIntegrityV2;
         private static JToken? _securityContextV1;
         private static JToken? _securityContextV2;
+        private static JToken? _multikeyContextV1;
 
         public static JToken VeresOneContextV1
         {
@@ -1316,6 +1355,15 @@ namespace Cryptosuite.Core
             {
                 _securityContextV2 ??= JToken.Parse(SecurityContextV2String);
                 return _securityContextV2;
+            }
+        }
+
+        public static JToken MultikeyContextV1
+        {
+            get
+            {
+                _multikeyContextV1 ??= JToken.Parse(MultikeyContextV1String);
+                return _multikeyContextV1;
             }
         }
     }

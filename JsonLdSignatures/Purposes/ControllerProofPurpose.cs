@@ -68,7 +68,7 @@ namespace JsonLdSignatures.Purposes
                     document = JsonLdProcessor.Frame(
                         document,
                         framingDocument,
-                        new JsonLdProcessorOptions { CompactToRelative = false, DocumentLoader = documentLoader.LoadDocument });
+                        new JsonLdProcessorOptions { CompactToRelative = false, RemoteContextLimit = -1, DocumentLoader = documentLoader.LoadDocument });
                 }
                 validationResult.Controller = document;
             }

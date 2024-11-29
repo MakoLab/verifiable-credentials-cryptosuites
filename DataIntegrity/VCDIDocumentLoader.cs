@@ -24,6 +24,7 @@ namespace DataIntegrity
             AddStatic(Contexts.VeresOneContextV1Url, Contexts.VeresOneContextV1);
             AddStatic(Contexts.DataIntegrityV1Url, Contexts.DataIntegrityV1);
             AddStatic(Contexts.DataIntegrityV2Url, Contexts.DataIntegrityV2);
+            AddStatic(Contexts.MultikeyContextV1Url, Contexts.MultikeyContextV1);
         }
 
         public override RemoteDocument LoadDocument(Uri url)

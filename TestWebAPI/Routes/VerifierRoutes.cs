@@ -34,7 +34,7 @@ namespace TestWebAPI.Routes
             {
                 var (document, cryptosuiteName, keypair) = ProcessVerificationRequest(documentLoader, jsonStr);
                 var cryptosuite = resolver.GetCryptosuite(cryptosuiteName) ?? throw new ArgumentException("Cryptosuite not found.");
-                var suite = new DataIntegrityProof(cryptosuite, keypair.Signer);
+                var suite = new DataIntegrityProof(cryptosuite, keypair.Signer); //TODO: Check if Signer can be null
                 var jss = new JsonLdSignatureService();
                 var result = jss.Verify(document, suite, new AssertionMethodPurpose(), documentLoader);
                 var response = JsonLdSignatureService.ToJsonResult(result).ToString();

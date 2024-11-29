@@ -64,7 +64,7 @@ namespace JsonLdSignatures
                 return new List<Result<VerificationResult>>() { Result.Fail("No matching proofs found in the given document.") };
             }
             doc.Remove("proof");
-            var results = Verify(document, suites, proofSet, purposes, loader);
+            var results = Verify(doc, suites, proofSet, purposes, loader);
             if (results.Count == 0)
             {
                 return new List<Result<VerificationResult>>() { Result.Fail("Did not verify any proofs; insufficient proofs matched the acceptable suite(s) and required purpose(s).") };

@@ -36,12 +36,12 @@ namespace ECDsa_sd_2023_Cryptosuite
             {
                 throw new Exception("Number of signatures does not match number of non-mandatory statements.");
             }
-            var controllerDocument = GetControllerDocument(proof.VerificationMethod, documentLoader);
-            var vm = GetVerificationMethod(proof.VerificationMethod, controllerDocument);
-            var publicKeyBytes = vd.PublicKey;
+            var scopedPublickey = MultikeyService.ToMultibaseString(vd.PublicKey);
+            var baseSignature = MultikeyService.ToMultibaseString(vd.BaseSignature);
+            var scopedVm = GetVerificationMethodDocument($"did:key:{scopedPublickey}#{scopedPublickey}", documentLoader);
             var toVerify = BaseProof.SerializeSignData(vd.ProofHash, vd.PublicKey, vd.MandatoryHash);
             var verified = true;
-            var verifier = CreateVerifier(vm);
+            var verifier = CreateVerifier(scopedVm);
             for (int i = 0; i < vd.Signatures.Count; i++)
             {
                 var signature = vd.Signatures[i];
@@ -55,27 +55,60 @@ namespace ECDsa_sd_2023_Cryptosuite
             }
             if (!verified)
             {
-                throw new Exception("Signature verification failed.");
+                throw new Exception("Non-mandatory properties verification failed.");
             }
+            proof.ProofValue = baseSignature;
             return toVerify;
         }
 
-        private ControllerDocument GetControllerDocument(string uri, IDocumentLoader documentLoader)
+        private VerificationMethod GetVerificationMethodDocument(string uri, IDocumentLoader documentLoader)
         {
-            var remoteDocument = documentLoader.LoadDocument(new Uri(uri));
-            var controllerDocument = remoteDocument.Document switch
+            var url = new Uri(uri);
+            var remoteDocument = documentLoader.LoadDocument(url);
+            var document = remoteDocument.Document switch
             {
-                JToken jToken => jToken.ToObject<ControllerDocument>(),
-                string str => JObject.Parse(str).ToObject<ControllerDocument>(),
+                JObject jObject => jObject,
+                string str => JObject.Parse(str),
                 _ => throw new Exception("Invalid remote document type.")
             };
-            return controllerDocument is not null ? controllerDocument : throw new Exception("Could not retrieve a controller document from url.");
+            var documentType = GetDocumentType(document) ?? throw new Exception("Invalid document type.");
+            if (documentType == typeof(MultikeyVerificationMethod))
+            {
+                return document.ToObject<MultikeyVerificationMethod>() ?? throw new Exception("Invalid MultikeyVerificationMethod document.");
+            }
+            if (documentType == typeof(ControllerDocument))
+            {
+                var cd = document.ToObject<ControllerDocument>() ?? throw new Exception("Invalid ControllerDocument document.");
+                var keyId = url.Fragment.Length > 0 ? url.Fragment[1..] : String.Empty;
+                if (keyId.Length > 0)
+                {
+                    return GetVerificationMethod(uri, cd);
+                }
+                else
+                {
+                    return cd.VerificationMethod?.FirstOrDefault() ?? throw new Exception("Verification method not found in controller document.");
+                }
+            }
+            throw new Exception("Invalid document type.");
+        }
+
+        private static Type? GetDocumentType(JObject document)
+        {
+            if (document["type"]?.ToString().ToLower() == "multikey")
+            {
+                return typeof(MultikeyVerificationMethod);
+            }
+            if (document["verificationMethod"] is not null)
+            {
+                return typeof(ControllerDocument);
+            }
+            return null;
         }
 
         private VerificationMethod GetVerificationMethod(string uri, ControllerDocument cd)
         {
             var vm = cd.VerificationMethod?.FirstOrDefault(vm => vm.Id == uri);
-            return vm is not null ? vm : throw new Exception("Could not retrieve a verification method from controller document.");
+            return vm is not null ? vm : throw new Exception("Verification method not found in controller document.");
         }
     }
 }
