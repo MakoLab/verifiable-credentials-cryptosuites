@@ -25,6 +25,7 @@ namespace JsonLdSignatures
         public JObject Sign(JObject document, LinkedDataSignature suite, ProofPurpose purpose, IDocumentLoader documentLoader, bool addSuiteContext = true)
         {
             suite.EnsureSuiteContext(document, addSuiteContext);
+            CheckCredentialStructure(document);
             return _proofSetService.Add(document, suite, purpose, documentLoader);
         }
 
@@ -104,6 +105,14 @@ namespace JsonLdSignatures
                 json.Add("error", res);
             }
             return json;
+        }
+
+        private void CheckCredentialStructure(JObject document)
+        {
+            if (document["credentialSubject"] is null)
+            {
+                throw new ArgumentException("'credentialSubject' property is required.");
+            }
         }
     }
 }

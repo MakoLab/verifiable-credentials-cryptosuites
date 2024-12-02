@@ -13,6 +13,7 @@ namespace JsonLdExtensions.Canonicalization
             options.ProduceGeneralizedRdf = false;
             var ts = new TripleStore();
             var parser = new JsonLdParser(options);
+            parser.Warning += HandleParserWarning;
             if (options.SkipExpansion)
             {
                 ts.LoadFromString(input.ToString(), parser);
@@ -23,6 +24,11 @@ namespace JsonLdExtensions.Canonicalization
                 ts.LoadFromString(expanded.ToString(), parser);
             }
             return ts.Canonicalize(options);
+        }
+
+        private static void HandleParserWarning(string message)
+        {
+            Console.WriteLine($"Warning: {message}");
         }
     }
 }
