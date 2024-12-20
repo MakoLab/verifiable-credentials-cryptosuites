@@ -119,15 +119,16 @@ namespace TestWebAPI.Routes
                 SecretKeyMultibase = mdp.SecretKeyMultibase,
             });
             var date = DateTime.Parse("2023-03-01T21:29:24Z");
-            var crypto = new ECDsaSd2023CreateProofCryptosuite();
+            var mandatoryPointers = GetMandatoryPointers(jsonObj);
+            var crypto = new ECDsaSd2023CreateProofCryptosuite(mandatoryPointers);
             var suite = new DataIntegrityProof(crypto, keypair.Signer, date);
             var jsonLd = new JsonLdSignatureService();
             try
             {
                 var signed = jsonLd.Sign(document, suite, new AssertionMethodPurpose(new Cryptosuite.Core.Controller { Id = mdp.VerificationMethodId }, date), documentLoader);
+                jsonStr = signed.ToString();
                 logger.LogDebug("Sd Issuer response:\n===================");
                 logger.LogDebug("{Response}", jsonStr);
-                jsonStr = signed.ToString();
                 return Results.Json(JsonDocument.Parse(jsonStr));
             }
             catch (Exception e)
@@ -135,6 +136,15 @@ namespace TestWebAPI.Routes
                 logger.LogError("Error:\n======\n{Error message}", e.Message);
                 return Results.BadRequest(e.Message);
             }
+        }
+
+        private static IList<string> GetMandatoryPointers(JObject jsonObj)
+        {
+            if (jsonObj["options"]?["mandatoryPointers"] is not JArray mandatoryPointers)
+            {
+                return [];
+            }
+            return [.. mandatoryPointers.Select(p => p.ToString())];
         }
     }
 }

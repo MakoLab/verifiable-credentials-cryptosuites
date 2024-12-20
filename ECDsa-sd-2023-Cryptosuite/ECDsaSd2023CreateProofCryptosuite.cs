@@ -6,6 +6,7 @@ using ECDsa_sd_2023_Functions;
 using JsonLdExtensions;
 using JsonLdExtensions.Canonicalization;
 using Newtonsoft.Json.Linq;
+using System.Diagnostics;
 using System.Text;
 
 namespace ECDsa_sd_2023_Cryptosuite
@@ -74,11 +75,20 @@ namespace ECDsa_sd_2023_Cryptosuite
                 Signatures = signatures,
                 BaseSignature = baseSignature
             };
+            Debug.WriteLine($"Public key: {Convert.ToHexString(publicKey)}");
+            Debug.WriteLine($"Base signature: {Convert.ToHexString(baseSignature)}");
+            Debug.WriteLine($"Signatures: {string.Join(", ", signatures.Select(s => Convert.ToHexString(s)))}");
+            Debug.WriteLine($"Mandatory: {string.Join(", ", mandatory)}");
+            Debug.WriteLine($"Non-mandatory: {string.Join(", ", nonMandatory)}");
+            Debug.WriteLine($"Proof hash: {Convert.ToHexString(proofHash)}");
+            Debug.WriteLine($"Mandatory hash: {Convert.ToHexString(mandatoryHash)}");
+            Debug.WriteLine($"To sign: {Convert.ToHexString(toSign)}");
+            Debug.WriteLine($"HMAC key: {Convert.ToHexString(hmacKey)}");
             return baseProof.Serialize();
         }
 
         public byte[] CreateVerifyData(JObject document, Proof proof, IEnumerable<Proof> proofSet, IDocumentLoader documentLoader)
-        {
+        { 
             return [];
         }
     }

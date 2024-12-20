@@ -58,7 +58,7 @@ namespace ECDsa_sd_2023_Functions
             var baseSignature = cbor[0].ToObject<byte[]>();
             var publicKey = cbor[1].ToObject<byte[]>();
             var signatures = cbor[2].ToObject<List<byte[]>>();
-            var compressedLabelMap = cbor[3].ToObject<Dictionary<string, byte[]>>();
+            var compressedLabelMap = cbor[3].ToObject<Dictionary<int, byte[]>>();
             var labelMap = LabelMapCompressor.DecompressLabelMap(compressedLabelMap);
             var mandatoryIndexes = cbor[4].ToObject<List<int>>();
             return new DisclosureData

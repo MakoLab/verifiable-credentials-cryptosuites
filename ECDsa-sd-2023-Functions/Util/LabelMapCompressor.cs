@@ -5,17 +5,23 @@ namespace ECDsa_sd_2023_Functions.Util
 {
     public static class LabelMapCompressor
     {
-        public static Dictionary<string, byte[]> CompressLabelMap(Dictionary<string, string> labelMap)
+        public static Dictionary<int, byte[]> CompressLabelMap(Dictionary<string, string> labelMap)
         {
-            var compressedLabelMap = new Dictionary<string, byte[]>();
+            var compressedLabelMap = new Dictionary<int, byte[]>();
             foreach (var (key, value) in labelMap)
             {
-                compressedLabelMap.Add(key.Replace("c14n", ""), BaseConvert.FromBase64UrlNoPadding(value[1..]));
+                var counter = key.Replace("c14n", "");
+                var success = int.TryParse(counter, out var index);
+                if (!success)
+                {
+                    throw new ArgumentException("Invalid label map key");
+                }
+                compressedLabelMap.Add(index, BaseConvert.FromBase64UrlNoPadding(value[1..]));
             }
             return compressedLabelMap;
         }
 
-        public static Dictionary<string, string> DecompressLabelMap(Dictionary<string, byte[]> compressedLabelMap)
+        public static Dictionary<string, string> DecompressLabelMap(Dictionary<int, byte[]> compressedLabelMap)
         {
             var labelMap = new Dictionary<string, string>();
             foreach (var (key, value) in compressedLabelMap)

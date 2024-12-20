@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
+  </ItemGroup>
+
+  <ItemGroup>
     <ProjectReference Include="..\Cryptosuite\Cryptosuite.Core.csproj" />
     <ProjectReference Include="..\DI-Sd-Primitives\DI-Sd-Primitives.csproj" />
     <ProjectReference Include="..\ECDsa-Multikey\ECDsa-Multikey.csproj" />

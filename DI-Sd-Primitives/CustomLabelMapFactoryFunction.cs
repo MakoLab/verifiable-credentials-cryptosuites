@@ -11,7 +11,12 @@ namespace DI_Sd_Primitives
             var bnodeIdMap = new Dictionary<string, string>();
             foreach (var entry in canonicalIdMap)
             {
-                if (_labelMap.TryGetValue(entry.Value, out string? value))
+                var internalId = entry.Value;
+                if (entry.Value.StartsWith("_:"))
+                {
+                    internalId = internalId[2..];
+                }
+                if (_labelMap.TryGetValue(internalId, out string? value))
                 {
                     bnodeIdMap.Add(entry.Key, value);
                 }

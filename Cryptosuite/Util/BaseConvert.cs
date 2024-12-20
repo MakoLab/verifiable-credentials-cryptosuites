@@ -4,18 +4,47 @@
     {
         public static string ToBase64UrlNoPadding(byte[] data)
         {
-            return Convert.ToBase64String(data).Replace('+', '-').Replace('/', '_').Remove('=');
+            string base64 = Convert.ToBase64String(data);
+            Span<char> buffer = stackalloc char[base64.Length];
+            int index = 0;
+
+            foreach (char c in base64)
+            {
+                buffer[index++] = c switch
+                {
+                    '+' => '-',
+                    '/' => '_',
+                    _ => c
+                };
+            }
+
+            // Trim padding characters ('=')
+            int end = index;
+            while (end > 0 && buffer[end - 1] == '=') end--;
+
+            return new string(buffer[..end]);
         }
 
         public static byte[] FromBase64UrlNoPadding(string data)
         {
-            data = data.Replace('-', '+').Replace('_', '/');
-            int padding = data.Length % 4;
-            if (padding > 0)
+            int padding = (4 - (data.Length % 4)) % 4;
+            Span<char> charSpan = stackalloc char[data.Length + padding];
+            for (int i = 0; i < data.Length; i++)
             {
-                data += new string('=', 4 - padding);
+                char c = data[i];
+                charSpan[i] = c switch
+                {
+                    '-' => '+',
+                    '_' => '/',
+                    _ => c
+                };
             }
-            return Convert.FromBase64String(data);
+            for (int i = data.Length; i < data.Length + padding; i++)
+            {
+                charSpan[i] = '=';
+            }
+
+            return Convert.FromBase64String(new string(charSpan));
         }
     }
 }
