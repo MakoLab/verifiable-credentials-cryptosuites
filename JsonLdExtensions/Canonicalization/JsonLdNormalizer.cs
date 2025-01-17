@@ -1,10 +1,8 @@
-﻿using JsonFlatten;
-using Newtonsoft.Json.Linq;
-using System.Diagnostics;
+﻿using Newtonsoft.Json.Linq;
+using JsonLdExtensions;
 using VDS.RDF;
 using VDS.RDF.JsonLd;
 using VDS.RDF.Parsing;
-using VDS.RDF.Writing;
 
 namespace JsonLdExtensions.Canonicalization
 {
@@ -14,34 +12,25 @@ namespace JsonLdExtensions.Canonicalization
         {
             options ??= new JsonLdNormalizerOptions();
             options.ProduceGeneralizedRdf = false;
+            options.SafeMode = true;
             var ts = new TripleStore();
             var parser = new JsonLdParser(options);
-            parser.Warning += HandleParserWarning;
-            var expanded = JsonLdProcessor.Expand(input, options);
+            var processorWarnings = new List<JsonLdProcessorWarning>();
+            var expanded = JsonLdProcessor.Expand(input, options, processorWarnings);
+            if (processorWarnings.Any())
+            {
+                ts.Dispose();
+                throw new DataLossException(String.Join("\n", processorWarnings.Select(w => w.Message)));
+            }
             if (options.SkipExpansion)
             {
-                ts.LoadFromString(input.ToString(), parser);
+                ts.SafeLoadFromString(input.ToString(), parser);
             }
             else
             {
-                ts.LoadFromString(expanded.ToString(), parser);
+                ts.SafeLoadFromString(expanded.ToString(), parser);
             }
-            //var writer = new JsonLdWriter(new JsonLdWriterOptions() { UseNativeTypes = true, ProcessingMode = VDS.RDF.JsonLd.Syntax.JsonLdProcessingMode.JsonLd11 });
-            //var loaded = writer.SerializeStore(ts);
-            //var iExp = JsonLdProcessor.Expand(input, options);
-            //var iTypes = (iExp[0]["@type"] as JArray)?.Count;
-            //var lTypes = (loaded[0]["@type"] as JArray)?.Count;
-            //if ((lTypes is not null) && (lTypes != iTypes))
-            //{
-            //    throw new DataLossException("Undefined type in input document.");
-            //}
             return ts.Canonicalize(options);
-        }
-
-        private static void HandleParserWarning(string message)
-        {
-            Console.WriteLine($"Warning: {message}");
-            Debug.WriteLine($"Warning: {message}");
         }
     }
 }

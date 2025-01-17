@@ -12,7 +12,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="dotNetRdf.Core" Version="3.3.0" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="System.Text.RegularExpressions" Version="4.3.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
@@ -33,6 +32,12 @@
     <ProjectReference Include="..\JsonLdExtensions\JsonLdExtensions.csproj" />
     <ProjectReference Include="..\JsonLdSignatures\JsonLdSignatures.csproj" />
     <ProjectReference Include="..\SecurityDocumentLoader\SecurityTestDocumentLoader.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="dotNetRdf">
+      <HintPath>..\..\dotnetrdf\Libraries\dotNetRdf.Core\bin\Release\netstandard2.0\dotNetRdf.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

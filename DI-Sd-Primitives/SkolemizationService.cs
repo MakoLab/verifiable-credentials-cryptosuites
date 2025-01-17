@@ -1,6 +1,7 @@
 ﻿using JsonLdExtensions.Canonicalization;
 using Newtonsoft.Json.Linq;
 using System.Text.RegularExpressions;
+using JsonLdExtensions;
 using VDS.RDF;
 using VDS.RDF.JsonLd;
 using VDS.RDF.Parsing;
@@ -109,21 +110,26 @@ namespace DI_Sd_Primitives
         public static (JArray skolemizedExpandedDocument, JObject skolemizedCompactDocument) SkolemizeCompactJsonLd(JToken compactJson, string urnScheme)
         {
             var context = compactJson["@context"];
-            var expandedJson = JsonLdProcessor.Expand(compactJson, new JsonLdProcessorOptions() { RemoteContextLimit = -1 });
+            var processorWarnings = new List<JsonLdProcessorWarning>();
+            var expandedJson = JsonLdProcessor.Expand(compactJson, new JsonLdProcessorOptions() { RemoteContextLimit = -1 }, processorWarnings);
+            if (processorWarnings.Any())
+            {
+                throw new DataLossException(String.Join("\n", processorWarnings.Select(w => w.Message)));
+            }
             var count = 0;
             var skolemizedExpandedDocument = SkolemizeExpandedJsonLd(expandedJson, urnScheme, Guid.NewGuid().ToString(), ref count);
             var skolemizedCompactDocument = JsonLdProcessor.Compact(skolemizedExpandedDocument, context, new JsonLdProcessorOptions());
             return (skolemizedExpandedDocument, skolemizedCompactDocument);
         }
 
-        public static IList<string> ToDeskolemizedNQuads(this JToken skolemizedDocument)
+        public static IList<string> ToDeskolemizedNQuads(this JToken skolemizedDocument, string customUrnScheme)
         {
             var triplestore = new TripleStore();
-            triplestore.LoadFromString(skolemizedDocument.ToString(), new JsonLdParser());
+            triplestore.SafeLoadFromString(skolemizedDocument.ToString(), new JsonLdParser());
             var nQuadsWriter = new NQuadsWriter();
             var data = VDS.RDF.Writing.StringWriter.Write(triplestore, nQuadsWriter);
             var nQuads = data.Split("\n").ToList();
-            var deskolemizedNQuads = Deskolemize(nQuads, "custom-scheme");
+            var deskolemizedNQuads = Deskolemize(nQuads, customUrnScheme);
             return deskolemizedNQuads;
         }
 
@@ -144,7 +150,7 @@ namespace DI_Sd_Primitives
         {
             return node switch
             {
-                IBlankNode blankNode => new UriNode(new Uri($"urn:{urnScheme}:{blankNode.InternalID}")),
+                IBlankNode blankNode => new UriNode(new Uri($"urn:{urnScheme}_{blankNode.InternalID}")),
                 _ => node
             };
         }
@@ -153,8 +159,8 @@ namespace DI_Sd_Primitives
         {
             return node switch
             {
-                IUriNode uriNode => uriNode.Uri.AbsoluteUri.StartsWith($"urn:{urnScheme}:")
-                                    ? new BlankNode(uriNode.Uri.AbsoluteUri[$"urn:{urnScheme}:".Length..])
+                IUriNode uriNode => uriNode.Uri.AbsoluteUri.StartsWith($"urn:{urnScheme}_")
+                                    ? new BlankNode(uriNode.Uri.AbsoluteUri[$"urn:{urnScheme}_".Length..])
                                     : uriNode,
                 _ => node
             };

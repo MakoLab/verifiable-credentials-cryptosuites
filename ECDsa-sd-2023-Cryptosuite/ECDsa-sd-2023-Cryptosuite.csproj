@@ -18,4 +18,10 @@
     <ProjectReference Include="..\ECDsa-sd-2023-Functions\ECDsa-sd-2023-Functions.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Reference Include="dotNetRdf">
+      <HintPath>..\..\dotnetrdf\Libraries\dotNetRdf.Core\bin\Release\netstandard2.0\dotNetRdf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
 </Project>

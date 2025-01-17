@@ -9,7 +9,6 @@
 
   <ItemGroup>
     <PackageReference Include="BouncyCastle.Cryptography" Version="2.4.0" />
-    <PackageReference Include="dotNetRdf.Core" Version="3.3.0" />
     <PackageReference Include="Microsoft.Json.Pointer" Version="2.3.0" />
     <PackageReference Include="OneOf" Version="3.0.271" />
     <PackageReference Include="PeterO.Cbor" Version="4.5.5" />
@@ -24,6 +23,12 @@
 
   <ItemGroup>
     <Folder Include="Util\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="dotNetRdf">
+      <HintPath>..\..\dotnetrdf\Libraries\dotNetRdf.Core\bin\Release\netstandard2.0\dotNetRdf.dll</HintPath>
+    </Reference>
   </ItemGroup>
 
 </Project>

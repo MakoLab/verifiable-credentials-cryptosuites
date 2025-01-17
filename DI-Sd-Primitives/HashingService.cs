@@ -16,9 +16,15 @@ namespace DI_Sd_Primitives
             _digest = new Sha256Digest();
         }
 
+        public HashingService(IDigest digest)
+        {
+            _digest = digest;
+        }
+
         public byte[] HashString(string input)
         {
-            var data = Encoding.UTF8.GetBytes(input);
+            _digest.Reset();
+             var data = Encoding.UTF8.GetBytes(input);
             _digest.BlockUpdate(data, 0, data.Length);
             var output = new byte[_digest.GetDigestSize()];
             _digest.DoFinal(output, 0);
@@ -27,6 +33,7 @@ namespace DI_Sd_Primitives
 
         public byte[] HashMandatoryNQuads(IList<string> nQuads)
         {
+            _digest.Reset();
             var input = Encoding.UTF8.GetBytes(String.Join("", nQuads));
             _digest.BlockUpdate(input, 0, input.Length);
             var output = new byte[_digest.GetDigestSize()];

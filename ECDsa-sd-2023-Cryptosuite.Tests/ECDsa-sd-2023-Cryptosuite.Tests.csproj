@@ -33,6 +33,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Reference Include="dotNetRdf">
+      <HintPath>..\..\dotnetrdf\Libraries\dotNetRdf.Core\bin\Release\netstandard2.0\dotNetRdf.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
     <Using Include="Xunit" />
   </ItemGroup>
 

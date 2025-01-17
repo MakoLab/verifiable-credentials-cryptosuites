@@ -50,6 +50,7 @@ namespace ECDsa_sd_2023_Cryptosuite
                 mandatory = [.. value.Matching.Values];
                 nonMandatory = [.. value.NonMatching.Values];
             }
+            proof.Context = document["@context"];
             var canon = Canonize(JObject.FromObject(proof), new JsonLdNormalizerOptions() { DocumentLoader = documentLoader.LoadDocument });
             var proofHash = hs.HashString(canon);
             var mandatoryHash = hs.HashMandatoryNQuads(mandatory);
@@ -75,15 +76,18 @@ namespace ECDsa_sd_2023_Cryptosuite
                 Signatures = signatures,
                 BaseSignature = baseSignature
             };
-            Debug.WriteLine($"Public key: {Convert.ToHexString(publicKey)}");
-            Debug.WriteLine($"Base signature: {Convert.ToHexString(baseSignature)}");
-            Debug.WriteLine($"Signatures: {string.Join(", ", signatures.Select(s => Convert.ToHexString(s)))}");
-            Debug.WriteLine($"Mandatory: {string.Join(", ", mandatory)}");
-            Debug.WriteLine($"Non-mandatory: {string.Join(", ", nonMandatory)}");
-            Debug.WriteLine($"Proof hash: {Convert.ToHexString(proofHash)}");
-            Debug.WriteLine($"Mandatory hash: {Convert.ToHexString(mandatoryHash)}");
-            Debug.WriteLine($"To sign: {Convert.ToHexString(toSign)}");
-            Debug.WriteLine($"HMAC key: {Convert.ToHexString(hmacKey)}");
+            #region Debug
+            Debug.WriteLine($"Public key:\n{Convert.ToHexString(publicKey)}");
+            Debug.WriteLine($"Base signature:\n{Convert.ToHexString(baseSignature)}");
+            Debug.WriteLine($"Signatures:\n{string.Join("\n", signatures.Select(s => Convert.ToHexString(s)))}");
+            Debug.WriteLine($"Mandatory:\n{string.Join("", mandatory)}");
+            Debug.WriteLine($"Non-mandatory:\n{string.Join("", nonMandatory)}");
+            Debug.WriteLine($"Canonicalized:\n{canon}");
+            Debug.WriteLine($"Proof hash:\n{Convert.ToHexString(proofHash)}");
+            Debug.WriteLine($"Mandatory hash:\n{Convert.ToHexString(mandatoryHash)}");
+            Debug.WriteLine($"To sign:\n{Convert.ToHexString(toSign)}");
+            Debug.WriteLine($"HMAC key:\n{Convert.ToHexString(hmacKey)}");
+            #endregion
             return baseProof.Serialize();
         }
 

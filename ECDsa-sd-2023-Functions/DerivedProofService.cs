@@ -1,5 +1,6 @@
 ﻿using Cryptosuite.Core;
 using DI_Sd_Primitives;
+using JsonLdExtensions;
 using JsonLdExtensions.Canonicalization;
 using Newtonsoft.Json.Linq;
 using Org.BouncyCastle.Crypto.Digests;

@@ -4,13 +4,14 @@ using Microsoft.Json.Pointer;
 using Newtonsoft.Json.Linq;
 using OneOf;
 using System.Text;
+using JsonLdExtensions;
 using VDS.RDF;
 
 namespace DI_Sd_Primitives
 {
     public static class JsonSelectionExtension
     {
-        public const string CustomUrnScheme = "ecdsa-sd-2023";
+        public const string CustomUrnScheme = "bnid";
 
         /// <summary>
         /// Converts a JSON Pointer to an array of paths into a JSON tree.
@@ -160,7 +161,7 @@ namespace DI_Sd_Primitives
             {
                 return null;
             }
-            var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(selectionDocument);
+            var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(selectionDocument, CustomUrnScheme);
             var relabeledNQuads = SkolemizationService.RelabelBlankNodes(deskolemizedNQuads, labelMap);
             return new SelectCanonicalNQuadsResult
             {
@@ -189,7 +190,7 @@ namespace DI_Sd_Primitives
         public static CanonicalizationAndGroupingResult CanonicalizeAndGroup(this JObject document, ILabelMapFactoryFunction labelMapFactoryFunction, IDictionary<string, IList<string>> groupDefinitions)
         {
             var (skolemizedExpandedDocument, skolemizedCompactDocument) = SkolemizationService.SkolemizeCompactJsonLd(document, CustomUrnScheme);
-            var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(skolemizedExpandedDocument);
+            var deskolemizedNQuads = SkolemizationService.ToDeskolemizedNQuads(skolemizedExpandedDocument, CustomUrnScheme);
             var deskolemizedTs = new TripleStore();
             deskolemizedTs.LoadFromString(string.Join("\n", deskolemizedNQuads));
             var canonicalizationService = new CanonicalizationService();
